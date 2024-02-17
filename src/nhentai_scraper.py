@@ -24,8 +24,9 @@ class Gallery:
         
         self.download_dir = download_dir
         if not download_dir:
-            cur_path = os.path.dirname(__file__)
-            self.download_dir = os.path.relpath('../Downloaded/', cur_path)
+            self.download_dir = os.path.relpath('../Downloaded/', os.getcwd())
+        
+        self.inputs_dir = os.path.relpath('../inputs/', os.getcwd())
         
         self.headers = headers
         if not self.headers:
@@ -38,9 +39,7 @@ class Gallery:
         
     def load_headers(self):
         
-        cur_path = os.path.dirname(__file__)
-        inputs_folder_path = os.path.relpath('../inputs/', cur_path)
-        headers_filename = f'{inputs_folder_path}/headers.json'
+        headers_filename = f'{self.inputs_dir}/headers.json'
         with open(headers_filename) as f:
             self.headers = json.load(f)
 
@@ -48,9 +47,7 @@ class Gallery:
     
     def load_cookies(self):
         
-        cur_path = os.path.dirname(__file__)
-        inputs_folder_path = os.path.relpath('../inputs/', cur_path)
-        cookies_filename = f'{inputs_folder_path}/cookies.json'
+        cookies_filename = f'{self.inputs_dir}/cookies.json'
         with open(cookies_filename) as f:
             self.cookies = json.load(f)
             
@@ -104,7 +101,8 @@ class Gallery:
                 break
                 
         if tries >= 3:
-            self.status = 'Tried more than 5 times when getting metadata'
+            self.status = 'Tried more than 5 times when getting metadata, '\
+                + 'try updating cf_clearance'
             return 
             
         self.metadata = api_response.json()
@@ -132,14 +130,16 @@ class Gallery:
     def make_dir(self):
         
         # replace '/' with '_' for folder directory
-        self.folder_dir = os.path.join(self.download_dir,self.title.replace('/', '_'))
+        self.folder_dir = os.path.join(self.download_dir, 
+                                       self.title.replace('/', '_'))
             
         # check whether there exists a downloaded gallery with the same name
         if os.path.isdir(self.folder_dir):
             # check whether the gallery was downloaded with a different source
             self.load_downloaded_metadata()
             if int(self.downloaded_metadata['id']) != int(self.id):
-                self.status = f"Same gallery with different id {self.downloaded_metadata['id']} already exists"
+                self.status = "Same gallery with different id "\
+                    +f"{self.downloaded_metadata['id']} already exists"
                 
                 return
             
@@ -212,7 +212,9 @@ class Gallery:
         thumb_width, thumb_height = thumb.size
         thumb_size = max(thumb_width, thumb_height)
         thumb_square=Image.new('RGBA', (thumb_size, thumb_size), (0,0,0,0))
-        thumb_square.paste(thumb ,(int((thumb_size-thumb_width)/2),int((thumb_size-thumb_height)/2)))
+        thumb_square.paste(thumb ,
+                           (int((thumb_size-thumb_width)/2),
+                            int((thumb_size-thumb_height)/2)))
         thumb_rgb = thumb_square.convert('RGB')
         thumb_rgb.save(self.thumb_filename)
         
@@ -253,11 +255,12 @@ class Gallery:
             
             return
         
-        # download all missing pages, and try for up to 3 times for failed pages
+        # download all missing pages, and retry up to 3 times for failed pages
         tries = 0
         while len(self.missing_pages) != 0:
             if tries != 0:
-                print(f'\n\nRetrying failed downloads for the {tries}(th) time...\n')
+                print('\n\nRetrying failed downloads '
+                      + f'for the {tries}(th) time...\n')
                 
             self.download_missing_pages()
             self.load_missing_pages()
@@ -273,7 +276,6 @@ class Gallery:
                 
                 return
 
-        self.status = f'Finished downloading {self.title}'
             
     def download_missing_pages(self):
         
@@ -282,7 +284,7 @@ class Gallery:
             
     def load_missing_pages(self):
         
-        # check against self.num_pages to check whether all page numbers are downloaded 
+        # check whether all page numbers are downloaded against self.num_pages
         self.missing_pages = []
         file_list = os.listdir(self.folder_dir)
         for page in range(int(self.num_pages)):
@@ -300,7 +302,8 @@ class Gallery:
         # check whether there are more pages downloaded than self.num_pages
         # which should not happen
         extra_pages = []
-        for file_count in [file.split('.')[0] for file in os.listdir(self.folder_dir)]:
+        for file_count in [file.split('.')[0] 
+                           for file in os.listdir(self.folder_dir)]:
             if file_count != 'Icon\r' and file_count != 'metadata'\
                 and file_count != 'thumb' and file_count != '':
                 if int(file_count) not in range(int(self.num_pages)+1):
@@ -308,8 +311,54 @@ class Gallery:
                     
         return extra_pages
     
+    def img2pdf(self):
+        
+        print('Converting images to PDF file...')
+        pdf_path = f'{self.folder_dir}/{self.title}.pdf'
+        
+        # load all image files and remove unwanted ones
+        image_filenames = os.listdir(self.folder_dir)
+        exclude_list = ['Icon\r', 'metadata.json', '.DS_Store',
+                        'thumb.jpg', 'thumb.png']
+        for file in exclude_list:
+            if file in image_filenames:
+                image_filenames.remove(file)
+        
+        # check whether pdf already exists
+        if f'{self.title}.pdf' in image_filenames:
+            print('PDF file already exists')
+            self.status = f'Finished downloading {self.title}'
+            
+            return
+        
+        # sort according to page number
+        sort = [int(page.split('.')[0]) for page in image_filenames]
+        image_filenames = [file for _, file in sorted(zip(sort, image_filenames))]
+        
+        # open all image files and save to pdf
+        images = [Image.open(os.path.join(self.folder_dir, img_filename))
+                  for img_filename in image_filenames]
+        
+        try:
+            images[0].save(pdf_path, "PDF", resolution=100.0, 
+                           save_all=True, append_images=images[1:])
+        except Exception as error:
+            self.status = f'Error when converting to pdf: {error}'
+            return
+            
+        self.status = f'Finished downloading {self.title}'
+        
     def download(self):
             
+        def check_status():
+            if self.status == 'Not finished...':
+                return True
+            else:
+                print(f'\n\n{self.status}')
+                print(f"\n\n{'-'*200}")
+                
+                return False
+        
         try:
             self.get_metadata()
         except Exception as error:
@@ -320,19 +369,19 @@ class Gallery:
             
             return self.status
         
-        if self.status != 'Not finished...':
-            print(f'\n\n{self.status}')
-            print('Try updating cf_clearance')
-            print(f"\n\n{'-'*200}")
-            
-            return self.status
+        if not check_status(): return self.status
         
         self.check_gallery()
+        if not check_status(): return self.status
+        
+        self.img2pdf()
         
         print(f'\n\n{self.status}')
         print(f"\n\n{'-'*200}")
             
         return self.status
+
+    
 
 if __name__ == '__main__':
     # download_dir = '/Volumes/Transcend/Transcend/untitled folder/nhentai_new/test/'

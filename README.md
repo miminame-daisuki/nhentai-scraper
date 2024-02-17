@@ -8,3 +8,5 @@
 - Show current progress and estimate remaining time
 
 - fileicon: ERROR: Target not found or neither file nor folder: '../Downloaded/[たかやKi] ドキ2 Xmas'
+- Can't search ssd by tag (because of file system not being MacOS Extended?)
+- Add img2pdf to Gallery class (and check the part separated by alot of blank lines)
