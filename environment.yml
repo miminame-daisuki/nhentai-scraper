@@ -1,0 +1,8 @@
+name: scraper
+channels:
+  - defaults
+dependencies:
+  - selenium
+  - spyder
+  - pillow
+prefix: /Users/ball/opt/anaconda3/envs/scraper
