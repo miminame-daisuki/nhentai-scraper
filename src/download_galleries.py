@@ -25,27 +25,37 @@ def main():
     if x != 'y':
         return 
     
+    # confirm download location
+    download_dir = ' /Volumes/Samsung PSSD T7 Media/untitled folder/nhentai_new/Downloaded/'
+    while True:
+        confirm_download_dir = input((f'Download to {download_dir}?(y/n)'))
+        if confirm_download_dir != 'y':
+            download_dir = str(input('Download directory: '))
+        else:
+            break
+    
     failed_galleries = []
     failed_retry_galleries = []
     
     download_list = load_download_list()
     for count, gallery_id in zip(range(len(download_list)), download_list):
         print(f'Downloading number {count+1} out of {len(download_list)} galleries...')        
-        gallery = Gallery(gallery_id)
+        gallery = Gallery(gallery_id, download_dir=download_dir)
         gallery.download()
         if gallery.status[:20] != 'Finished downloading':
             failed_galleries.append(f'{gallery_id}')
     
-    # write the failed galleries to failed_download_list.txt
+    # retry failed galleries
     if len(failed_galleries) != 0:
         print('\n\nRetrying failed galleries...')
         print(f"\n\n{'-'*200}")
         for gallery_id in failed_galleries:
-            gallery = Gallery(gallery_id)
+            gallery = Gallery(gallery_id, download_dir=download_dir)
             gallery.download()
             if gallery.status[:20] != 'Finished downloading':
                 failed_retry_galleries.append(f'{gallery_id}, status: {gallery.status}')
         
+        # write the failed retry galleries to failed_download_list.txt
         if len(failed_retry_galleries) != 0:
             cur_path = os.path.dirname(__file__)
             inputs_folder_path = os.path.relpath('../inputs/', cur_path)

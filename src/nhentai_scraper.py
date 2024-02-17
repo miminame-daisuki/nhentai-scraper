@@ -25,6 +25,7 @@ class Gallery:
         self.download_dir = download_dir
         if not download_dir:
             self.download_dir = os.path.relpath('../Downloaded/', os.getcwd())
+        print(f"\nDownload directory set to: '{self.download_dir}'")
         
         self.inputs_dir = os.path.relpath('../inputs/', os.getcwd())
         
@@ -384,7 +385,7 @@ class Gallery:
     
 
 if __name__ == '__main__':
-    # download_dir = '/Volumes/Transcend/Transcend/untitled folder/nhentai_new/test/'
+    download_dir = '/Volumes/Transcend/Transcend/untitled folder/nhentai_new/test/'
     gallery_id = input('Input gallery id: ')
-    gallery = Gallery(gallery_id)
+    gallery = Gallery(gallery_id, download_dir=download_dir)
     gallery.download()
