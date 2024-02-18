@@ -1,5 +1,19 @@
 # NHentai scraper
-Scraper/Downloader for [nhentai](https://nhentai.net)
+Scraper/Downloader for [nhentai](https://nhentai.net), specifically designed for MacOS
+
+## Features
+- Automatically sets thumbnail and tags to folder for each gallery
+- Combines downloaded images into pdf
+
+## Dependencies
+- [fileicon](https://github.com/mklement0/fileicon)
+- [tag](https://github.com/jdberry/tag)
+
+## Usage
+1. Place the id of the galleries you want to download in the file `download_list.txt` inside the folder `inputs/`
+2. Double click the `double_click_run.command` file in the `src/` folder
+
+
 - Failed when retrieving thumbnail
 - Use different mirrors (i3, i5, i7, ...) when status code = 404
 - Add tmux
