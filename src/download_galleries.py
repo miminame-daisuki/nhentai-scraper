@@ -26,7 +26,7 @@ def main():
         return 
     
     # confirm download location
-    download_dir = ' /Volumes/Samsung PSSD T7 Media/untitled folder/nhentai_new/Downloaded/'
+    download_dir = os.path.relpath('../Downloaded/', os.getcwd())
     while True:
         confirm_download_dir = input((f'Download to {download_dir}?(y/n)'))
         if confirm_download_dir != 'y':

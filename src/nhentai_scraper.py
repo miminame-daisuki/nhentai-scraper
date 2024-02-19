@@ -385,7 +385,7 @@ class Gallery:
     
 
 if __name__ == '__main__':
-    download_dir = '/Volumes/Transcend/Transcend/untitled folder/nhentai_new/test/'
+    download_dir = os.path.relpath('../test/', os.getcwd())
     gallery_id = input('Input gallery id: ')
     gallery = Gallery(gallery_id, download_dir=download_dir)
     gallery.download()
