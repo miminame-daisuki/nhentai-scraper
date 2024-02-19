@@ -9,9 +9,10 @@ Scraper/Downloader for [nhentai](https://nhentai.net), specifically designed for
 - [fileicon](https://github.com/mklement0/fileicon)
 - [tag](https://github.com/jdberry/tag)
 
-## Usage
-1. Place the id of the galleries you want to download in the file `download_list.txt` inside the folder `inputs/`
-2. Double click the `double_click_run.command` file in the `src/` folder
+## Basic Usage
+1. Place the id (six digit number) of the galleries you want to download in the file `download_list.txt` inside the folder `inputs/`
+2. Open your browser, find the cookies and headers (for bypassing CloudFlare), and put those in the `cookies.txt` and 'headers.txt` files inside `inputs`
+3. Double click the `double_click_run.command` file in the `src/` folder
 
 
 - Failed when retrieving thumbnail
@@ -24,5 +25,3 @@ Scraper/Downloader for [nhentai](https://nhentai.net), specifically designed for
 - Show current progress and estimate remaining time
 
 - fileicon: ERROR: Target not found or neither file nor folder: '../Downloaded/[たかやKi] ドキ2 Xmas'
-- Can't search ssd by tag (because of file system not being MacOS Extended?)
-- Add img2pdf to Gallery class (and check the part separated by alot of blank lines)
