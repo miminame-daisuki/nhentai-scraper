@@ -26,7 +26,7 @@ def main():
         return 
     
     # confirm download location
-    download_dir = os.path.relpath('../Downloaded/', os.getcwd())
+    download_dir = os.path.abspath(f'{get_application_folder_dir()}/Downloaded/')
     while True:
         confirm_download_dir = input((f'Download to {download_dir}?(y/n)'))
         if confirm_download_dir != 'y':
