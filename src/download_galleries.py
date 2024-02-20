@@ -7,12 +7,12 @@ Created on Tue Feb 13 19:43:58 2024
 """
 import os
 
-from nhentai_scraper import Gallery
+from nhentai_scraper import Gallery, get_application_folder_dir
 
 def load_download_list():
-    cur_path = os.path.dirname(__file__)
-    inputs_folder_path = os.path.relpath('../inputs/', cur_path)
-    filename = f'{inputs_folder_path}/download_list.txt'
+    application_folder_path = get_application_folder_dir()
+    inputs_dir = os.path.abspath(f'{application_folder_path}/inputs/')
+    filename = f'{inputs_dir}/download_list.txt'
     with open(filename) as f:
         download_list = f.read().splitlines()
     download_list = [entry for entry in download_list if not entry == '']

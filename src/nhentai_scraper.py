@@ -11,9 +11,21 @@ import random
 import time
 import json
 import os
+import sys
 from PIL import Image
 import signal
 import subprocess
+
+def get_application_folder_dir():
+    
+    # when running executable
+    if getattr(sys, 'frozen', False):
+        application_folder_dir = os.path.dirname(sys.executable)
+    # when running python script (placed inside ./src/)
+    elif __file__:
+        application_folder_dir = os.path.abspath(f'{os.path.dirname(__file__)}/..')
+        
+    return application_folder_dir
 
 class Gallery:
     
@@ -22,12 +34,19 @@ class Gallery:
         
         self.id = str(gallery_id).split('#')[-1]
         
-        self.download_dir = download_dir
+        self.application_folder_path = get_application_folder_dir()
+        
+        # set download_dir to the one provided, or use default directory
+        if download_dir:
+            if os.path.isabs(download_dir):
+                self.download_dir = download_dir
+            else:
+                self.download_dir = os.path.abspath(f'{self.application_folder_path}/{download_dir}/')
         if not download_dir:
-            self.download_dir = os.path.relpath('../Downloaded/', os.getcwd())
+            self.downloaded_dir = os.path.abspath(f'{self.application_folder_path}/Downloaded/')
         print(f"\nDownload directory set to: '{self.download_dir}'")
         
-        self.inputs_dir = os.path.relpath('../inputs/', os.getcwd())
+        self.inputs_dir = os.path.abspath(f'{self.application_folder_path}/inputs/')
         
         self.headers = headers
         if not self.headers:
