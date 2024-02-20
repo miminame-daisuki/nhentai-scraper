@@ -322,12 +322,15 @@ class Gallery:
         # check whether there are more pages downloaded than self.num_pages
         # which should not happen
         extra_pages = []
-        for file_count in [file.split('.')[0] 
-                           for file in os.listdir(self.folder_dir)]:
-            if file_count != 'Icon\r' and file_count != 'metadata'\
-                and file_count != 'thumb' and file_count != '':
-                if int(file_count) not in range(int(self.num_pages)+1):
-                    extra_pages.append(file_count)
+        downloaded_pages = os.listdir(self.folder_dir)
+        non_page_files = ['Icon\r', 'metadata.json', 'thumb.jpg', 'thumb.jpg']
+        downloaded_pages = [page for page in downloaded_pages
+                            if page not in non_page_files]
+        downloaded_pages = [page for page in downloaded_pages
+                            if page.split('.')[1] != 'pdf']
+        for file_count in downloaded_pages:
+            if int(file_count.split('.')[0]) not in range(int(self.num_pages)+1):
+                extra_pages.append(file_count)
                     
         return extra_pages
     
@@ -340,16 +343,15 @@ class Gallery:
         image_filenames = os.listdir(self.folder_dir)
         exclude_list = ['Icon\r', 'metadata.json', '.DS_Store',
                         'thumb.jpg', 'thumb.png']
-        for file in exclude_list:
-            if file in image_filenames:
-                image_filenames.remove(file)
+        image_filenames = [file for file in image_filenames if not file in exclude_list]
         
         # check whether pdf already exists
-        if f'{self.title}.pdf' in image_filenames:
-            print('PDF file already exists')
-            self.status = f'Finished downloading {self.title}'
-            
-            return
+        for filename in image_filenames:
+            if 'pdf' in filename:
+                print('PDF file already exists')
+                self.status = f'Finished downloading {self.title}'
+                
+                return
         
         # sort according to page number
         sort = [int(page.split('.')[0]) for page in image_filenames]
@@ -404,7 +406,7 @@ class Gallery:
     
 
 if __name__ == '__main__':
-    download_dir = os.path.relpath('../test/', os.getcwd())
+    download_dir = os.path.abspath(f'{get_application_folder_dir()}/Downloaded/')
     gallery_id = input('Input gallery id: ')
     gallery = Gallery(gallery_id, download_dir=download_dir)
     gallery.download()
