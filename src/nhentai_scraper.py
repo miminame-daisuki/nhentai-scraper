@@ -15,6 +15,7 @@ import sys
 from PIL import Image
 import signal
 import subprocess
+import unicodedata
 
 def get_application_folder_dir():
     
@@ -131,6 +132,7 @@ class Gallery:
             self.title = self.metadata['title']['japanese']
         else:
             self.title = self.metadata['title']['english']
+        self.title = self.title.replace('/', '_')
         self.tags = [tag['name'] for tag in self.metadata['tags']]
         self.num_pages = self.metadata['num_pages']
         
@@ -150,8 +152,7 @@ class Gallery:
     def make_dir(self):
         
         # replace '/' with '_' for folder directory
-        self.folder_dir = os.path.join(self.download_dir, 
-                                       self.title.replace('/', '_'))
+        self.folder_dir = os.path.join(self.download_dir, self.title)
             
         # check whether there exists a downloaded gallery with the same name
         if os.path.isdir(self.folder_dir):
@@ -323,11 +324,11 @@ class Gallery:
         # which should not happen
         extra_pages = []
         downloaded_pages = os.listdir(self.folder_dir)
-        non_page_files = ['Icon\r', 'metadata.json', 'thumb.jpg', 'thumb.jpg']
-        downloaded_pages = [page for page in downloaded_pages
-                            if page not in non_page_files]
-        downloaded_pages = [page for page in downloaded_pages
-                            if page.split('.')[1] != 'pdf']
+        non_page_files = ['Icon\r', 'metadata.json', 'thumb.jpg', 'thumb.png', 
+                          '.DS_Store', f'{self.title}.pdf']
+        downloaded_pages = [unicodedata.normalize('NFC', page) 
+                            for page in downloaded_pages
+                            if unicodedata.normalize('NFC', page) not in non_page_files]
         for file_count in downloaded_pages:
             if int(file_count.split('.')[0]) not in range(int(self.num_pages)+1):
                 extra_pages.append(file_count)

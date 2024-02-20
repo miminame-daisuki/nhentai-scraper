@@ -11,8 +11,8 @@ from nhentai_scraper import Gallery, get_application_folder_dir
 
 def load_download_list():
     application_folder_path = get_application_folder_dir()
-    inputs_dir = os.path.abspath(f'{application_folder_path}/inputs/')
-    filename = f'{inputs_dir}/download_list.txt'
+    inputs_folder_dir = os.path.abspath(f'{application_folder_path}/inputs/')
+    filename = f'{inputs_folder_dir}/download_list.txt'
     with open(filename) as f:
         download_list = f.read().splitlines()
     download_list = [entry for entry in download_list if not entry == '']
@@ -57,9 +57,9 @@ def main():
         
         # write the failed retry galleries to failed_download_list.txt
         if len(failed_retry_galleries) != 0:
-            cur_path = os.path.dirname(__file__)
-            inputs_folder_path = os.path.relpath('../inputs/', cur_path)
-            filename = f'{inputs_folder_path}/failed_download_list.txt'
+            application_folder_path = get_application_folder_dir()
+            inputs_folder_dir = os.path.abspath(f'{application_folder_path}/inputs/')
+            filename = f'{inputs_folder_dir}/failed_download_list.txt'
             with open(filename, 'w') as f:
                 for entry in failed_retry_galleries:
                     f.write(entry)
