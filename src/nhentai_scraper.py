@@ -146,6 +146,8 @@ class Gallery:
             extension = 'jpg'
         elif img_metadata['t'] == 'p':
             extension = 'png'
+        elif img_metadata['t'] == 'g':
+            extension = 'gif'
             
         return extension
     
@@ -407,7 +409,7 @@ class Gallery:
     
 
 if __name__ == '__main__':
-    download_dir = os.path.abspath(f'{get_application_folder_dir()}/Downloaded/')
+    download_dir = os.path.abspath(f'{get_application_folder_dir()}/test/')
     gallery_id = input('Input gallery id: ')
     gallery = Gallery(gallery_id, download_dir=download_dir)
     gallery.download()
