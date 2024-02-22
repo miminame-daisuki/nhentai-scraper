@@ -38,8 +38,8 @@ def main():
     failed_retry_galleries = []
     
     download_list = load_download_list()
-    for count, gallery_id in zip(range(len(download_list)), download_list):
-        print(f'Downloading number {count+1} out of {len(download_list)} galleries...')        
+    for count, gallery_id in enumerate(download_list, start=1):
+        print(f'Downloading number {count} out of {len(download_list)} galleries...')        
         gallery = Gallery(gallery_id, download_dir=download_dir)
         gallery.download()
         if gallery.status[:20] != 'Finished downloading':

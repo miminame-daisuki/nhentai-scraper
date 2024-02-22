@@ -75,24 +75,31 @@ class Gallery:
         return self.cookies
     
     def get_response(self, url, headers={}, cookies={},
-                     sleep_time='default', timeout_time=60):
+                     sleep_time='default', timeout_time=61):
         
         # register a handler for the timeout
-        def handler(signum, frame):
-            signame = signal.Signals(signum).name
-            print(f'Signal handler called with signal {signame} ({signum})')
-            raise OSError("Waited for too long")
+        # def handler(signum, frame):
+        #     signame = signal.Signals(signum).name
+        #     print(f'Signal handler called with signal {signame} ({signum})')
+        #     raise OSError("Waited for too long")
             
         if not headers:
             headers = self.headers
         if not cookies:
             cookies = self.cookies
             
+        # try:
+        #     signal.signal(signal.SIGALRM, handler)
+        #     signal.alarm(timeout_time)
+        #     response = requests.get(url, headers=headers, cookies=cookies)
+        #     signal.alarm(0)
+        # except Exception as error:
+        #     print(f'An exception occured: {error}')
+        #     response = ''
+            
         try:
-            signal.signal(signal.SIGALRM, handler)
-            signal.alarm(timeout_time)
-            response = requests.get(url, headers=headers, cookies=cookies)
-            signal.alarm(0)
+            response = requests.get(url, headers=headers, cookies=cookies,
+                                    timeout=timeout_time)
         except Exception as error:
             print(f'An exception occured: {error}')
             response = ''

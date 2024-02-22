@@ -14,8 +14,13 @@ Scraper/Downloader for [nhentai](https://nhentai.net), specifically designed for
 2. Open your browser, find the cookies and headers (for bypassing CloudFlare), and put those in the `cookies.txt` and 'headers.txt` files inside `inputs`
 3. Double click the `double_click_run.command` file in the `src/` folder
 
-- Confiem cf_clearance before execution
+- use logging
+- use requests.get(timeout=61)
+- use progressbar or tqdm
+- use Path for paths
 - Failed when retrieving thumbnail
+
+- Confiem cf_clearance before execution
 - Use different mirrors (i3, i5, i7, ...) when status code = 404
 - Add tmux
 - Add diagnosis? (total slept time, failed url percentage, ...)
