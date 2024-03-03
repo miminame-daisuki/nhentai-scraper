@@ -24,7 +24,7 @@ def get_gallery_id(url):
 
 
 # retrieves all gallery ids from a artist
-def search_author(artist: str):
+def search_artist(artist: str):
 
     artist_url = f'https://nhentai.net/artist/{artist}/'
     print('Loading page 1')
@@ -38,6 +38,17 @@ def search_author(artist: str):
     return download_list
 
 
+def load_artist():
+    with open(filename) as f:
+        artist_list = f.read().splitlines()
+    artist_list = [entry for entry in artist_list if not entry == '']
+
+    for artist in artist_list:
+        download_list.extend(search_artist(artist))
+
+    return download_list
+
+
 if __name__ == '__main__':
     artist = 'ichiri'
-    download_list = search_author(artist)
+    download_list = search_artist(artist)
