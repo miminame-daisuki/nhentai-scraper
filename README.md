@@ -19,6 +19,8 @@ Scraper/Downloader for [nhentai](https://nhentai.net), specifically designed for
 - use progressbar or tqdm
 - use Path for paths
 - Failed when retrieving thumbnail
+- Add check whether same title, different language has been downloaded or not (using split('[')?)
+- Download by author (download all galleries?, even the ones the same title by using title-1, title-2 for example?) to automatically update downloaded galleries
 
 - Confiem cf_clearance before execution
 - Use different mirrors (i3, i5, i7, ...) when status code = 404

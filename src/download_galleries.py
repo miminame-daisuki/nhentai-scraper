@@ -9,6 +9,7 @@ import os
 
 from nhentai_scraper import Gallery, get_application_folder_dir
 
+
 def load_download_list():
     application_folder_path = get_application_folder_dir()
     inputs_folder_dir = os.path.abspath(f'{application_folder_path}/inputs/')
@@ -19,12 +20,13 @@ def load_download_list():
 
     return download_list
 
+
 def main():
-    
+
     x = input('Confirm using vpn (y/n)')
     if x != 'y':
-        return 
-    
+        return
+
     # confirm download location
     download_dir = os.path.abspath(f'{get_application_folder_dir()}/Downloaded/')
     while True:
@@ -33,18 +35,18 @@ def main():
             download_dir = str(input('Download directory: '))
         else:
             break
-    
+
     failed_galleries = []
     failed_retry_galleries = []
-    
+
     download_list = load_download_list()
     for count, gallery_id in enumerate(download_list, start=1):
-        print(f'Downloading number {count} out of {len(download_list)} galleries...')        
+        print(f'Downloading number {count} out of {len(download_list)} galleries...')
         gallery = Gallery(gallery_id, download_dir=download_dir)
         gallery.download()
         if gallery.status[:20] != 'Finished downloading':
             failed_galleries.append(f'{gallery_id}')
-    
+
     # retry failed galleries
     if len(failed_galleries) != 0:
         print('\n\nRetrying failed galleries...')
@@ -54,7 +56,7 @@ def main():
             gallery.download()
             if gallery.status[:20] != 'Finished downloading':
                 failed_retry_galleries.append(f'{gallery_id}, status: {gallery.status}')
-        
+
         # write the failed retry galleries to failed_download_list.txt
         if len(failed_retry_galleries) != 0:
             application_folder_path = get_application_folder_dir()
@@ -69,6 +71,7 @@ def main():
             print('\n\n\nFinished all downloads!!!\n\n')
     else:
         print('\n\n\nFinished all downloads!!!\n\n')
-        
+
+
 if __name__ == '__main__':
     main()
