@@ -21,11 +21,13 @@ Scraper/Downloader for [nhentai](https://nhentai.net), specifically designed for
 - Download by author (download all galleries?, even the ones the same title by using title-1, title-2 for example?) to automatically update downloaded galleries
 - Automatically detect input file contains artist name or gallery id?
 - Combine download_author.py and download_galleries.py into one file containing main() and put function definitions in new file
+- Combine load_artist_list() and load_id_list()
 
 - Add diagnosis? (total slept time, failed url percentage, ...)
 - Same title already downloaded, different contents?
 - Is check_extra_pages needed?
 - Ask whether to use tag and fileicon when starting program
 - Add error handling for galleries that have been deleted from nhentai
+- Error handling for download_author.py (ex: typo in artist name, ...)
 
 - fileicon: ERROR: Target not found or neither file nor folder: '../Downloaded/[たかやKi] ドキ2 Xmas'
