@@ -19,6 +19,7 @@ import unicodedata
 
 def get_application_folder_dir():
 
+    application_folder_dir = ''
     # when running executable
     if getattr(sys, 'frozen', False):
         application_folder_dir = os.path.dirname(sys.executable)
@@ -412,6 +413,8 @@ class Gallery:
 
 if __name__ == '__main__':
     download_dir = os.path.abspath(f'{get_application_folder_dir()}/test/')
-    gallery_id = input('Input gallery id: ')
-    gallery = Gallery(gallery_id, download_dir=download_dir)
-    gallery.download()
+    id_list = input('Input gallery id: ')
+    id_list = id_list.split(' ')
+    for gallery_id in id_list:
+        gallery = Gallery(gallery_id, download_dir=download_dir)
+        gallery.download()

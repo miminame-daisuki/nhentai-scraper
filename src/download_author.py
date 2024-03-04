@@ -28,27 +28,30 @@ def search_artist(artist: str):
 
     artist_url = f'https://nhentai.net/artist/{artist}/'
     print('Loading page 1')
-    download_list, page_count = get_gallery_id(artist_url)
+    id_list, page_count = get_gallery_id(artist_url)
 
     for page in range(2, page_count+1):
         print(f'Loading page {page}')
         page_url = artist_url + f'?page={page}'
-        download_list.extend(get_gallery_id(page_url)[0])
+        id_list.extend(get_gallery_id(page_url)[0])
 
-    return download_list
+    return id_list
 
 
 def load_artist():
-    with open(filename) as f:
-        artist_list = f.read().splitlines()
-    artist_list = [entry for entry in artist_list if not entry == '']
+#    with open(filename) as f:
+#        artist_list = f.read().splitlines()
+#    artist_list = [entry for entry in artist_list if not entry == '']
 
+    artist_list = ['ichiri', 'mori-airi']
+    id_list = []
     for artist in artist_list:
-        download_list.extend(search_artist(artist))
+        print(f'Loading artist: {artist}')
+        id_list.extend(search_artist(artist))
 
-    return download_list
+    return id_list
 
 
 if __name__ == '__main__':
     artist = 'ichiri'
-    download_list = search_artist(artist)
+    id_list = load_artist()

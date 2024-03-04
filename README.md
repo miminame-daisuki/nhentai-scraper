@@ -16,21 +16,19 @@ Scraper/Downloader for [nhentai](https://nhentai.net), specifically designed for
 
 ## To-do list
 - use logging
-- use requests.get(timeout=61)
 - use progressbar or tqdm
 - use Path for paths
 - Failed when retrieving thumbnail
-- Add check whether same title, different language has been downloaded or not (using split('[')?)
 - Download by author (download all galleries?, even the ones the same title by using title-1, title-2 for example?) to automatically update downloaded galleries
 - Automatically detect input file contains artist name or gallery id?
 
 - Confiem cf_clearance before execution
-- Use different mirrors (i3, i5, i7, ...) when status code = 404
-- Add tmux
 - Add diagnosis? (total slept time, failed url percentage, ...)
 - Same title already downloaded, different contents?
 - Output failed_pages and pages_url for each failed_gallery_url
 - Is check_extra_pages needed?
 - Show current progress and estimate remaining time
+- Ask whether to use tag and fileicon when starting program
+- Add error handling for galleries that have been deleted from nhentai
 
 - fileicon: ERROR: Target not found or neither file nor folder: '../Downloaded/[たかやKi] ドキ2 Xmas'
