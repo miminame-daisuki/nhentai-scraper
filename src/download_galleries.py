@@ -5,7 +5,10 @@ Created on Tue Feb 13 19:43:58 2024
 
 @author: ball
 """
+
 import os
+import logging
+import datetime
 
 from nhentai_scraper import Gallery, get_application_folder_dir
 
@@ -28,10 +31,12 @@ def download_id_list(id_list, download_dir):
     failed_retry_galleries = []
     for count, gallery_id in enumerate(id_list, start=1):
         print(f'Downloading number {count} out of {len(id_list)} galleries...')
+        logging.info(f'Downloading number {count} out of {len(id_list)} galleries...')
         gallery = Gallery(gallery_id, download_dir=download_dir)
         gallery.download()
         if gallery.status[:20] != 'Finished downloading':
             failed_galleries.append(f'{gallery_id}')
+            logging.error(f'Failed to download id {gallery_id}, status: {gallery.status}')
 
     # retry failed galleries
     if len(failed_galleries) != 0:
@@ -60,6 +65,7 @@ def write_failed_retry_galleries(failed_retry_galleries):
 
 def main():
 
+    starttime = datetime.datetime.now().strftime("%Y-%m-%d %H:%M %p")
     x = input('Confirm using vpn (y/n)')
     if x != 'y':
         return
@@ -72,6 +78,13 @@ def main():
             download_dir = str(input('Download directory: '))
         else:
             break
+
+    # loging
+    logging_dir = os.path.abspath(f'{get_application_folder_dir()}/Log/')
+    logging_filename = os.path.join(logging_dir, starttime)
+    logging.basicConfig(filename=logging_filename, level=logging.DEBUG,
+                        format='%(asctime)s %(levelname)s %(message)s', datefmt='%I:%M:%S %p')
+    logging.info(f'Program started at {starttime}')
 
     id_list = load_download_list()
     failed_retry_galleries = download_id_list(id_list, download_dir)

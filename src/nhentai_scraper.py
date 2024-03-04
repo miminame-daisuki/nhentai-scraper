@@ -15,6 +15,8 @@ import sys
 from PIL import Image
 import subprocess
 import unicodedata
+import logging
+from tqdm import tqdm
 
 
 def get_application_folder_dir():
@@ -50,7 +52,7 @@ class Gallery:
         if not download_dir:
             self.downloaded_dir = os.path.abspath(
                 f'{self.application_folder_path}/Downloaded/')
-        print(f"\nDownload directory set to: '{self.download_dir}'")
+        logging.info(f"\nDownload directory set to: '{self.download_dir}'")
 
         self.inputs_dir = os.path.abspath(
             f'{self.application_folder_path}/inputs/')
@@ -92,20 +94,20 @@ class Gallery:
             response = requests.get(url, headers=headers, cookies=cookies,
                                     timeout=timeout_time)
         except Exception as error:
-            print(f'An exception occured: {error}')
+            logging.error(f'An exception occured: {error}')
             response = ''
 
         # sleep for sleep_time after each get_response
         if sleep_time == 'default':
             sleep_time = 3*random.random()+1.5
-        print(f'Sleeping for ~ {sleep_time:.1f} seconds...')
+        logging.info(f'Sleeping for ~ {sleep_time:.1f} seconds...')
         time.sleep(sleep_time)
 
         return response
 
     def get_metadata(self):
 
-        print(f"\nRetrieving gallery api for id '{self.id}'...")
+        logging.info(f"\nRetrieving gallery api for id '{self.id}'...")
         api_url = f'https://nhentai.net/api/gallery/{int(self.id)}'
 
         api_response = self.get_response(api_url)
@@ -113,7 +115,7 @@ class Gallery:
         # try for up to 3 times
         tries = 0
         while api_response.status_code != 200 or not api_response:
-            print('Retrying...')
+            logging.error(f'Failed to retrieve metadata with status code {api_response.status_code}, retrying...')
             api_response = self.get_response(api_url)
             tries += 1
             if tries >= 3:
@@ -135,6 +137,7 @@ class Gallery:
         self.num_pages = self.metadata['num_pages']
 
         print(f'\n\nTitle: {self.title}\n')
+        logging.info(f'\n\nTitle: {self.title}\n')
 
         return self.metadata
 
@@ -171,7 +174,7 @@ class Gallery:
                     self.download_thumb()
                     self.set_thumb()
                 except Exception as error:
-                    print(f'An exception occured: {error}')
+                    logging.error(f'An exception occured when downloading/setting thumbnail: {error}')
 
         else:
             os.mkdir(self.folder_dir)
@@ -184,7 +187,7 @@ class Gallery:
                 self.download_thumb()
                 self.set_thumb()
             except Exception as error:
-                print(f'An exception occured: {error}')
+                    logging.error(f'An exception occured when downloading/setting thumbnail: {error}')
 
     def load_downloaded_metadata(self):
 
@@ -202,16 +205,16 @@ class Gallery:
 
     def download_thumb(self):
 
-        print('\nRetrieving thumbnail...')
+        logging.info('\nRetrieving thumbnail...')
         extension = self.get_img_extension(
             self.metadata['images']['thumbnail'])
         thumb_url = f'https://t3.nhentai.net/galleries/{self.media_id}/thumb.{extension}'
         thumb_response = self.get_response(thumb_url)
         if not thumb_response:
-            print('Failed when getting response for thumbnail')
+            logging.error('Failed when getting response for thumbnail')
             return
         if thumb_response.status_code != 200:
-            print(f'Something went wrong: {thumb_response.status_code}')
+            logging.error(f'Something went wrong when retrieving thumbnail: {thumb_response.status_code}')
             return
 
         self.thumb_filename = f'{self.folder_dir}/thumb.{extension}'
@@ -246,27 +249,27 @@ class Gallery:
 
     def download_page(self, page):
 
-        print(f'\nRetrieving Page {page}/{self.num_pages} url...')
+        logging.info(f'\nRetrieving Page {page}/{self.num_pages} url...')
 
         extension = self.get_img_extension(
             self.metadata['images']['pages'][int(page)-1])
         img_url = f'https://i5.nhentai.net/galleries/{self.media_id}/{int(page)}.{extension}'
         img_response = self.get_response(img_url)
         if not img_response:
-            print(f'Failed when getting response for page {page}')
+            logging.error(f'Failed when getting response for page {page}')
             return
         if img_response.status_code != 200:
-            print(f'Something went wrong with: {img_response.status_code}')
+            logging.error(f'Something went wrong with when getting response for page {page}: {img_response.status_code}')
             return
 
-        print('Image downloaded')
+        logging.info('Image downloaded')
         filename = f'{self.folder_dir}/{str(page)}.{extension}'
         with open(filename, 'wb') as f:
             f.write(img_response.content)
 
     def check_gallery(self):
 
-        print('\nChecking downloaded gallery...')
+        logging.info('\nChecking downloaded gallery...')
         self.make_dir()
         if not self.status == 'Not finished...':
             return self.status
@@ -283,7 +286,7 @@ class Gallery:
         tries = 0
         while len(self.missing_pages) != 0:
             if tries != 0:
-                print('\n\nRetrying failed downloads '
+                logging.info('\n\nRetrying failed downloads '
                       + f'for the {tries}(th) time...\n')
 
             self.download_missing_pages()
@@ -295,14 +298,14 @@ class Gallery:
 
             tries += 1
             if tries > 3 and len(self.missing_pages) != 0:
-                print(f'\nFailed pages: {self.missing_pages}')
+                logging.error(f'\nFailed pages: {self.missing_pages}')
                 self.status = 'Retried 3 times'
 
                 return
 
     def download_missing_pages(self):
 
-        for page_count in self.missing_pages:
+        for page_count in tqdm(self.missing_pages):
             self.download_page(page_count)
 
     def load_missing_pages(self):
@@ -339,7 +342,7 @@ class Gallery:
 
     def img2pdf(self):
 
-        print('Converting images to PDF file...')
+        logging.info('Converting images to PDF file...')
         pdf_path = f'{self.folder_dir}/{self.title}.pdf'
 
         # load all image files and remove unwanted ones
@@ -352,7 +355,7 @@ class Gallery:
         # check whether pdf already exists
         for filename in image_filenames:
             if 'pdf' in filename:
-                print('PDF file already exists')
+                logging.info('PDF file already exists')
                 self.status = f'Finished downloading {self.title}'
 
                 return
@@ -381,18 +384,18 @@ class Gallery:
             if self.status == 'Not finished...':
                 return True
             else:
-                print(f'\n\n{self.status}')
-                print(f"\n\n{'-'*200}")
+                logging.error(f'\n\nStatus: {self.status}')
+                logging.info(f"\n\n{'-'*200}")
 
                 return False
 
         try:
             self.get_metadata()
         except Exception as error:
-            print(f'An exception occured: {error}')
+            logging.error(f'An exception occured when retrieving metadata: {error}')
             self.status = 'Error when retrieving metadata'
-            print(f'\n\n{self.status}')
-            print(f"\n\n{'-'*200}")
+            logging.error(f'\n\n{self.status}')
+            logging.info(f"\n\n{'-'*200}")
 
             return self.status
 
@@ -405,8 +408,8 @@ class Gallery:
 
         self.img2pdf()
 
-        print(f'\n\n{self.status}')
-        print(f"\n\n{'-'*200}")
+        logging.info(f'\n\n{self.status}')
+        logging.info(f"\n\n{'-'*200}")
 
         return self.status
 
