@@ -1,18 +1,16 @@
-import requests
 from bs4 import BeautifulSoup
-import time
-import random
+import os
+
+from nhentai_scraper import get_application_folder_dir, start_logging, get_response, load_headers, load_cookies
+from download_galleries import confirm_settings, download_id_list, check_failed_retry_galleries
 
 
-# retrieves all <=25 gallery ids from a nhentai url
-def get_gallery_id(url):
+def get_gallery_id(url, headers={}, cookies={}):
+    # retrieves all <=25 gallery ids from a nhentai url
 
     gallery_id = []
-    cookies = {'cf_clearance': 'wNF01bqaKxeqf.V9wQw8vrtqp6iCGKv05HtfTjTMFSM-1709480007-1.0.1.1-.d3ir9ZGw7UajznShf2db60wRKZsCAEL76Bz__zw8EtPIE6Gq3ZFz49tX75rkmmW1gACiCAVFPuDRcQcXEja7w'}
-    headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.5 Safari/605.1.15'}
 
-    response = requests.get(url, headers=headers, cookies=cookies, timeout=60)
-    time.sleep(3*random.random()+1.5)
+    response = get_response(url, headers=headers, cookies=cookies)
     soup = BeautifulSoup(response.content, features='html.parser')
     gallery_count = soup.find('span', {'class': 'count'}).string
     page_count = int(gallery_count)//25 + 1
@@ -26,32 +24,47 @@ def get_gallery_id(url):
 # retrieves all gallery ids from a artist
 def search_artist(artist: str):
 
+    print(f'Searching galleries from artist {artist}')
     artist_url = f'https://nhentai.net/artist/{artist}/'
-    print('Loading page 1')
-    id_list, page_count = get_gallery_id(artist_url)
+    application_folder_path = get_application_folder_dir()
+    inputs_dir = os.path.abspath(f'{application_folder_path}/inputs/')
+    headers = load_headers(inputs_dir)
+    cookies = load_cookies(inputs_dir)
+    id_list, page_count = get_gallery_id(artist_url,
+                                         headers=headers,
+                                         cookies=cookies)
 
     for page in range(2, page_count+1):
-        print(f'Loading page {page}')
         page_url = artist_url + f'?page={page}'
-        id_list.extend(get_gallery_id(page_url)[0])
+        id_list.extend(get_gallery_id(page_url,
+                                      headers=headers,
+                                      cookies=cookies)[0])
 
     return id_list
 
 
-def load_artist():
-#    with open(filename) as f:
-#        artist_list = f.read().splitlines()
-#    artist_list = [entry for entry in artist_list if not entry == '']
+def load_artist_list():
+    application_folder_path = get_application_folder_dir()
+    inputs_folder_dir = os.path.abspath(f'{application_folder_path}/inputs/')
+    filename = f'{inputs_folder_dir}/download_artist.txt'
+    with open(filename) as f:
+        artist_list = f.read().splitlines()
+    artist_list = [entry for entry in artist_list if not entry == '']
 
-    artist_list = ['ichiri', 'mori-airi']
-    id_list = []
+    return artist_list
+
+
+def main():
+    start_logging()
+    download_dir = confirm_settings()
+    artist_list = load_artist_list()
+    failed_retry_galleries = []
     for artist in artist_list:
+        id_list = search_artist(artist)
         print(f'Loading artist: {artist}')
-        id_list.extend(search_artist(artist))
-
-    return id_list
+        failed_retry_galleries.extend(download_id_list(id_list, download_dir))
+    check_failed_retry_galleries(failed_retry_galleries)
 
 
 if __name__ == '__main__':
-    artist = 'ichiri'
-    id_list = load_artist()
+    main()

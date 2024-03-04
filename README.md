@@ -10,8 +10,8 @@ Scraper/Downloader for [nhentai](https://nhentai.net), specifically designed for
 - [tag](https://github.com/jdberry/tag)
 
 ## Basic Usage
-1. Place the id (six digit number) of the galleries you want to download in the file `download_list.txt` inside the folder `inputs/`
-2. Open your browser, find the cookies and headers (for bypassing CloudFlare), and put those in the `cookies.txt` and `headers.txt` files inside `inputs`
+1. Place the id (six digit number) of the galleries you want to download in the file `download_id.txt` inside the folder `inputs/`
+2. Open your browser, find the cookies and headers (for bypassing CloudFlare), and put those in the `cookies.txt` and `headers.txt` files inside `inputs/`
 3. Double click the `double_click_run.command` file in the `src/` folder
 
 ## To-do list
@@ -20,6 +20,7 @@ Scraper/Downloader for [nhentai](https://nhentai.net), specifically designed for
 - Failed when retrieving thumbnail
 - Download by author (download all galleries?, even the ones the same title by using title-1, title-2 for example?) to automatically update downloaded galleries
 - Automatically detect input file contains artist name or gallery id?
+- Combine download_author.py and download_galleries.py into one file containing main() and put function definitions in new file
 
 - Add diagnosis? (total slept time, failed url percentage, ...)
 - Same title already downloaded, different contents?

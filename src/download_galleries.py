@@ -8,21 +8,20 @@ Created on Tue Feb 13 19:43:58 2024
 
 import os
 import logging
-import datetime
 
 from nhentai_scraper import Gallery, get_application_folder_dir, start_logging
 
 
-def load_download_list():
+def load_id_list():
 
     application_folder_path = get_application_folder_dir()
     inputs_folder_dir = os.path.abspath(f'{application_folder_path}/inputs/')
-    filename = f'{inputs_folder_dir}/download_list.txt'
+    filename = f'{inputs_folder_dir}/download_id.txt'
     with open(filename) as f:
-        download_list = f.read().splitlines()
-    download_list = [entry for entry in download_list if not entry == '']
+        id_list = f.read().splitlines()
+    id_list = [entry for entry in id_list if not entry == '']
 
-    return download_list
+    return id_list
 
 
 def download_id_list(id_list, download_dir):
@@ -52,28 +51,37 @@ def download_id_list(id_list, download_dir):
     return failed_retry_galleries
 
 
-def write_failed_retry_galleries(failed_retry_galleries):
+def check_failed_retry_galleries(failed_retry_galleries):
 
-    application_folder_path = get_application_folder_dir()
-    inputs_folder_dir = os.path.abspath(f'{application_folder_path}/inputs/')
-    filename = f'{inputs_folder_dir}/failed_download_list.txt'
-    with open(filename, 'w') as f:
-        for entry in failed_retry_galleries:
-            f.write(entry)
-            f.write('\n')
-    print(f'\n\n\nFailed gallery id written to {filename}\n\n')
+    if len(failed_retry_galleries) != 0:
+        # write the failed retry galleries to failed_download_id.txt
+        application_folder_path = get_application_folder_dir()
+        inputs_folder_dir = os.path.abspath(f'{application_folder_path}/inputs/')
+        filename = f'{inputs_folder_dir}/failed_download_id.txt'
+        with open(filename, 'w') as f:
+            for entry in failed_retry_galleries:
+                f.write(entry)
+                f.write('\n')
+        print(f'\n\n\nFailed gallery id written to {filename}\n\n')
+    else:
+        print('\n\n\nFinished all downloads!!!\n\n')
 
 
-def main():
+def confirm_settings():
 
-    start_logging()
-    x = input('Confirm using vpn?(y/n)')
-    if x != 'y':
-        return
+    while True:
+        x = input('Confirm using vpn?(y/n)')
+        if x != 'y':
+            continue
+        else:
+            break
 
-    x = input('Confirm updated cf_clearance?(y/n)')
-    if x != 'y':
-        return
+    while True:
+        x = input('Confirm updated cf_clearance?(y/n)')
+        if x != 'y':
+            continue
+        else:
+            break
 
     # confirm download location
     download_dir = os.path.abspath(f'{get_application_folder_dir()}/Downloaded/')
@@ -84,14 +92,16 @@ def main():
         else:
             break
 
-    id_list = load_download_list()
-    failed_retry_galleries = download_id_list(id_list, download_dir)
+    return download_dir
 
-    # write the failed retry galleries to failed_download_list.txt
-    if len(failed_retry_galleries) != 0:
-        write_failed_retry_galleries(failed_retry_galleries)
-    else:
-        print('\n\n\nFinished all downloads!!!\n\n')
+
+def main():
+
+    start_logging()
+    download_dir = confirm_settings()
+    id_list = load_id_list()
+    failed_retry_galleries = download_id_list(id_list, download_dir)
+    check_failed_retry_galleries(failed_retry_galleries)
 
 
 if __name__ == '__main__':

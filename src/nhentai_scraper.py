@@ -43,6 +43,43 @@ def get_application_folder_dir():
     return application_folder_dir
 
 
+def load_headers(inputs_dir):
+
+    headers_filename = f'{inputs_dir}/headers.json'
+    with open(headers_filename) as f:
+        headers = json.load(f)
+
+    return headers
+
+
+def load_cookies(inputs_dir):
+
+    cookies_filename = f'{inputs_dir}/cookies.json'
+    with open(cookies_filename) as f:
+        cookies = json.load(f)
+
+    return cookies
+
+
+def get_response(url, headers={}, cookies={},
+                 sleep_time='default', timeout_time=61):
+
+    try:
+        response = requests.get(url, headers=headers, cookies=cookies,
+                                timeout=timeout_time)
+    except Exception as error:
+        logging.error(f'An exception occured: {error}')
+        response = ''
+
+    # sleep for sleep_time after each get_response
+    if sleep_time == 'default':
+        sleep_time = 3*random.random()+1.5
+    logging.info(f'Sleeping for ~ {sleep_time:.1f} seconds...')
+    time.sleep(sleep_time)
+
+    return response
+
+
 class Gallery:
 
     def __init__(self, gallery_id, download_dir='',
@@ -69,64 +106,29 @@ class Gallery:
 
         self.headers = headers
         if not self.headers:
-            self.load_headers()
+            self.headers = load_headers(self.inputs_dir)
         self.cookies = cookies
         if not self.cookies:
-            self.load_cookies()
+            self.cookies = load_cookies(self.inputs_dir)
 
         self.status = 'Not finished...'
-
-    def load_headers(self):
-
-        headers_filename = f'{self.inputs_dir}/headers.json'
-        with open(headers_filename) as f:
-            self.headers = json.load(f)
-
-        return self.headers
-
-    def load_cookies(self):
-
-        cookies_filename = f'{self.inputs_dir}/cookies.json'
-        with open(cookies_filename) as f:
-            self.cookies = json.load(f)
-
-        return self.cookies
-
-    def get_response(self, url, headers={}, cookies={},
-                     sleep_time='default', timeout_time=61):
-
-        if not headers:
-            headers = self.headers
-        if not cookies:
-            cookies = self.cookies
-
-        try:
-            response = requests.get(url, headers=headers, cookies=cookies,
-                                    timeout=timeout_time)
-        except Exception as error:
-            logging.error(f'An exception occured: {error}')
-            response = ''
-
-        # sleep for sleep_time after each get_response
-        if sleep_time == 'default':
-            sleep_time = 3*random.random()+1.5
-        logging.info(f'Sleeping for ~ {sleep_time:.1f} seconds...')
-        time.sleep(sleep_time)
-
-        return response
 
     def get_metadata(self):
 
         logging.info(f"\nRetrieving gallery api for id '{self.id}'...")
         api_url = f'https://nhentai.net/api/gallery/{int(self.id)}'
 
-        api_response = self.get_response(api_url)
+        api_response = get_response(api_url,
+                                    headers=self.headers,
+                                    cookies=self.cookies)
 
         # try for up to 3 times
         tries = 0
         while api_response.status_code != 200 or not api_response:
             logging.error(f'Failed to retrieve metadata with status code {api_response.status_code}, retrying...')
-            api_response = self.get_response(api_url)
+            api_response = get_response(api_url,
+                                        headers=self.headers,
+                                        cookies=self.cookies)
             tries += 1
             if tries >= 3:
                 break
@@ -219,7 +221,9 @@ class Gallery:
         extension = self.get_img_extension(
             self.metadata['images']['thumbnail'])
         thumb_url = f'https://t3.nhentai.net/galleries/{self.media_id}/thumb.{extension}'
-        thumb_response = self.get_response(thumb_url)
+        thumb_response = get_response(thumb_url,
+                                      headers=self.headers,
+                                      cookies=self.cookies)
         if not thumb_response:
             logging.error('Failed when getting response for thumbnail')
             return
@@ -266,7 +270,9 @@ class Gallery:
         extension = self.get_img_extension(
             self.metadata['images']['pages'][int(page)-1])
         img_url = f'https://i5.nhentai.net/galleries/{self.media_id}/{int(page)}.{extension}'
-        img_response = self.get_response(img_url)
+        img_response = get_response(img_url,
+                                    headers=self.headers,
+                                    cookies=self.cookies)
         if not img_response:
             logging.error(f'Failed when getting response for page {page}')
             return
