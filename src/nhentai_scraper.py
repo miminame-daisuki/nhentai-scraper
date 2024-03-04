@@ -13,7 +13,7 @@ import json
 import os
 import sys
 from PIL import Image
-import subprocess
+from subprocess import PIPE, run
 import unicodedata
 import logging
 from tqdm import tqdm
@@ -136,7 +136,7 @@ class Gallery:
         self.tags = [tag['name'] for tag in self.metadata['tags']]
         self.num_pages = self.metadata['num_pages']
 
-        print(f'\n\nTitle: {self.title}\n')
+        print(f'\n\nDownloading {self.title}\n')
         logging.info(f'\n\nTitle: {self.title}\n')
 
         return self.metadata
@@ -226,8 +226,8 @@ class Gallery:
         tags_string = ''.join(f"'{tag}'," for tag in self.tags)[:-1]
 
         # set tags with tag
-        set_tags_command = f"tag -a {tags_string} '{self.folder_dir}'"
-        subprocess.call(set_tags_command, shell=True)
+        set_tags_command = ['tag', '-a', f'{tags_string}', f'{self.folder_dir}']
+        run(set_tags_command)
 
     def set_thumb(self):
 
@@ -244,8 +244,10 @@ class Gallery:
         thumb_rgb.save(self.thumb_filename)
 
         # set thumbnail with filicon
-        set_thumb_command = f"fileicon set '{self.folder_dir}' '{self.thumb_filename}'"
-        subprocess.call(set_thumb_command, shell=True)
+        set_thumb_command = ['fileicon', 'set',
+                             f'{self.folder_dir}', f'{self.thumb_filename}']
+        result = run(set_thumb_command, capture_output=True)
+        logging.info(f'{result.stdout}')
 
     def download_page(self, page):
 

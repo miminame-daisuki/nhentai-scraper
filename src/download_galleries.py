@@ -30,13 +30,14 @@ def download_id_list(id_list, download_dir):
     failed_galleries = []
     failed_retry_galleries = []
     for count, gallery_id in enumerate(id_list, start=1):
-        print(f'Downloading number {count} out of {len(id_list)} galleries...')
         logging.info(f'Downloading number {count} out of {len(id_list)} galleries...')
         gallery = Gallery(gallery_id, download_dir=download_dir)
         gallery.download()
         if gallery.status[:20] != 'Finished downloading':
             failed_galleries.append(f'{gallery_id}')
             logging.error(f'Failed to download id {gallery_id}, status: {gallery.status}')
+        else:
+            print(f'Finished {count} out of {len(id_list)} gallery downloads.')
 
     # retry failed galleries
     if len(failed_galleries) != 0:
@@ -65,7 +66,7 @@ def write_failed_retry_galleries(failed_retry_galleries):
 
 def main():
 
-    starttime = datetime.datetime.now().strftime("%Y-%m-%d %H:%M %p")
+    starttime = datetime.datetime.now().strftime("%Y-%m-%d-%H-%M")
     x = input('Confirm using vpn (y/n)')
     if x != 'y':
         return
@@ -80,8 +81,8 @@ def main():
             break
 
     # loging
-    logging_dir = os.path.abspath(f'{get_application_folder_dir()}/Log/')
-    logging_filename = os.path.join(logging_dir, starttime)
+    logging_dir = os.path.abspath(f'{get_application_folder_dir()}/log/')
+    logging_filename = os.path.join(logging_dir, f'{starttime}.log')
     logging.basicConfig(filename=logging_filename, level=logging.DEBUG,
                         format='%(asctime)s %(levelname)s %(message)s', datefmt='%I:%M:%S %p')
     logging.info(f'Program started at {starttime}')
