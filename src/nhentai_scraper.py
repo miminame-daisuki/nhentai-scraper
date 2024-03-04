@@ -13,10 +13,20 @@ import json
 import os
 import sys
 from PIL import Image
-from subprocess import PIPE, run
+from subprocess import run
 import unicodedata
 import logging
+import datetime
 from tqdm import tqdm
+
+
+def start_logging():
+    starttime = datetime.datetime.now().strftime("%Y-%m-%d-%H-%M")
+    logging_dir = os.path.abspath(f'{get_application_folder_dir()}/log/')
+    logging_filename = os.path.join(logging_dir, f'{starttime}.log')
+    logging.basicConfig(filename=logging_filename, level=logging.DEBUG,
+                        format='%(asctime)s %(levelname)s %(message)s', datefmt='%I:%M:%S %p')
+    logging.info('Program started')
 
 
 def get_application_folder_dir():
@@ -136,7 +146,7 @@ class Gallery:
         self.tags = [tag['name'] for tag in self.metadata['tags']]
         self.num_pages = self.metadata['num_pages']
 
-        print(f'\n\nDownloading {self.title}\n')
+        print(f'\nDownloading {self.title}')
         logging.info(f'\n\nTitle: {self.title}\n')
 
         return self.metadata
@@ -187,7 +197,7 @@ class Gallery:
                 self.download_thumb()
                 self.set_thumb()
             except Exception as error:
-                    logging.error(f'An exception occured when downloading/setting thumbnail: {error}')
+                logging.error(f'An exception occured when downloading/setting thumbnail: {error}')
 
     def load_downloaded_metadata(self):
 
@@ -289,6 +299,8 @@ class Gallery:
         while len(self.missing_pages) != 0:
             if tries != 0:
                 logging.info('\n\nRetrying failed downloads '
+                             + f'for the {tries}(th) time...\n')
+                print('Retrying failed downloads '
                       + f'for the {tries}(th) time...\n')
 
             self.download_missing_pages()
@@ -417,6 +429,7 @@ class Gallery:
 
 
 if __name__ == '__main__':
+    start_logging()
     download_dir = os.path.abspath(f'{get_application_folder_dir()}/test/')
     id_list = input('Input gallery id: ')
     id_list = id_list.split(' ')

@@ -10,7 +10,7 @@ import os
 import logging
 import datetime
 
-from nhentai_scraper import Gallery, get_application_folder_dir
+from nhentai_scraper import Gallery, get_application_folder_dir, start_logging
 
 
 def load_download_list():
@@ -66,8 +66,12 @@ def write_failed_retry_galleries(failed_retry_galleries):
 
 def main():
 
-    starttime = datetime.datetime.now().strftime("%Y-%m-%d-%H-%M")
-    x = input('Confirm using vpn (y/n)')
+    start_logging()
+    x = input('Confirm using vpn?(y/n)')
+    if x != 'y':
+        return
+
+    x = input('Confirm updated cf_clearance?(y/n)')
     if x != 'y':
         return
 
@@ -79,13 +83,6 @@ def main():
             download_dir = str(input('Download directory: '))
         else:
             break
-
-    # loging
-    logging_dir = os.path.abspath(f'{get_application_folder_dir()}/log/')
-    logging_filename = os.path.join(logging_dir, f'{starttime}.log')
-    logging.basicConfig(filename=logging_filename, level=logging.DEBUG,
-                        format='%(asctime)s %(levelname)s %(message)s', datefmt='%I:%M:%S %p')
-    logging.info(f'Program started at {starttime}')
 
     id_list = load_download_list()
     failed_retry_galleries = download_id_list(id_list, download_dir)

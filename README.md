@@ -15,19 +15,15 @@ Scraper/Downloader for [nhentai](https://nhentai.net), specifically designed for
 3. Double click the `double_click_run.command` file in the `src/` folder
 
 ## To-do list
-- use logging
-- use progressbar or tqdm
+- use progressbar or tqdm to show current progress and estimate remaining time
 - use Path for paths
 - Failed when retrieving thumbnail
 - Download by author (download all galleries?, even the ones the same title by using title-1, title-2 for example?) to automatically update downloaded galleries
 - Automatically detect input file contains artist name or gallery id?
 
-- Confiem cf_clearance before execution
 - Add diagnosis? (total slept time, failed url percentage, ...)
 - Same title already downloaded, different contents?
-- Output failed_pages and pages_url for each failed_gallery_url
 - Is check_extra_pages needed?
-- Show current progress and estimate remaining time
 - Ask whether to use tag and fileicon when starting program
 - Add error handling for galleries that have been deleted from nhentai
 
