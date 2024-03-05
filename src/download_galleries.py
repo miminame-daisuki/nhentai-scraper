@@ -28,25 +28,27 @@ def download_id_list(id_list, download_dir):
 
     failed_galleries = []
     failed_retry_galleries = []
+    finished_count = 0
     for count, gallery_id in enumerate(id_list, start=1):
         logging.info(f'Downloading number {count} out of {len(id_list)} galleries...')
         gallery = Gallery(gallery_id, download_dir=download_dir)
         gallery.download()
-        if gallery.status[:20] != 'Finished downloading':
+        if gallery.status[:20] == 'Finished downloading':
+            finished_count += 1
+            print(f'Finished {finished_count} out of {len(id_list)} gallery downloads.')
+        else:
             failed_galleries.append(f'{gallery_id}')
             logging.error(f'Failed to download id {gallery_id}, status: {gallery.status}')
-        else:
-            print(f'Finished {count} out of {len(id_list)} gallery downloads.')
 
     # retry failed galleries
     if len(failed_galleries) != 0:
-        print('\n\nRetrying failed galleries...')
-        print(f"\n\n{'-'*200}")
+        print('\nRetrying failed galleries...')
         for gallery_id in failed_galleries:
             gallery = Gallery(gallery_id, download_dir=download_dir)
             gallery.download()
             if gallery.status[:20] != 'Finished downloading':
                 failed_retry_galleries.append(f'{gallery_id}, status: {gallery.status}')
+        print(f"\n{'-'*200}")
 
     return failed_retry_galleries
 
@@ -91,6 +93,8 @@ def confirm_settings():
             download_dir = str(input('Download directory: '))
         else:
             break
+
+    print(f"\n{'-'*200}")
 
     return download_dir
 

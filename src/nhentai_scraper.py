@@ -21,9 +21,9 @@ from tqdm import tqdm
 
 
 def start_logging():
-    starttime = datetime.datetime.now().strftime("%Y-%m-%d-%H-%M")
+    starttime = datetime.datetime.now().strftime("%Y_%m_%d_%H_%M")
     logging_dir = os.path.abspath(f'{get_application_folder_dir()}/log/')
-    logging_filename = os.path.join(logging_dir, f'{starttime}.log')
+    logging_filename = os.path.join(logging_dir, f'{__name__}-{starttime}.log')
     logging.basicConfig(filename=logging_filename, level=logging.DEBUG,
                         format='%(asctime)s %(levelname)s %(message)s', datefmt='%I:%M:%S %p')
     logging.info('Program started')
@@ -148,7 +148,7 @@ class Gallery:
         self.tags = [tag['name'] for tag in self.metadata['tags']]
         self.num_pages = self.metadata['num_pages']
 
-        print(f'\nDownloading {self.title}')
+        print(f'\nDownloading {self.title} (#{self.id})')
         logging.info(f'\n\nTitle: {self.title}\n')
 
         return self.metadata
@@ -175,7 +175,7 @@ class Gallery:
             self.load_downloaded_metadata()
             if int(self.downloaded_metadata['id']) != int(self.id):
                 self.status = "Same gallery with different id "\
-                    + f"{self.downloaded_metadata['id']} already exists"
+                    + f"#{self.downloaded_metadata['id']} already exists"
 
                 return
 
@@ -318,7 +318,7 @@ class Gallery:
 
             tries += 1
             if tries > 3 and len(self.missing_pages) != 0:
-                logging.error(f'\nFailed pages: {self.missing_pages}')
+                logging.error(f'Failed pages: {self.missing_pages}')
                 self.status = 'Retried 3 times'
 
                 return
@@ -404,7 +404,8 @@ class Gallery:
             if self.status == 'Not finished...':
                 return True
             else:
-                logging.error(f'\n\nStatus: {self.status}')
+                logging.error(f'Status: {self.status}')
+                print(f'{self.status}')
                 logging.info(f"\n\n{'-'*200}")
 
                 return False
@@ -414,7 +415,7 @@ class Gallery:
         except Exception as error:
             logging.error(f'An exception occured when retrieving metadata: {error}')
             self.status = 'Error when retrieving metadata'
-            logging.error(f'\n\n{self.status}')
+            logging.error(f'{self.status}')
             logging.info(f"\n\n{'-'*200}")
 
             return self.status

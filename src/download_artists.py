@@ -24,7 +24,7 @@ def get_gallery_id(url, headers={}, cookies={}):
 # retrieves all gallery ids from a artist
 def search_artist(artist: str):
 
-    print(f'Searching galleries from artist {artist}')
+    print(f'\nSearching galleries from artist {artist}')
     artist_url = f'https://nhentai.net/artist/{artist}/'
     application_folder_path = get_application_folder_dir()
     inputs_dir = os.path.abspath(f'{application_folder_path}/inputs/')
@@ -61,7 +61,6 @@ def main():
     failed_retry_galleries = []
     for artist in artist_list:
         id_list = search_artist(artist)
-        print(f'Loading artist: {artist}')
         failed_retry_galleries.extend(download_id_list(id_list, download_dir))
     check_failed_retry_galleries(failed_retry_galleries)
 
