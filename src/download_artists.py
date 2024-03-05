@@ -27,21 +27,22 @@ def get_gallery_id(url, headers={}, cookies={}):
     return gallery_id, page_count
 
 
-# retrieves all gallery ids from a artist
-def search_artist(artist: str):
+# retrieves all gallery ids from a tag
+def search_tag(tag: str):
 
-    print(f'\nSearching galleries from artist {artist}')
-    artist_url = f'https://nhentai.net/artist/{artist}/'
+    print((f"\nSearching galleries from {tag.split('/')[0]}"
+           f"{tag.split('/')[1]}"))
+    tag_url = f"https://nhentai.net/{tag.split('/')[0]}/{tag.split('/')[1]}/"
     application_folder_path = nhentai_scraper.get_application_folder_dir()
     inputs_dir = os.path.abspath(f'{application_folder_path}/inputs/')
     headers = nhentai_scraper.load_headers(inputs_dir)
     cookies = nhentai_scraper.load_cookies(inputs_dir)
-    id_list, page_count = get_gallery_id(artist_url,
+    id_list, page_count = get_gallery_id(tag_url,
                                          headers=headers,
                                          cookies=cookies)
 
     for page in range(2, page_count+1):
-        page_url = artist_url + f'?page={page}'
+        page_url = tag_url + f'?page={page}'
         id_list.extend(get_gallery_id(page_url,
                                       headers=headers,
                                       cookies=cookies)[0])
@@ -49,26 +50,26 @@ def search_artist(artist: str):
     return id_list
 
 
-def load_artist_list():
+def load_tag_list():
     application_folder_path = nhentai_scraper.get_application_folder_dir()
     inputs_folder_dir = os.path.abspath(f'{application_folder_path}/inputs/')
-    filename = f'{inputs_folder_dir}/download_artist.txt'
+    filename = f'{inputs_folder_dir}/download_tags.txt'
     with open(filename) as f:
-        artist_list = f.read().splitlines()
-    artist_list = [entry for entry in artist_list if not entry == '']
+        tag_list = f.read().splitlines()
+    tag_list = [entry for entry in tag_list if not entry == '']
 
-    return artist_list
+    return tag_list
 
 
 def main():
     nhentai_scraper.set_logging_config()
     logger.info('Program started')
     download_dir = download_galleries.confirm_settings()
-    artist_list = load_artist_list()
+    tag_list = load_tag_list()
     failed_retry_galleries = []
-    for artist in artist_list:
+    for tag in tag_list:
         try:
-            id_list = search_artist(artist)
+            id_list = search_tag(tag)
         except Exception as error:
             logger.error(f'{error}')
             continue

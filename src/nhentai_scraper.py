@@ -24,19 +24,6 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def start_logging():
-    starttime = datetime.datetime.now().strftime("%Y_%m_%d_%H_%M")
-    logging_dir = os.path.abspath(f'{get_application_folder_dir()}/log/')
-    logging_filename = os.path.join(logging_dir, f'{__name__}-{starttime}.log')
-    logging.basicConfig(
-        filename=logging_filename,
-        level=logging.DEBUG,
-        format='%(asctime)s %(levelname)s %(message)s',
-        datefmt='%I:%M:%S %p'
-    )
-    logging.info('Program started')
-
-
 def set_logging_config(logging_config_filename=''):
     logging_dir = os.path.abspath(f'{get_application_folder_dir()}/log/')
     if not logging_config_filename:

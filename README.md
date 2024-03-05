@@ -4,7 +4,7 @@ Scraper/Downloader for [nhentai](https://nhentai.net), specifically designed for
 ## Features
 - Automatically sets thumbnail and tags to folder for each gallery
 - Combines downloaded images into pdf
-- Downloads from a user-given list of gallery ids or tag/artist/group names
+- Downloads from a user-given list of gallery ids or tags/artists/groups/parodies...
 
 ## Dependencies
 - [fileicon](https://github.com/mklement0/fileicon)
@@ -12,10 +12,18 @@ Scraper/Downloader for [nhentai](https://nhentai.net), specifically designed for
 
 ## Basic Usage
 1. Place the id (six digit number) of the galleries you want to download in the file `download_id.txt` inside the folder `inputs/`
+1. 
+Example:
+```
+artist/
+tag/
+group/
+```
 2. Open your browser, find the cookies and headers (for bypassing CloudFlare), and put those in the `cookies.txt` and `headers.txt` files inside `inputs/`
 3. Double click the `double_click_run.command` file in the `src/` folder
 
 ## To-do list
+- Add blacklist
 - use progressbar or tqdm to show current progress and estimate remaining time
 - use Path for paths
 - Failed when retrieving thumbnail
@@ -23,16 +31,14 @@ Scraper/Downloader for [nhentai](https://nhentai.net), specifically designed for
 - Automatically detect input file contains artist name or gallery id?
 - Combine download_author.py and download_galleries.py into one file containing main() and put function definitions in new file
 - Combine load_artist_list() and load_id_list()
-- Adjust download_artists.py for groups, tags, ...
+- Separate galleries with same title already downloaded from failed_galleries
 
 - Add diagnosis? (total slept time, failed url percentage, ...)
 - Same title already downloaded, different contents?
 - Is check_extra_pages needed?
 - Ask whether to use tag and fileicon when starting program
 - Add error handling for galleries that have been deleted from nhentai
-- Error handling for download_author.py (ex: typo in artist name, ...)
-- Logging for download_artists.py
-- Delete old logs
+- Logging for confirm_settings()
 - Add more settings in confirm_settings()
 
 - fileicon: ERROR: Target not found or neither file nor folder: '../Downloaded/[たかやKi] ドキ2 Xmas'
