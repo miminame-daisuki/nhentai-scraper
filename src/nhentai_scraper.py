@@ -10,23 +10,49 @@ import requests
 import random
 import time
 import json
+import yaml
 import os
 import sys
 from PIL import Image
 from subprocess import run
 import unicodedata
-import logging
 import datetime
 from tqdm import tqdm
+import logging
+
+
+logger = logging.getLogger(__name__)
 
 
 def start_logging():
     starttime = datetime.datetime.now().strftime("%Y_%m_%d_%H_%M")
     logging_dir = os.path.abspath(f'{get_application_folder_dir()}/log/')
     logging_filename = os.path.join(logging_dir, f'{__name__}-{starttime}.log')
-    logging.basicConfig(filename=logging_filename, level=logging.DEBUG,
-                        format='%(asctime)s %(levelname)s %(message)s', datefmt='%I:%M:%S %p')
+    logging.basicConfig(
+        filename=logging_filename,
+        level=logging.DEBUG,
+        format='%(asctime)s %(levelname)s %(message)s',
+        datefmt='%I:%M:%S %p'
+    )
     logging.info('Program started')
+
+
+def set_logging_config(logging_config_filename=''):
+    logging_dir = os.path.abspath(f'{get_application_folder_dir()}/log/')
+    if not logging_config_filename:
+        logging_config_filename = os.path.join(logging_dir,
+                                               'logging_config.yaml')
+    with open(logging_config_filename) as f:
+        if 'yaml' in logging_config_filename:
+            logging_config = yaml.full_load(f)
+        elif 'json' in logging_config_filename:
+            logging_config = json.load(f)
+
+    logging_filename = os.path.join(logging_dir,
+                                    f'{os.path.basename(__file__)}.log')
+    logging_config['handlers']['file']['filename'] = logging_filename
+
+    logging.config.dictConfig(logging_config)
 
 
 def get_application_folder_dir():
@@ -68,13 +94,13 @@ def get_response(url, headers={}, cookies={},
         response = requests.get(url, headers=headers, cookies=cookies,
                                 timeout=timeout_time)
     except Exception as error:
-        logging.error(f'An exception occured: {error}')
+        logger.error(f'An exception occured: {error}')
         response = ''
 
     # sleep for sleep_time after each get_response
     if sleep_time == 'default':
         sleep_time = 3*random.random()+1.5
-    logging.info(f'Sleeping for ~ {sleep_time:.1f} seconds...')
+    logger.info(f'Sleeping for ~ {sleep_time:.1f} seconds...')
     time.sleep(sleep_time)
 
     return response
@@ -99,7 +125,7 @@ class Gallery:
         if not download_dir:
             self.downloaded_dir = os.path.abspath(
                 f'{self.application_folder_path}/Downloaded/')
-        logging.info(f"\nDownload directory set to: '{self.download_dir}'")
+        logger.info(f"\nDownload directory set to: '{self.download_dir}'")
 
         self.inputs_dir = os.path.abspath(
             f'{self.application_folder_path}/inputs/')
@@ -115,7 +141,7 @@ class Gallery:
 
     def get_metadata(self):
 
-        logging.info(f"\nRetrieving gallery api for id '{self.id}'...")
+        logger.info(f"\nRetrieving gallery api for id '{self.id}'...")
         api_url = f'https://nhentai.net/api/gallery/{int(self.id)}'
 
         api_response = get_response(api_url,
@@ -125,7 +151,8 @@ class Gallery:
         # try for up to 3 times
         tries = 0
         while api_response.status_code != 200 or not api_response:
-            logging.error(f'Failed to retrieve metadata with status code {api_response.status_code}, retrying...')
+            logger.error(('Failed to retrieve metadata with status code'
+                          f'{api_response.status_code}, retrying...'))
             api_response = get_response(api_url,
                                         headers=self.headers,
                                         cookies=self.cookies)
@@ -149,7 +176,7 @@ class Gallery:
         self.num_pages = self.metadata['num_pages']
 
         print(f'\nDownloading {self.title} (#{self.id})')
-        logging.info(f'\n\nTitle: {self.title}\n')
+        logger.info(f'\n\nTitle: {self.title}\n')
 
         return self.metadata
 
@@ -186,7 +213,8 @@ class Gallery:
                     self.download_thumb()
                     self.set_thumb()
                 except Exception as error:
-                    logging.error(f'An exception occured when downloading/setting thumbnail: {error}')
+                    logger.error(('An exception occured when'
+                                  f'downloading/setting thumbnail: {error}'))
 
         else:
             os.mkdir(self.folder_dir)
@@ -199,7 +227,8 @@ class Gallery:
                 self.download_thumb()
                 self.set_thumb()
             except Exception as error:
-                logging.error(f'An exception occured when downloading/setting thumbnail: {error}')
+                logger.error(('An exception occured when downloading/setting'
+                              f'thumbnail: {error}'))
 
     def load_downloaded_metadata(self):
 
@@ -217,18 +246,20 @@ class Gallery:
 
     def download_thumb(self):
 
-        logging.info('\nRetrieving thumbnail...')
+        logger.info('\nRetrieving thumbnail...')
         extension = self.get_img_extension(
             self.metadata['images']['thumbnail'])
-        thumb_url = f'https://t3.nhentai.net/galleries/{self.media_id}/thumb.{extension}'
+        thumb_url = ('https://t3.nhentai.net/galleries/'
+                     f'{self.media_id}/thumb.{extension}')
         thumb_response = get_response(thumb_url,
                                       headers=self.headers,
                                       cookies=self.cookies)
         if not thumb_response:
-            logging.error('Failed when getting response for thumbnail')
+            logger.error('Failed when getting response for thumbnail')
             return
         if thumb_response.status_code != 200:
-            logging.error(f'Something went wrong when retrieving thumbnail: {thumb_response.status_code}')
+            logger.error(('Something went wrong when retrieving thumbnail:'
+                          f'{thumb_response.status_code}'))
             return
 
         self.thumb_filename = f'{self.folder_dir}/thumb.{extension}'
@@ -240,7 +271,10 @@ class Gallery:
         tags_string = ''.join(f"'{tag}'," for tag in self.tags)[:-1]
 
         # set tags with tag
-        set_tags_command = ['tag', '-a', f'{tags_string}', f'{self.folder_dir}']
+        set_tags_command = ['tag',
+                            '-a',
+                            f'{tags_string}',
+                            f'{self.folder_dir}']
         run(set_tags_command)
 
     def set_thumb(self):
@@ -261,33 +295,35 @@ class Gallery:
         set_thumb_command = ['fileicon', 'set',
                              f'{self.folder_dir}', f'{self.thumb_filename}']
         result = run(set_thumb_command, capture_output=True)
-        logging.info(f'{result.stdout}')
+        logger.info(f'{result.stdout}')
 
     def download_page(self, page):
 
-        logging.info(f'\nRetrieving Page {page}/{self.num_pages} url...')
+        logger.info(f'\nRetrieving Page {page}/{self.num_pages} url...')
 
         extension = self.get_img_extension(
             self.metadata['images']['pages'][int(page)-1])
-        img_url = f'https://i5.nhentai.net/galleries/{self.media_id}/{int(page)}.{extension}'
+        img_url = ('https://i5.nhentai.net/galleries/'
+                   f'{self.media_id}/{int(page)}.{extension}')
         img_response = get_response(img_url,
                                     headers=self.headers,
                                     cookies=self.cookies)
         if not img_response:
-            logging.error(f'Failed when getting response for page {page}')
+            logger.error(f'Failed when getting response for page {page}')
             return
         if img_response.status_code != 200:
-            logging.error(f'Something went wrong with when getting response for page {page}: {img_response.status_code}')
+            logger.error(('Something went wrong with when getting response'
+                          f'for page {page}: {img_response.status_code}'))
             return
 
-        logging.info('Image downloaded')
+        logger.info('Image downloaded')
         filename = f'{self.folder_dir}/{str(page)}.{extension}'
         with open(filename, 'wb') as f:
             f.write(img_response.content)
 
     def check_gallery(self):
 
-        logging.info('\nChecking downloaded gallery...')
+        logger.info('\nChecking downloaded gallery...')
         self.make_dir()
         if not self.status == 'Not finished...':
             return self.status
@@ -304,8 +340,8 @@ class Gallery:
         tries = 0
         while len(self.missing_pages) != 0:
             if tries != 0:
-                logging.info('\n\nRetrying failed downloads '
-                             + f'for the {tries}(th) time...\n')
+                logger.info('\n\nRetrying failed downloads '
+                            + f'for the {tries}(th) time...\n')
                 print('Retrying failed downloads '
                       + f'for the {tries}(th) time...\n')
 
@@ -318,7 +354,7 @@ class Gallery:
 
             tries += 1
             if tries > 3 and len(self.missing_pages) != 0:
-                logging.error(f'Failed pages: {self.missing_pages}')
+                logger.error(f'Failed pages: {self.missing_pages}')
                 self.status = 'Retried 3 times'
 
                 return
@@ -353,16 +389,18 @@ class Gallery:
                           '.DS_Store', f'{self.title}.pdf']
         downloaded_pages = [unicodedata.normalize('NFC', page)
                             for page in downloaded_pages
-                            if unicodedata.normalize('NFC', page) not in non_page_files]
+                            if unicodedata.normalize('NFC', page)
+                            not in non_page_files]
         for file_count in downloaded_pages:
-            if int(file_count.split('.')[0]) not in range(int(self.num_pages)+1):
+            if (int(file_count.split('.')[0])
+                    not in range(int(self.num_pages)+1)):
                 extra_pages.append(file_count)
 
         return extra_pages
 
     def img2pdf(self):
 
-        logging.info('Converting images to PDF file...')
+        logger.info('Converting images to PDF file...')
         pdf_path = f'{self.folder_dir}/{self.title}.pdf'
 
         # load all image files and remove unwanted ones
@@ -375,7 +413,7 @@ class Gallery:
         # check whether pdf already exists
         for filename in image_filenames:
             if 'pdf' in filename:
-                logging.info('PDF file already exists')
+                logger.info('PDF file already exists')
                 self.status = f'Finished downloading {self.title}'
 
                 return
@@ -404,19 +442,20 @@ class Gallery:
             if self.status == 'Not finished...':
                 return True
             else:
-                logging.error(f'Status: {self.status}')
+                logger.error(f'Status: {self.status}')
                 print(f'{self.status}')
-                logging.info(f"\n\n{'-'*200}")
+                logger.info(f"\n\n{'-'*200}")
 
                 return False
 
         try:
             self.get_metadata()
         except Exception as error:
-            logging.error(f'An exception occured when retrieving metadata: {error}')
+            logger.error(('An exception occured when'
+                          f'retrieving metadata: {error}'))
             self.status = 'Error when retrieving metadata'
-            logging.error(f'{self.status}')
-            logging.info(f"\n\n{'-'*200}")
+            logger.error(f'{self.status}')
+            logger.info(f"\n\n{'-'*200}")
 
             return self.status
 
@@ -429,17 +468,22 @@ class Gallery:
 
         self.img2pdf()
 
-        logging.info(f'\n\n{self.status}')
-        logging.info(f"\n\n{'-'*200}")
+        logger.info(f'\n\n{self.status}')
+        logger.info(f"\n\n{'-'*200}")
 
         return self.status
 
 
-if __name__ == '__main__':
-    start_logging()
+def main():
+    set_logging_config()
+    logger.info('Program started')
     download_dir = os.path.abspath(f'{get_application_folder_dir()}/test/')
     id_list = input('Input gallery id: ')
     id_list = id_list.split(' ')
     for gallery_id in id_list:
         gallery = Gallery(gallery_id, download_dir=download_dir)
         gallery.download()
+
+
+if __name__ == '__main__':
+    main()

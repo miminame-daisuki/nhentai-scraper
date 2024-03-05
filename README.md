@@ -4,6 +4,7 @@ Scraper/Downloader for [nhentai](https://nhentai.net), specifically designed for
 ## Features
 - Automatically sets thumbnail and tags to folder for each gallery
 - Combines downloaded images into pdf
+- Downloads from a user-given list of gallery ids or tag/artist/group names
 
 ## Dependencies
 - [fileicon](https://github.com/mklement0/fileicon)
@@ -32,5 +33,6 @@ Scraper/Downloader for [nhentai](https://nhentai.net), specifically designed for
 - Error handling for download_author.py (ex: typo in artist name, ...)
 - Logging for download_artists.py
 - Delete old logs
+- Add more settings in confirm_settings()
 
 - fileicon: ERROR: Target not found or neither file nor folder: '../Downloaded/[たかやKi] ドキ2 Xmas'
