@@ -16,13 +16,12 @@ import sys
 from PIL import Image
 from subprocess import run
 import unicodedata
-import datetime
 from tqdm import tqdm
 import logging
 import logging.config
 
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('__main__.' + __name__)
 
 
 def set_logging_config(logging_config_filename=''):
@@ -37,7 +36,7 @@ def set_logging_config(logging_config_filename=''):
             logging_config = json.load(f)
 
     logging_filename = os.path.join(logging_dir,
-                                    f'{os.path.basename(__file__)}.log')
+                                    f'{__name__}.log')
     logging_config['handlers']['file']['filename'] = logging_filename
 
     logging.config.dictConfig(logging_config)
@@ -55,6 +54,18 @@ def get_application_folder_dir():
             f'{os.path.dirname(__file__)}/..')
 
     return application_folder_dir
+
+
+def load_input_list(filename):
+
+    application_folder_path = get_application_folder_dir()
+    inputs_folder_dir = os.path.abspath(f'{application_folder_path}/inputs/')
+    filename = f'{inputs_folder_dir}/{filename}'
+    with open(filename) as f:
+        id_list = f.read().splitlines()
+    id_list = [entry for entry in id_list if not entry == '']
+
+    return id_list
 
 
 def load_headers(inputs_dir):
@@ -160,13 +171,21 @@ class Gallery:
         else:
             self.title = self.metadata['title']['english']
         self.title = self.title.replace('/', '_')
-        self.tags = [tag['name'] for tag in self.metadata['tags']]
+        self.tags = [f"{tag['type']}:{tag['name']}"
+                     for tag in self.metadata['tags']]
         self.num_pages = self.metadata['num_pages']
 
         print(f'\nDownloading {self.title} (#{self.id})')
         logger.info(f'\n\nTitle: {self.title}\n')
 
         return self.metadata
+
+    def check_blacklist(self, blacklist=None):
+        if not blacklist:
+            blacklist = load_input_list('blacklist.txt')
+        for tag in self.metadata['tags']:
+            if any(tag in self.tags for tag in blacklist):
+                self.status = 'BLACKLISTED'
 
     def get_img_extension(self, img_metadata):
 
@@ -256,7 +275,8 @@ class Gallery:
 
     def set_tags(self):
 
-        tags_string = ''.join(f"'{tag}'," for tag in self.tags)[:-1]
+        tags_string = ''.join(f"'{tag}'," for tag in self.tags)
+        tags_string = tags_string[:-1]  # to exclude the final ','
 
         # set tags with tag
         set_tags_command = ['tag',
@@ -331,7 +351,7 @@ class Gallery:
                 logger.info('\n\nRetrying failed downloads '
                             + f'for the {tries}(th) time...\n')
                 print('Retrying failed downloads '
-                      + f'for the {tries}(th) time...\n')
+                      + f'for the {tries}(th) time...')
 
             self.download_missing_pages()
             self.load_missing_pages()
@@ -446,7 +466,10 @@ class Gallery:
             logger.info(f"\n\n{'-'*200}")
 
             return self.status
+        if not check_status():
+            return self.status
 
+        self.check_blacklist()
         if not check_status():
             return self.status
 
@@ -462,7 +485,7 @@ class Gallery:
         return self.status
 
 
-def main():
+if __name__ == '__main__':
     set_logging_config()
     logger.info('Program started')
     download_dir = os.path.abspath(f'{get_application_folder_dir()}/test/')
@@ -471,7 +494,4 @@ def main():
     for gallery_id in id_list:
         gallery = Gallery(gallery_id, download_dir=download_dir)
         gallery.download()
-
-
-if __name__ == '__main__':
-    main()
+        print(gallery.status)

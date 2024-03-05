@@ -12,19 +12,7 @@ import logging
 import nhentai_scraper
 
 
-logger = logging.getLogger(__name__)
-
-
-def load_id_list():
-
-    application_folder_path = nhentai_scraper.get_application_folder_dir()
-    inputs_folder_dir = os.path.abspath(f'{application_folder_path}/inputs/')
-    filename = f'{inputs_folder_dir}/download_id.txt'
-    with open(filename) as f:
-        id_list = f.read().splitlines()
-    id_list = [entry for entry in id_list if not entry == '']
-
-    return id_list
+logger = logging.getLogger('__main__.' + __name__)
 
 
 def download_id_list(id_list, download_dir):
@@ -116,7 +104,7 @@ def main():
     nhentai_scraper.set_logging_config()
     logger.info('Program started')
     download_dir = confirm_settings()
-    id_list = load_id_list()
+    id_list = nhentai_scraper.load_input_list('download_id.txt')
     failed_retry_galleries = download_id_list(id_list, download_dir)
     check_failed_retry_galleries(failed_retry_galleries)
 

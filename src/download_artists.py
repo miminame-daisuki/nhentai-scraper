@@ -30,9 +30,8 @@ def get_gallery_id(url, headers={}, cookies={}):
 # retrieves all gallery ids from a tag
 def search_tag(tag: str):
 
-    print((f"\nSearching galleries from {tag.split('/')[0]}"
-           f"{tag.split('/')[1]}"))
-    tag_url = f"https://nhentai.net/{tag.split('/')[0]}/{tag.split('/')[1]}/"
+    print(f"\nSearching galleries from {tag}")
+    tag_url = f"https://nhentai.net/{tag.split(':')[0]}/{tag.split(':')[1]}/"
     application_folder_path = nhentai_scraper.get_application_folder_dir()
     inputs_dir = os.path.abspath(f'{application_folder_path}/inputs/')
     headers = nhentai_scraper.load_headers(inputs_dir)
@@ -50,22 +49,12 @@ def search_tag(tag: str):
     return id_list
 
 
-def load_tag_list():
-    application_folder_path = nhentai_scraper.get_application_folder_dir()
-    inputs_folder_dir = os.path.abspath(f'{application_folder_path}/inputs/')
-    filename = f'{inputs_folder_dir}/download_tags.txt'
-    with open(filename) as f:
-        tag_list = f.read().splitlines()
-    tag_list = [entry for entry in tag_list if not entry == '']
-
-    return tag_list
-
-
 def main():
     nhentai_scraper.set_logging_config()
+
     logger.info('Program started')
     download_dir = download_galleries.confirm_settings()
-    tag_list = load_tag_list()
+    tag_list = nhentai_scraper.load_input_list('download_tags.txt')
     failed_retry_galleries = []
     for tag in tag_list:
         try:
@@ -73,6 +62,7 @@ def main():
         except Exception as error:
             logger.error(f'{error}')
             continue
+        logger.info(f'Start downloading for {tag}')
         failed_retry_galleries.extend(
             download_galleries.download_id_list(id_list, download_dir)
         )

@@ -23,14 +23,12 @@ group/
 3. Double click the `double_click_run.command` file in the `src/` folder
 
 ## To-do list
-- Add blacklist
 - use progressbar or tqdm to show current progress and estimate remaining time
 - use Path for paths
 - Failed when retrieving thumbnail
 - Download by author (download all galleries?, even the ones the same title by using title-1, title-2 for example?) to automatically update downloaded galleries
 - Automatically detect input file contains artist name or gallery id?
 - Combine download_author.py and download_galleries.py into one file containing main() and put function definitions in new file
-- Combine load_artist_list() and load_id_list()
 - Separate galleries with same title already downloaded from failed_galleries
 
 - Add diagnosis? (total slept time, failed url percentage, ...)
@@ -40,5 +38,6 @@ group/
 - Add error handling for galleries that have been deleted from nhentai
 - Logging for confirm_settings()
 - Add more settings in confirm_settings()
+- Add yaml for each gallery in addition to json
 
 - fileicon: ERROR: Target not found or neither file nor folder: '../Downloaded/[たかやKi] ドキ2 Xmas'
