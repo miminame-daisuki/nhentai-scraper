@@ -23,6 +23,7 @@ group/
 3. Double click the `double_click_run.command` file in the `src/` folder
 
 ## To-do list
+- retag old_Downloaded
 - use progressbar or tqdm to show current progress and estimate remaining time
 - use Path for paths
 - Failed when retrieving thumbnail
@@ -39,5 +40,7 @@ group/
 - Logging for confirm_settings()
 - Add more settings in confirm_settings()
 - Add yaml for each gallery in addition to json
+- Log user termination of program
+- Add another handler for printint std output (change most logger.info to logger.debug?)
 
 - fileicon: ERROR: Target not found or neither file nor folder: '../Downloaded/[たかやKi] ドキ2 Xmas'

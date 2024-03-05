@@ -124,7 +124,7 @@ class Gallery:
         if not download_dir:
             self.downloaded_dir = os.path.abspath(
                 f'{self.application_folder_path}/Downloaded/')
-        logger.info(f"\nDownload directory set to: '{self.download_dir}'")
+        logger.info(f"Download directory set to: '{self.download_dir}'")
 
         self.inputs_dir = os.path.abspath(
             f'{self.application_folder_path}/inputs/')
@@ -140,7 +140,7 @@ class Gallery:
 
     def get_metadata(self):
 
-        logger.info(f"\nRetrieving gallery api for id '{self.id}'...")
+        logger.info(f"Retrieving gallery api for id '{self.id}'...")
         api_url = f'https://nhentai.net/api/gallery/{int(self.id)}'
 
         api_response = get_response(api_url,
@@ -174,9 +174,6 @@ class Gallery:
         self.tags = [f"{tag['type']}:{tag['name']}"
                      for tag in self.metadata['tags']]
         self.num_pages = self.metadata['num_pages']
-
-        print(f'\nDownloading {self.title} (#{self.id})')
-        logger.info(f'\n\nTitle: {self.title}\n')
 
         return self.metadata
 
@@ -253,7 +250,7 @@ class Gallery:
 
     def download_thumb(self):
 
-        logger.info('\nRetrieving thumbnail...')
+        logger.info('Retrieving thumbnail...')
         extension = self.get_img_extension(
             self.metadata['images']['thumbnail'])
         thumb_url = ('https://t3.nhentai.net/galleries/'
@@ -275,7 +272,7 @@ class Gallery:
 
     def set_tags(self):
 
-        tags_string = ''.join(f"'{tag}'," for tag in self.tags)
+        tags_string = ''.join(f'{tag},' for tag in self.tags)
         tags_string = tags_string[:-1]  # to exclude the final ','
 
         # set tags with tag
@@ -307,7 +304,7 @@ class Gallery:
 
     def download_page(self, page):
 
-        logger.info(f'\nRetrieving Page {page}/{self.num_pages} url...')
+        logger.info(f'Retrieving Page {page}/{self.num_pages} url...')
 
         extension = self.get_img_extension(
             self.metadata['images']['pages'][int(page)-1])
@@ -331,7 +328,7 @@ class Gallery:
 
     def check_gallery(self):
 
-        logger.info('\nChecking downloaded gallery...')
+        logger.info('Checking downloaded gallery...')
         self.make_dir()
         if not self.status == 'Not finished...':
             return self.status
@@ -347,8 +344,11 @@ class Gallery:
         # download all missing pages, and retry up to 3 times for failed pages
         tries = 0
         while len(self.missing_pages) != 0:
+            if tries == 0:
+                print(f'\nDownloading {self.title} (#{self.id})')
+                logger.info(f'Title: {self.title}')
             if tries != 0:
-                logger.info('\n\nRetrying failed downloads '
+                logger.info('Retrying failed downloads '
                             + f'for the {tries}(th) time...\n')
                 print('Retrying failed downloads '
                       + f'for the {tries}(th) time...')
@@ -422,7 +422,7 @@ class Gallery:
         for filename in image_filenames:
             if 'pdf' in filename:
                 logger.info('PDF file already exists')
-                self.status = f'Finished downloading {self.title}'
+                self.status = 'PDF file already exists'
 
                 return
 
@@ -448,11 +448,19 @@ class Gallery:
 
         def check_status():
             if self.status == 'Not finished...':
+
                 return True
+
+            elif self.status[:20] == 'Finished downloading':
+                logger.info(f'\n\n{self.status}')
+                logger.info(f"\n{'-'*200}")
+
+                return True
+
             else:
                 logger.error(f'Status: {self.status}')
                 print(f'{self.status}')
-                logger.info(f"\n\n{'-'*200}")
+                logger.info(f"\n{'-'*200}")
 
                 return False
 
@@ -463,7 +471,7 @@ class Gallery:
                           f'retrieving metadata: {error}'))
             self.status = 'Error when retrieving metadata'
             logger.error(f'{self.status}')
-            logger.info(f"\n\n{'-'*200}")
+            logger.info(f"\n{'-'*200}")
 
             return self.status
         if not check_status():
@@ -478,9 +486,8 @@ class Gallery:
             return self.status
 
         self.img2pdf()
-
-        logger.info(f'\n\n{self.status}')
-        logger.info(f"\n\n{'-'*200}")
+        if not check_status():
+            return self.status
 
         return self.status
 
@@ -494,4 +501,5 @@ if __name__ == '__main__':
     for gallery_id in id_list:
         gallery = Gallery(gallery_id, download_dir=download_dir)
         gallery.download()
-        print(gallery.status)
+        if gallery.status[:20] == 'Finished downloading':
+            print(gallery.status)
