@@ -8,6 +8,7 @@ Created on Tue Feb 13 19:43:58 2024
 
 import os
 import logging
+from tqdm import tqdm
 
 import nhentai_scraper
 
@@ -20,7 +21,7 @@ def download_id_list(id_list, download_dir):
     failed_galleries = []
     failed_retry_galleries = []
     finished_count = 0
-    for count, gallery_id in enumerate(id_list, start=1):
+    for count, gallery_id in enumerate(tqdm(id_list), start=1):
         logger.info((f'Downloading number {count} '
                      f'out of {len(id_list)} galleries...'))
         gallery = nhentai_scraper.Gallery(gallery_id,

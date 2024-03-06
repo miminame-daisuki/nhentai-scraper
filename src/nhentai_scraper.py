@@ -146,6 +146,10 @@ class Gallery:
         api_response = get_response(api_url,
                                     headers=self.headers,
                                     cookies=self.cookies)
+        self.api_response_status_code = api_response.status_code
+        if self.api_response_status_code == 404:
+            self.status = '404 - Not Found'
+            return
 
         # try for up to 3 times
         tries = 0
@@ -155,6 +159,7 @@ class Gallery:
             api_response = get_response(api_url,
                                         headers=self.headers,
                                         cookies=self.cookies)
+            self.api_response_status_code = api_response.status_code
             tries += 1
             if tries >= 3:
                 break
@@ -279,8 +284,12 @@ class Gallery:
         set_tags_command = ['tag',
                             '-a',
                             f'{tags_string}',
-                            f'{self.folder_dir}']
-        run(set_tags_command)
+                            f"{self.folder_dir}"
+                            ]
+        result = run(set_tags_command, capture_output=True, check=True)
+        logger.info(f'{result.stdout}')
+        if result.returncode != 0:
+            self.status = result.stdout
 
     def set_thumb(self):
 
@@ -297,10 +306,15 @@ class Gallery:
         thumb_rgb.save(self.thumb_filename)
 
         # set thumbnail with filicon
-        set_thumb_command = ['fileicon', 'set',
-                             f'{self.folder_dir}', f'{self.thumb_filename}']
-        result = run(set_thumb_command, capture_output=True)
+        set_thumb_command = ['fileicon',
+                             'set',
+                             f"{self.folder_dir}",
+                             f'{self.thumb_filename}'
+                             ]
+        result = run(set_thumb_command, capture_output=True, check=True)
         logger.info(f'{result.stdout}')
+        if result.returncode != 0:
+            self.status = result.stdout
 
     def download_page(self, page):
 

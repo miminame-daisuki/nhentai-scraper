@@ -1,4 +1,12 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Sat Feb 11 22:22:59 2024
+
+@author: ball
+"""
 from bs4 import BeautifulSoup
+
 import os
 import logging
 
