@@ -38,7 +38,8 @@ def get_gallery_id(url, headers={}, cookies={}):
 # retrieves all gallery ids from a tag
 def search_tag(tag: str):
 
-    print(f"\nSearching galleries from {tag}")
+    logger.info(f"\nSearching galleries from {tag}\n")
+    print(f"\nSearching galleries from {tag}\n")
     tag_url = f"https://nhentai.net/{tag.split(':')[0]}/{tag.split(':')[1]}/"
     application_folder_path = nhentai_scraper.get_application_folder_dir()
     inputs_dir = os.path.abspath(f'{application_folder_path}/inputs/')
@@ -60,11 +61,12 @@ def search_tag(tag: str):
 def main():
 
     nhentai_scraper.set_logging_config()
+    logger.info(f"\n{'-'*200}")
     logger.info('Program started')
     download_dir = download_galleries.confirm_settings()
     tag_list = nhentai_scraper.load_input_list('download_tags.txt')
     failed_galleries = {
-        'failed_galleries': [],
+        'initial_failed_galleries': [],
         'failed_retry_galleries': [],
         'repeated_galleries': []
     }
