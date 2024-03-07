@@ -17,6 +17,7 @@ from PIL import Image
 from subprocess import run
 import unicodedata
 from tqdm import tqdm
+from pypdf import PdfReader
 import logging
 import logging.config
 
@@ -94,7 +95,8 @@ def get_response(url, headers={}, cookies={},
                                 timeout=timeout_time)
     except Exception as error:
         logger.error(f'An exception occured: {error}')
-        response = ''
+        response = lambda: None
+        response.status_code = 'No_response'
 
     # sleep for sleep_time after each get_response
     if sleep_time == 'default':
@@ -136,38 +138,37 @@ class Gallery:
         if not self.cookies:
             self.cookies = load_cookies(self.inputs_dir)
 
-        self.status = 'Not finished...'
+        self.status_code = -1
 
-    def get_metadata(self):
+    def download_metadata(self):
 
-        logger.info(f"Retrieving gallery api for id '{self.id}'...")
+        logger.info(('Downloading gallery metadata '
+                     f"for id '{self.id}' from Nhentai api..."))
         api_url = f'https://nhentai.net/api/gallery/{int(self.id)}'
 
         api_response = get_response(api_url,
                                     headers=self.headers,
                                     cookies=self.cookies)
-        self.api_response_status_code = api_response.status_code
-        if self.api_response_status_code == 404:
-            self.status = '404 - Not Found'
+        if api_response.status_code == 403:
+            self.status_code = -2
+            return
+        elif api_response.status_code == 404:
+            self.status_code = -3
             return
 
-        # try for up to 3 times
+        # retry for up to 3 times
         tries = 0
-        while api_response.status_code != 200 or not api_response:
+        while api_response.status_code != 200:
             logger.error(('Failed to retrieve metadata with status code'
                           f'{api_response.status_code}, retrying...'))
             api_response = get_response(api_url,
                                         headers=self.headers,
                                         cookies=self.cookies)
-            self.api_response_status_code = api_response.status_code
             tries += 1
-            if tries >= 3:
-                break
 
-        if tries >= 3:
-            self.status = 'Tried more than 5 times when getting metadata, '\
-                + 'try updating cf_clearance'
-            return
+            if tries >= 3 and api_response != 200:
+                self.status_code = -4
+                return
 
         self.metadata = api_response.json()
         self.media_id = self.metadata['media_id']
@@ -187,7 +188,7 @@ class Gallery:
             blacklist = load_input_list('blacklist.txt')
         for tag in self.metadata['tags']:
             if any(tag in self.tags for tag in blacklist):
-                self.status = 'BLACKLISTED'
+                self.status_code = -5
 
     def get_img_extension(self, img_metadata):
 
@@ -201,8 +202,8 @@ class Gallery:
         return extension
 
     def make_dir(self):
-
         # replace '/' with '_' for folder directory
+
         self.folder_dir = os.path.join(self.download_dir, self.title)
 
         # check whether there exists a downloaded gallery with the same name
@@ -210,8 +211,7 @@ class Gallery:
             # check whether the gallery was downloaded with a different source
             self.load_downloaded_metadata()
             if int(self.downloaded_metadata['id']) != int(self.id):
-                self.status = "Same gallery with different id "\
-                    + f"#{self.downloaded_metadata['id']} already exists"
+                self.status_code = 2
 
                 return
 
@@ -263,10 +263,8 @@ class Gallery:
         thumb_response = get_response(thumb_url,
                                       headers=self.headers,
                                       cookies=self.cookies)
-        if not thumb_response:
-            logger.error('Failed when getting response for thumbnail')
-            return
         if thumb_response.status_code != 200:
+            self.status_code = -6
             logger.error(('Something went wrong when retrieving thumbnail:'
                           f'{thumb_response.status_code}'))
             return
@@ -289,7 +287,8 @@ class Gallery:
         result = run(set_tags_command, capture_output=True, check=True)
         logger.info(f'{result.stdout}')
         if result.returncode != 0:
-            self.status = result.stdout
+            self.status_code = -7
+            logger.error(f"{result.stderr}")
 
     def set_thumb(self):
 
@@ -314,7 +313,8 @@ class Gallery:
         result = run(set_thumb_command, capture_output=True, check=True)
         logger.info(f'{result.stdout}')
         if result.returncode != 0:
-            self.status = result.stdout
+            self.status_code = -8
+            logger.error(f"{result.stderr}")
 
     def download_page(self, page):
 
@@ -327,9 +327,6 @@ class Gallery:
         img_response = get_response(img_url,
                                     headers=self.headers,
                                     cookies=self.cookies)
-        if not img_response:
-            logger.error(f'Failed when getting response for page {page}')
-            return
         if img_response.status_code != 200:
             logger.error(('Something went wrong with when getting response'
                           f'for page {page}: {img_response.status_code}'))
@@ -343,17 +340,13 @@ class Gallery:
     def check_gallery(self):
 
         logger.info('Checking downloaded gallery...')
-        self.make_dir()
-        if not self.status == 'Not finished...':
-            return self.status
 
         # check for missing and extra pages
         self.load_missing_pages()
-        extra_pages = self.check_extra_pages()
-        if len(extra_pages) != 0:
-            self.status = 'There are more pages downloaded than self.num_pages'
+        self.check_extra_pages()
 
-            return
+        if self.status_code != -1:
+            return self.status_code
 
         # download all missing pages, and retry up to 3 times for failed pages
         tries = 0
@@ -362,10 +355,10 @@ class Gallery:
                 print(f'\nDownloading {self.title} (#{self.id})')
                 logger.info(f'Title: {self.title}')
             if tries != 0:
-                logger.info('Retrying failed downloads '
-                            + f'for the {tries}(th) time...\n')
-                print('Retrying failed downloads '
-                      + f'for the {tries}(th) time...')
+                logger.info(('Retrying failed downloads '
+                             f'for the {tries}(th) time...\n'))
+                print(('Retrying failed downloads '
+                       f'for the {tries}(th) time...'))
 
             self.download_missing_pages()
             self.load_missing_pages()
@@ -377,8 +370,7 @@ class Gallery:
             tries += 1
             if tries > 3 and len(self.missing_pages) != 0:
                 logger.error(f'Failed pages: {self.missing_pages}')
-                self.status = 'Retried 3 times'
-
+                self.status_code = -9
                 return
 
     def download_missing_pages(self):
@@ -418,92 +410,119 @@ class Gallery:
                     not in range(int(self.num_pages)+1)):
                 extra_pages.append(file_count)
 
+        if len(extra_pages) != 0:
+            self.status_code = -10
+
         return extra_pages
 
-    def img2pdf(self):
-
-        logger.info('Converting images to PDF file...')
-        pdf_path = f'{self.folder_dir}/{self.title}.pdf'
+    def check_pdf(self):
 
         # load all image files and remove unwanted ones
         image_filenames = os.listdir(self.folder_dir)
         exclude_list = ['Icon\r', 'metadata.json', '.DS_Store',
                         'thumb.jpg', 'thumb.png']
         image_filenames = [
-            file for file in image_filenames if file not in exclude_list]
+            file for file in image_filenames if file not in exclude_list
+        ]
 
         # check whether pdf already exists
-        for filename in image_filenames:
-            if 'pdf' in filename:
-                logger.info('PDF file already exists')
-                self.status = 'PDF file already exists'
+        pdf_path = f"{self.folder_dir}/{self.title}.pdf"
+        if f"{self.title}.pdf" in image_filenames:
+            reader = PdfReader(f"{self.title}.pdf")
+            if len(reader.pages) == self.num_pages:
+                logger.info('PDF file already exists with matching page count')
+                self.status_code = 1
 
                 return
 
+        logger.info('Converting images to PDF file...')
         # sort according to page number
         sort = [int(page.split('.')[0]) for page in image_filenames]
         image_filenames = [file for _, file in sorted(
             zip(sort, image_filenames))]
 
         # open all image files and save to pdf
-        images = [Image.open(os.path.join(self.folder_dir, img_filename))
-                  for img_filename in image_filenames]
-
         try:
+            images = [Image.open(os.path.join(self.folder_dir, img_filename))
+                      for img_filename in image_filenames]
             images[0].save(pdf_path, "PDF", resolution=100.0,
                            save_all=True, append_images=images[1:])
         except Exception as error:
-            self.status = f'Error when converting to pdf: {error}'
-            return
+            logger.error(f"{error}")
+            self.status_code = -11
 
-        self.status = f'Finished downloading {self.title}'
+    def status(self):
+        # status_code >=0: Normal
+        # status_code <0: Error
+        status_list = {
+            0: f"Finished downloading {self.title} (#{self.id})",
+            1: f"Already downloaded {self.title} (#{self.id})",
+            2: (f"#{self.downloaded_metadata['id']} has the same title "
+                f"as the already downloaded {self.title} (#{self.id})"),
+            -1: 'Download not finished...',
+            -2: 'Error 403 - Forbidden (try updating `cf_clearance`)',
+            -3: 'Error 404 - Not Found for #{self.id}',
+            -4: ('Error when downloading metadata '
+                 f"(failed retry 3 times) for #{self.id}"),
+            -5: f"BLACKLISTED #{self.id}",
+            -6: 'Error when downloading thmbnail',
+            -7: 'Error when setting tags',
+            -8: 'Error when setting thumbnail',
+            -9: 'Error when downloading missing pages (failed retry 3 times)',
+            -10: 'There are more pages downloaded than self.num_pages',
+            -11: 'Error when saving PDF',
+        }
+
+        return status_list[self.status_code]
 
     def download(self):
 
         def check_status():
-            if self.status == 'Not finished...':
+            logger.info(f"{self.status()}")
+            if self.status_code == -1:
 
                 return True
 
-            elif self.status[:20] == 'Finished downloading':
-                logger.info(f'\n\n{self.status}')
+            elif self.status_code == 0:
+                logger.info(f'\n\n{self.status()}')
                 logger.info(f"\n{'-'*200}")
 
                 return True
 
-            else:
-                logger.error(f'Status: {self.status}')
-                print(f'{self.status}')
-                logger.info(f"\n{'-'*200}")
+            elif self.status_code > 0:
+                print(self.status())
 
                 return False
 
-        try:
-            self.get_metadata()
-        except Exception as error:
-            logger.error(('An exception occured when'
-                          f'retrieving metadata: {error}'))
-            self.status = 'Error when retrieving metadata'
-            logger.error(f'{self.status}')
-            logger.info(f"\n{'-'*200}")
+            else:
+                print(f'{self.status()}')
+                logger.error(f'Status: {self.status()}')
+                logger.error(f"\n{'-'*200}")
 
-            return self.status
+                return False
+
+        self.download_metadata()
         if not check_status():
-            return self.status
+            return self.status_code
 
         self.check_blacklist()
         if not check_status():
-            return self.status
+            return self.status_code
+
+        self.make_dir()
+        if not check_status():
+            return self.status_code
 
         self.check_gallery()
         if not check_status():
-            return self.status
+            return self.status_code
 
-        self.img2pdf()
+        self.check_pdf()
         if not check_status():
-            return self.status
+            return self.status_code
 
-        return self.status
+        self.status_code = 0
+        check_status()
 
 
 if __name__ == '__main__':
@@ -515,5 +534,5 @@ if __name__ == '__main__':
     for gallery_id in id_list:
         gallery = Gallery(gallery_id, download_dir=download_dir)
         gallery.download()
-        if gallery.status[:20] == 'Finished downloading':
-            print(gallery.status)
+        if gallery.status_code == 0:
+            print(gallery.status())

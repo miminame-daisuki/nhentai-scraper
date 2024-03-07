@@ -33,14 +33,16 @@ group/
 - Combine download_author.py and download_galleries.py into one file containing main() and put function definitions in new file
 - Separate galleries with same title already downloaded from failed_galleries
 - Fix logger name
+- Overwrite same gallery with newer one?
 
 - Add diagnosis? (total slept time, failed url percentage, ...)
 - Same title already downloaded, different contents?
 - Is check_extra_pages needed?
 - Ask whether to use tag and fileicon when starting program
-- Add error handling for galleries that have been deleted from nhentai
+- Check whether tag and fileicon has been installed
 - Logging for confirm_settings()
 - Add more settings in confirm_settings()
 - Add yaml for each gallery in addition to json
 - Log user termination of program
 - Add another handler for printing std output (change most logger.info to logger.debug?)
+- Logger decode byte string for logging to .log
