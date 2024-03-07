@@ -457,8 +457,8 @@ class Gallery:
         status_list = {
             0: f"Finished downloading {self.title} (#{self.id})",
             1: f"Already downloaded {self.title} (#{self.id})",
-            2: (f"#{self.downloaded_metadata['id']} has the same title "
-                f"as the already downloaded {self.title} (#{self.id})"),
+            2: (f"The already downloaded #{self.downloaded_metadata['id']} "
+                f"has the same title as {self.title} (#{self.id})"),
             -1: 'Download not finished...',
             -2: 'Error 403 - Forbidden (try updating `cf_clearance`)',
             -3: 'Error 404 - Not Found for #{self.id}',

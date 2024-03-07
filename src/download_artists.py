@@ -58,12 +58,16 @@ def search_tag(tag: str):
 
 
 def main():
-    nhentai_scraper.set_logging_config()
 
+    nhentai_scraper.set_logging_config()
     logger.info('Program started')
     download_dir = download_galleries.confirm_settings()
     tag_list = nhentai_scraper.load_input_list('download_tags.txt')
-    failed_retry_galleries = []
+    failed_galleries = {
+        'failed_galleries': [],
+        'failed_retry_galleries': [],
+        'repeated_galleries': []
+    }
     for tag in tag_list:
         try:
             id_list = search_tag(tag)
@@ -71,10 +75,24 @@ def main():
             logger.error(f'{error}')
             continue
         logger.info(f'Start downloading for {tag}')
-        failed_retry_galleries.extend(
-            download_galleries.download_id_list(id_list, download_dir)
+        failed_galleries_extend = download_galleries.download_id_list(
+            id_list, download_dir
         )
-    download_galleries.check_failed_retry_galleries(failed_retry_galleries)
+        for key in failed_galleries:
+            failed_galleries[key].extend(
+                failed_galleries_extend[key]
+            )
+    if len(failed_galleries['repeated_galleries']) != 0:
+        download_galleries.write_failed_galleries(
+            failed_galleries['repeated_galleries'], 'repeated_galleries.txt'
+        )
+    if len(failed_galleries['failed_retry_galleries']) != 0:
+        download_galleries.write_failed_galleries(
+            failed_galleries['failed_retry_galleries'],
+            'failed_download_id.txt'
+        )
+    else:
+        print('\n\n\nFinished all downloads!!!\n\n')
 
 
 if __name__ == '__main__':

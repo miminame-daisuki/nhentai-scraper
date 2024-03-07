@@ -17,8 +17,12 @@ logger = logging.getLogger('__main__.' + __name__)
 
 def download_id_list(id_list, download_dir):
 
-    failed_galleries = []
-    failed_retry_galleries = []
+    failed_galleries = {
+        'failed_galleries': [],
+        'failed_retry_galleries': [],
+        'repeated_galleries': []
+    }
+
     finished_count = 0
     for count, gallery_id in enumerate(id_list, start=1):
         logger.info((f'Downloading number {count} '
@@ -30,8 +34,12 @@ def download_id_list(id_list, download_dir):
             finished_count += 1
             print((f'Finished {finished_count} '
                    f'out of {len(id_list)} gallery downloads.'))
+        elif gallery.status_code == 2:
+            failed_galleries['repeated_galleries'].append(
+                f"{gallery.status()}"
+            )
         else:
-            failed_galleries.append(f'{gallery_id}')
+            failed_galleries['failed_galleries'].append(f'{gallery_id}')
             logger.error((f'Failed to download #{gallery_id}, '
                           f'due to: {gallery.status()}'))
 
@@ -43,28 +51,26 @@ def download_id_list(id_list, download_dir):
                                               download_dir=download_dir)
             gallery.download()
             if gallery.status_code != 0:
-                failed_retry_galleries.append((f'{gallery_id}, '
-                                               f"status: {gallery.status()}"))
+                failed_galleries['failed_retry_galleries'].append(
+                    f"{gallery_id}, status: {gallery.status()}"
+                )
         print(f"\n{'-'*200}")
 
-    return failed_retry_galleries
+    return failed_galleries
 
 
-def check_failed_retry_galleries(failed_retry_galleries):
+def write_failed_galleries(failed_galleries, filename):
 
-    if len(failed_retry_galleries) != 0:
-        # write the failed retry galleries to failed_download_id.txt
-        application_folder_path = nhentai_scraper.get_application_folder_dir()
-        inputs_folder_dir = os.path.abspath((f'{application_folder_path}'
-                                             '/inputs/'))
-        filename = f'{inputs_folder_dir}/failed_download_id.txt'
-        with open(filename, 'w') as f:
-            for entry in failed_retry_galleries:
-                f.write(entry)
-                f.write('\n')
-        print(f'\n\n\nFailed gallery id written to {filename}\n\n')
-    else:
-        print('\n\n\nFinished all downloads!!!\n\n')
+    # write the failed retry galleries to failed_download_id.txt
+    application_folder_path = nhentai_scraper.get_application_folder_dir()
+    inputs_folder_dir = os.path.abspath((f'{application_folder_path}'
+                                         '/inputs/'))
+    filename = os.path.join(inputs_folder_dir, filename)
+    with open(filename, 'w') as f:
+        for entry in failed_galleries:
+            f.write(entry)
+            f.write('\n')
+    print(f'\n\n\nFailed gallery id written to {filename}\n\n')
 
 
 def confirm_settings():
@@ -105,8 +111,18 @@ def main():
     logger.info('Program started')
     download_dir = confirm_settings()
     id_list = nhentai_scraper.load_input_list('download_id.txt')
-    failed_retry_galleries = download_id_list(id_list, download_dir)
-    check_failed_retry_galleries(failed_retry_galleries)
+    failed_galleries = download_id_list(id_list, download_dir)
+    if len(failed_galleries['repeated_galleries']) != 0:
+        write_failed_galleries(
+            failed_galleries['repeated_galleries'], 'repeated_galleries.txt'
+        )
+    if len(failed_galleries['failed_retry_galleries']) != 0:
+        write_failed_galleries(
+            failed_galleries['failed_retry_galleries'],
+            'failed_download_id.txt'
+        )
+    else:
+        print('\n\n\nFinished all downloads!!!\n\n')
 
 
 if __name__ == '__main__':
