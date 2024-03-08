@@ -87,8 +87,13 @@ def load_cookies(inputs_dir):
     return cookies
 
 
-def get_response(url, headers={}, cookies={},
+def get_response(url, headers=None, cookies=None,
                  sleep_time='default', timeout_time=61):
+
+    if not headers:
+        headers = {}
+    if not cookies:
+        cookies = {}
 
     try:
         response = requests.get(url, headers=headers, cookies=cookies,
@@ -110,7 +115,7 @@ def get_response(url, headers={}, cookies={},
 class Gallery:
 
     def __init__(self, gallery_id, download_dir='',
-                 headers={}, cookies={}):
+                 headers=None, cookies=None):
 
         self.id = str(gallery_id).split('#')[-1]
         logger.info(f'Gallery initiated for id: {gallery_id}')
@@ -124,9 +129,11 @@ class Gallery:
             else:
                 self.download_dir = os.path.abspath(
                     f'{self.application_folder_path}/{download_dir}/')
-        if not download_dir:
+        else:
             self.downloaded_dir = os.path.abspath(
                 f'{self.application_folder_path}/Downloaded/')
+            if not os.path.isdir(self.download_dir):
+                os.mkdir(self.download_dir)
         logger.info(f"Download directory set to: '{self.download_dir}'")
 
         self.inputs_dir = os.path.abspath(
@@ -139,11 +146,10 @@ class Gallery:
         if not self.cookies:
             self.cookies = load_cookies(self.inputs_dir)
 
-        # status_code >=0: Normal
-        # status_code <0: Error
-        self.status_list = {}
         self.status_code = -1
-        self.status_list[-1] = 'Download not finished...'
+
+        self.title = ''
+        self.downloaded_metadata = {'id': ''}
 
     def download_metadata(self):
 
@@ -155,12 +161,12 @@ class Gallery:
                                     cookies=self.cookies)
         if api_response.status_code == 403:
             self.status_code = -2
-            self.status_list[-2] = ('Error 403 - Forbidden '
-                                    '(try updating `cf_clearance`)')
+
             return
+
         elif api_response.status_code == 404:
             self.status_code = -3
-            self.status_list[-3] = f'Error 404 - Not Found for #{self.id}'
+
             return
 
         # retry for up to 3 times
@@ -175,9 +181,7 @@ class Gallery:
 
             if tries >= 3 and api_response != 200:
                 self.status_code = -4
-                self.status_list[-4] = ('Error when downloading metadata '
-                                        '(failed retry 3 times) '
-                                        f"for #{self.id}")
+
                 return
 
         self.metadata = api_response.json()
@@ -200,7 +204,6 @@ class Gallery:
         for tag in self.metadata['tags']:
             if any(tag in self.tags for tag in blacklist):
                 self.status_code = -5
-                self.status_list[-5] = f"BLACKLISTED #{self.id}"
 
     def get_img_extension(self, img_metadata):
 
@@ -225,10 +228,6 @@ class Gallery:
             self.load_downloaded_metadata()
             if int(self.downloaded_metadata['id']) != int(self.id):
                 self.status_code = 2
-                self.status_list[2] = (f"{self.title} (#{self.id}) "
-                                       'has the same title as '
-                                       'the already downloaded '
-                                       f"#{self.downloaded_metadata['id']}")
 
                 return
 
@@ -282,7 +281,6 @@ class Gallery:
                                       cookies=self.cookies)
         if thumb_response.status_code != 200:
             self.status_code = -6
-            self.status_list[-6] = 'Error when downloading thmbnail'
             logger.error(('Something went wrong when retrieving thumbnail:'
                           f'{thumb_response.status_code}'))
             return
@@ -306,7 +304,6 @@ class Gallery:
         logger.info(f'{result.stdout}')
         if result.returncode != 0:
             self.status_code = -7
-            self.status_list[-7] = 'Error when setting tags'
             logger.error(f"{result.stderr}")
 
     def set_thumb(self):
@@ -333,7 +330,6 @@ class Gallery:
         logger.info(f'{result.stdout}')
         if result.returncode != 0:
             self.status_code = -8
-            self.status_list[-8] = 'Error when setting thumbnail'
             logger.error(f"{result.stderr}")
 
     def download_page(self, page):
@@ -391,8 +387,6 @@ class Gallery:
             if tries > 3 and len(self.missing_pages) != 0:
                 logger.error(f'Failed pages: {self.missing_pages}')
                 self.status_code = -9
-                self.status_list[-9] = ('Error when downloading missing pages '
-                                        '(failed retry 3 times)')
                 return
 
     def download_missing_pages(self):
@@ -434,8 +428,6 @@ class Gallery:
 
         if len(extra_pages) != 0:
             self.status_code = -10
-            self.status_list[-10] = ('There are more pages downloaded '
-                                     'than self.num_pages')
 
         return extra_pages
 
@@ -457,8 +449,6 @@ class Gallery:
             if len(reader.pages) == self.num_pages:
                 logger.info('PDF file already exists with matching page count')
                 self.status_code = 1
-                self.status_list[1] = (f"{self.title} (#{self.id}) "
-                                       'already downloaded')
 
                 return
 
@@ -477,30 +467,53 @@ class Gallery:
         except Exception as error:
             logger.error(f"{error}")
             self.status_code = -11
-            self.status_list[-11] = 'Error when saving PDF'
+
+    def status(self):
+        # status_code >=0: Normal
+        # status_code <0: Error
+        status_dict = {
+            0: f"Finished downloading {self.title} (#{self.id})",
+            1: f"{self.title} (#{self.id}) already downloaded",
+            2: (f"{self.title} (#{self.id}) has the same title as "
+                f"the already downloaded #{self.downloaded_metadata['id']}"),
+            -1: 'Download not finished...',
+            -2: 'Error 403 - Forbidden (try updating `cf_clearance`)',
+            -3: f'Error 404 - Not Found for #{self.id}',
+            -4: ('Error when downloading metadata '
+                 f"(failed retry 3 times) for #{self.id}"),
+            -5: f"BLACKLISTED #{self.id}",
+            -6: 'Error when downloading thmbnail',
+            -7: 'Error when setting tags',
+            -8: 'Error when setting thumbnail',
+            -9: 'Error when downloading missing pages (failed retry 3 times)',
+            -10: 'There are more pages downloaded than self.num_pages',
+            -11: 'Error when saving PDF',
+        }
+
+        return status_dict[self.status_code]
 
     def download(self):
 
         def check_status():
-            logger.info(f"{self.status_list[self.status_code]}")
+            logger.info(self.status())
             if self.status_code == -1:
 
                 return True
 
             elif self.status_code == 0:
-                logger.info(f'\n\n{self.status_list[self.status_code]}')
+                logger.info(f'\n\n{self.status()}')
                 logger.info(f"\n{'-'*200}")
 
                 return True
 
             elif self.status_code > 0:
-                print(self.status_list[self.status_code])
+                print(self.status())
 
                 return False
 
             else:
-                print(f'{self.status_list[self.status_code]}')
-                logger.error(f'Status: {self.status_list[self.status_code]}')
+                print(self.status())
+                logger.error(f'Status: {self.status()}')
                 logger.error(f"\n{'-'*200}")
 
                 return False
@@ -526,7 +539,6 @@ class Gallery:
             return self.status_code
 
         self.status_code = 0
-        self.status_list[0] = f"Finished downloading {self.title} (#{self.id})"
         check_status()
 
 

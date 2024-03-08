@@ -17,8 +17,13 @@ import download_galleries
 logger = logging.getLogger(__name__)
 
 
-def get_gallery_id(url, headers={}, cookies={}):
+def get_gallery_id(url, headers=None, cookies=None):
     # retrieves all <=25 gallery ids from a nhentai url
+
+    if not headers:
+        headers = {}
+    if not cookies:
+        cookies = {}
 
     gallery_id = []
 

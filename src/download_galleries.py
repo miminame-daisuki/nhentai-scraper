@@ -37,14 +37,14 @@ def download_id_list(id_list, download_dir):
                    f'out of {len(id_list)} gallery downloads.'))
         elif gallery.status_code == 2:
             failed_galleries['repeated_galleries'].append(
-                f"{gallery.status_list[gallery.status_code]}"
+                f"{gallery.status()}"
             )
         else:
             failed_galleries['initial_failed_galleries'].append(
                 f'{gallery_id}'
             )
             logger.error((f'Failed to download #{gallery_id}, due to '
-                          f"{gallery.status_list[gallery.status_code]}"))
+                          f"{gallery.status()}"))
 
     # retry failed galleries
     if len(failed_galleries['initial_failed_galleries']) != 0:
