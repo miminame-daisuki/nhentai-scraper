@@ -32,7 +32,9 @@ group/
 - Automatically detect input file contains artist name or gallery id?
 - Combine download_author.py and download_galleries.py into one file containing main() and put function definitions in new file
 - Fix logger name
-- Overwrite same gallery with newer one?
+- Overwrite same gallery with newer one (determined from id or upload date)?
+- Add tqdm in outer loops?
+- Don't use TimeRotatingFileHandler (Implement automatic deletetion of old logs manually)
 
 - Add diagnosis? (total slept time, failed url percentage, ...)
 - Is check_extra_pages needed?

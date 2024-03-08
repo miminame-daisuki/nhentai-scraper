@@ -38,8 +38,8 @@ def get_gallery_id(url, headers={}, cookies={}):
 # retrieves all gallery ids from a tag
 def search_tag(tag: str):
 
-    logger.info(f"\nSearching galleries from {tag}\n")
-    print(f"\nSearching galleries from {tag}\n")
+    logger.info(f"Searching galleries from {tag}")
+    print(f"\n\nSearching galleries from {tag}\n\n")
     tag_url = f"https://nhentai.net/{tag.split(':')[0]}/{tag.split(':')[1]}/"
     application_folder_path = nhentai_scraper.get_application_folder_dir()
     inputs_dir = os.path.abspath(f'{application_folder_path}/inputs/')

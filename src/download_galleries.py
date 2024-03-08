@@ -61,9 +61,11 @@ def download_id_list(id_list, download_dir):
         print(f"\n{'-'*200}")
 
     print((f"\nFinished {finished_count} out of {len(id_list)} gallery "
-           'downloads in total, with '
-           f"{len(failed_galleries['failed_retry_galleries'])} "
+           'downloads in total'))
+    print((f"{len(failed_galleries['failed_retry_galleries'])} "
            'failed retry galleries'))
+    print((f"{len(failed_galleries['repeated_galleries'])} "
+           'repeated galleries not downloaded'))
 
     return failed_galleries
 
