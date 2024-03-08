@@ -6,6 +6,7 @@ Scraper/Downloader for [nhentai](https://nhentai.net), specifically designed for
 - Combines downloaded images into pdf
 - Downloads from a user-given list of gallery ids or tags/artists/groups/parodies...
 - Supports user-defined blacklists for downloads
+- Supports running when in sleep
 
 ## Dependencies
 - [fileicon](https://github.com/mklement0/fileicon)
@@ -21,19 +22,20 @@ tag/
 group/
 ```
 2. Open your browser, find the cookies and headers (for bypassing CloudFlare), and put those in the `cookies.json` and `headers.json` files inside `inputs/`
-3. Double click the `double_click_run.command` file in the `src/` folder
+3. Double click the `no_sleep.command` file in the `src/` folder
 
 ## Tips
-- To search by title, don't include the parts in the paranthesis `[]`. Ex: To search for `[artist] title`, simply type `title`.
+- To search for downloaded galleries by title, don't include the parts in the paranthesis `[]`. Ex: To search for `[artist] title`, simply type `title`.
 
 ## To-do list
 - use Path for paths
-- Download by author (download all galleries?, even the ones the same title by using title-1, title-2 for example?) to automatically update downloaded galleries
+- Download by author (download all galleries?, even the ones with the same title by using title-1, title-2 for example?) to automatically update downloaded galleries
 - Automatically detect input file contains artist name or gallery id?
 - Combine download_author.py and download_galleries.py into one file containing main() and put function definitions in new file
 - Fix logger name
 - Overwrite same gallery with newer one (determined from id or upload date)?
 - Add tqdm in outer loops?
+- Create new log file every time program is started
 - Don't use TimeRotatingFileHandler (Implement automatic deletetion of old logs manually)
 
 - Add diagnosis? (total slept time, failed url percentage, ...)
@@ -44,5 +46,5 @@ group/
 - Add more settings in confirm_settings()
 - Add yaml for each gallery in addition to json
 - Log user termination of program
-- Add another handler for printing std output (change most logger.info to logger.debug?)
+- Add another handler for printing std output (change most of the logger.info to logger.debug?)
 - Logger decode byte string for logging to .log
