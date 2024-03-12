@@ -454,7 +454,7 @@ class Gallery:
 
         logger.info('Converting images to PDF file...')
         # sort according to page number
-        sort = [Path(page).stem for page in image_filenames]
+        sort = [int(Path(page).stem) for page in image_filenames]
         image_filenames = [file for _, file in sorted(
             zip(sort, image_filenames))]
 

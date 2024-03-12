@@ -14,7 +14,7 @@ Scraper/Downloader for [nhentai](https://nhentai.net), specifically designed for
 
 ## Basic Usage
 1. Place the id (six digit number) of the galleries you want to download in the file `download_id.txt` inside the folder `inputs/`
-1.
+1. 
 Example:
 ```
 artist/
@@ -32,7 +32,7 @@ group/
 - Download by author (download all galleries?, even the ones with the same title by using title-1, title-2 for example?) to automatically update downloaded galleries
 - Automatically detect input file contains artist name or gallery id?
 - Combine download_author.py and download_galleries.py into one file containing main() and put function definitions in new file
-- Fix logger name
+- Fix logger name in .log files
 - Overwrite same gallery with newer one (determined from id or upload date)?
 - Add tqdm in outer loops?
 - Create new log file every time program is started
