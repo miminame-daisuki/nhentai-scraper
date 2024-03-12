@@ -37,6 +37,11 @@ group/
 - Add tqdm in outer loops?
 - Create new log file every time program is started
 - Don't use TimeRotatingFileHandler (Implement automatic deletetion of old logs manually)
+- Capture ctrl-c
+- Error handling for not found tags
+- Download from mirror sites such as https://www2.hentai2.net/NUMBER_GOES_HERE.html or hitomi.la?
+- If Gallery.id == newest id from downloaded galleries, then skip (continue) to next artist to avoid checking every gallery
+- Write folder name using NFC of NFD?
 
 - Add diagnosis? (total slept time, failed url percentage, ...)
 - Is check_extra_pages needed?

@@ -44,8 +44,9 @@ def get_gallery_id(url, headers=None, cookies=None):
 def search_tag(tag: str):
 
     logger.info(f"Searching galleries from {tag}")
-    print(f"\n\nSearching galleries from {tag}\n\n")
-    tag_url = f"https://nhentai.net/{tag.split(':')[0]}/{tag.split(':')[1]}/"
+    print(f"\n\nSearching galleries from {tag}...\n\n")
+    tag_type, tag_name = tag.split(':')
+    tag_url = f"https://nhentai.net/{tag_type}/{tag_name}/"
     application_folder_path = nhentai_scraper.get_application_folder_dir()
     inputs_dir = os.path.abspath(f'{application_folder_path}/inputs/')
     headers = nhentai_scraper.load_headers(inputs_dir)
@@ -55,6 +56,7 @@ def search_tag(tag: str):
                                          cookies=cookies)
 
     for page in range(2, page_count+1):
+        logger.info(f"Searching page {page} from {tag}")
         page_url = tag_url + f'?page={page}'
         id_list.extend(get_gallery_id(page_url,
                                       headers=headers,

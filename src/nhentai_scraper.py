@@ -18,6 +18,7 @@ from subprocess import run
 import unicodedata
 from tqdm import tqdm
 from pypdf import PdfReader
+from pathlib import Path
 import logging
 import logging.config
 
@@ -391,18 +392,17 @@ class Gallery:
 
     def download_missing_pages(self):
 
-        for page_count in tqdm(self.missing_pages):
-            self.download_page(page_count)
+        for page in tqdm(self.missing_pages):
+            self.download_page(page)
 
     def load_missing_pages(self):
 
         # check whether all page numbers are downloaded against self.num_pages
         self.missing_pages = []
         file_list = os.listdir(self.folder_dir)
-        for page in range(int(self.num_pages)):
-            page_count = str(page+1)
-            if page_count not in [file.split('.')[0] for file in file_list]:
-                self.missing_pages.append(page_count)
+        for page in range(1, int(self.num_pages) + 1):
+            if str(page) not in [Path(file).stem for file in file_list]:
+                self.missing_pages.append(str(page))
 
         # delete duplicates
         self.missing_pages = list(dict.fromkeys(self.missing_pages))
@@ -421,10 +421,10 @@ class Gallery:
                             for page in downloaded_pages
                             if unicodedata.normalize('NFC', page)
                             not in non_page_files]
-        for file_count in downloaded_pages:
-            if (int(file_count.split('.')[0])
+        for downloaded_page in downloaded_pages:
+            if (int(Path(downloaded_page).stem)
                     not in range(int(self.num_pages)+1)):
-                extra_pages.append(file_count)
+                extra_pages.append(downloaded_page)
 
         if len(extra_pages) != 0:
             self.status_code = -10
@@ -434,16 +434,16 @@ class Gallery:
     def check_pdf(self):
 
         logger.info('Checking PDF...')
+        pdf_path = f"{self.folder_dir}/{self.title}.pdf"
         # load all image files and remove unwanted ones
         image_filenames = os.listdir(self.folder_dir)
         exclude_list = ['Icon\r', 'metadata.json', '.DS_Store',
                         'thumb.jpg', 'thumb.png']
         image_filenames = [
-            file for file in image_filenames if file not in exclude_list
+            unicodedata.normalize('NFC', file) for file in image_filenames if file not in exclude_list
         ]
 
         # check whether pdf already exists
-        pdf_path = f"{self.folder_dir}/{self.title}.pdf"
         if f"{self.title}.pdf" in image_filenames:
             reader = PdfReader(pdf_path)
             if len(reader.pages) == self.num_pages:
@@ -454,7 +454,7 @@ class Gallery:
 
         logger.info('Converting images to PDF file...')
         # sort according to page number
-        sort = [int(page.split('.')[0]) for page in image_filenames]
+        sort = [Path(page).stem for page in image_filenames]
         image_filenames = [file for _, file in sorted(
             zip(sort, image_filenames))]
 

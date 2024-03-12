@@ -48,24 +48,41 @@ def download_id_list(id_list, download_dir):
 
     # retry failed galleries
     if len(failed_galleries['initial_failed_galleries']) != 0:
-        print('\nRetrying failed galleries...')
-        for gallery_id in failed_galleries['initial_failed_galleries']:
+        print('\nRetrying failed galleries...\n')
+        for count, gallery_id in enumerate(
+            failed_galleries['initial_failed_galleries'],
+            start=1
+        ):
+            logger.info(f"\n{'-'*200}")
+            logger.info((f'Downloading number {count} '
+                     f'out of {len(id_list)} galleries...'))
             gallery = nhentai_scraper.Gallery(gallery_id,
                                               download_dir=download_dir)
             gallery.download()
-            if gallery.status_code != 0:
+            if gallery.status_code == 0 or gallery.status_code == 1:
+                finished_count += 1
+                print((f'Finished {finished_count} '
+                       f'out of {len(id_list)} gallery downloads.'))
+            elif gallery.status_code == 2:
+                failed_galleries['repeated_galleries'].append(
+                    f"{gallery.status()}"
+                )
+            else:
                 failed_galleries['failed_retry_galleries'].append(
                     (f'{gallery_id}, status: '
                      f"{gallery.status_list[gallery.status_code]}")
+                )
+                logger.error((f'Failed to download #{gallery_id}, due to '
+                              f"{gallery.status()}")
                 )
         print(f"\n{'-'*200}")
 
     print((f"\nFinished {finished_count} out of {len(id_list)} gallery "
            'downloads in total'))
-    print((f"{len(failed_galleries['failed_retry_galleries'])} "
-           'failed retry galleries'))
     print((f"{len(failed_galleries['repeated_galleries'])} "
            'repeated galleries not downloaded'))
+    print((f"{len(failed_galleries['failed_retry_galleries'])} "
+           'failed retry galleries'))
 
     return failed_galleries
 
