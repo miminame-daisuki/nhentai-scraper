@@ -24,6 +24,7 @@ def download_id_list(id_list, download_dir):
     }
 
     finished_count = 0
+    blacklist_count = 0
     for count, gallery_id in enumerate(id_list, start=1):
         logger.info(f"\n{'-'*200}")
         logger.info((f'Downloading number {count} '
@@ -55,7 +56,7 @@ def download_id_list(id_list, download_dir):
         ):
             logger.info(f"\n{'-'*200}")
             logger.info((f'Downloading number {count} '
-                     f'out of {len(id_list)} galleries...'))
+                        f'out of {len(id_list)} galleries...'))
             gallery = nhentai_scraper.Gallery(gallery_id,
                                               download_dir=download_dir)
             gallery.download()
@@ -67,13 +68,16 @@ def download_id_list(id_list, download_dir):
                 failed_galleries['repeated_galleries'].append(
                     f"{gallery.status()}"
                 )
+            elif gallery.status_code == -5:
+                blacklist_count += 1
             else:
                 failed_galleries['failed_retry_galleries'].append(
                     (f'{gallery_id}, status: '
-                     f"{gallery.status_list[gallery.status_code]}")
+                     f"{gallery.status()}")
                 )
-                logger.error((f'Failed to download #{gallery_id}, due to '
-                              f"{gallery.status()}")
+                logger.error(
+                    (f'Failed to download #{gallery_id}, due to '
+                     f"{gallery.status()}")
                 )
         print(f"\n{'-'*200}")
 
@@ -83,6 +87,7 @@ def download_id_list(id_list, download_dir):
            'repeated galleries not downloaded'))
     print((f"{len(failed_galleries['failed_retry_galleries'])} "
            'failed retry galleries'))
+    print(f'{blacklist_count} BLACKLISTED')
 
     return failed_galleries
 
