@@ -43,7 +43,7 @@ def set_logging_config(logging_config_filename=''):
 
     logging.config.dictConfig(logging_config)
 
-    logger.info(f"\n{'-'*200}")
+    logger.info(f"\n{'-'*os.get_terminal_size().columns}")
 
 
 def get_application_folder_dir():
@@ -99,8 +99,12 @@ def get_response(url, headers=None, cookies=None,
         cookies = {}
 
     try:
-        response = requests.get(url, headers=headers, cookies=cookies,
-                                timeout=timeout_time)
+        response = requests.get(
+            url,
+            headers=headers,
+            cookies=cookies,
+            timeout=timeout_time
+        )
     except Exception as error:
         logger.error(f'An exception occured: {error}')
         response = lambda: None
@@ -109,7 +113,7 @@ def get_response(url, headers=None, cookies=None,
     # sleep for sleep_time after each get_response
     if sleep_time == 'default':
         sleep_time = 3*random.random()+1.5
-    logger.info(f'Sleeping for ~ {sleep_time:.1f} seconds...')
+    logger.info(f'Sleeping for {sleep_time:.3f} seconds...')
     time.sleep(sleep_time)
 
     return response
@@ -146,8 +150,10 @@ class Gallery:
             self.download_dir = os.path.abspath(
                 f'{self.application_folder_path}/Downloaded/'
             )
-            if not os.path.isdir(self.download_dir):
-                os.mkdir(self.download_dir)
+
+        if not os.path.isdir(self.download_dir):
+            os.mkdir(self.download_dir)
+
         logger.info(f"Download directory set to: '{self.download_dir}'")
 
         self.inputs_dir = os.path.abspath(
@@ -209,15 +215,19 @@ class Gallery:
                      for tag in self.metadata['tags']]
         self.num_pages = self.metadata['num_pages']
 
+        logger.info('Metadata downloaded')
+        logger.info(f'Title: {self.title}')
+
         return self.metadata
 
     def check_blacklist(self, blacklist=None):
         logger.info('Checking blacklist...')
         if not blacklist:
             blacklist = load_input_list('blacklist.txt')
-        for tag in self.metadata['tags']:
-            if any(tag in self.tags for tag in blacklist):
-                self.status_code = -5
+        if any(tag in self.tags for tag in blacklist):
+            self.status_code = -5
+        else:
+            logger.info('Clear')
 
     def get_img_extension(self, img_metadata):
 
@@ -230,7 +240,7 @@ class Gallery:
 
         return extension
 
-    def check_dir(self):
+    def check_folder(self):
 
         logger.info('Checking folder...')
         # replace '/' with '_' for folder directory
@@ -238,8 +248,18 @@ class Gallery:
 
         # check whether there exists a downloaded gallery with the same name
         if os.path.isdir(self.folder_dir):
-            # check whether the gallery was downloaded with a different source
             self.load_downloaded_metadata()
+            logger.info('Folder exists with metadata loaded')
+
+            # check whether download is finished
+            # listed_tags = self.list_tags()
+            # if (int(self.downloaded_metadata['id']) == int(self.id) and
+            #         sorted(self.tags) == sorted(listed_tags)):
+            #     self.status_code = 1
+
+            #     return
+
+            # check whether the gallery was downloaded with a different source
             if int(self.downloaded_metadata['id']) != int(self.id):
                 self.status_code = 2
 
@@ -257,9 +277,8 @@ class Gallery:
 
         else:
             os.mkdir(self.folder_dir)
-
             self.save_metadata()
-            self.set_tags()
+            logger.info('Folder created with metadata saved')
 
             # download and set thumbnail
             try:
@@ -268,6 +287,15 @@ class Gallery:
             except Exception as error:
                 logger.error(('An exception occured when downloading/setting'
                               f'thumbnail: {error}'))
+
+    # def list_tags(self):
+
+    #     list_tag_command = ['tag', '--list', self.folder_dir]
+    #     result = run(list_tag_command, capture_output=True)
+    #     listed_tags = result.stdout.decode('utf-8').split('\t')[-1]
+    #     listed_tags = listed_tags.split('\n')[0].split(',')
+
+    #     return listed_tags
 
     def load_downloaded_metadata(self):
 
@@ -305,21 +333,21 @@ class Gallery:
 
     def set_tags(self):
 
+        logger.info('Setting tags...')
         tags_string = ''.join(f'{tag},' for tag in self.tags)
         tags_string = tags_string[:-1]  # to exclude the final ','
 
         # set tags with tag
         set_tags_command = [
             'tag',
-            '-a',
+            '--set',
             f'{tags_string}',
             f"{self.folder_dir}"
         ]
-        result = run(set_tags_command, capture_output=True, check=True)
-        logger.info(f'{result.stdout}')
+        result = run(set_tags_command, capture_output=True)
         if result.returncode != 0:
             self.status_code = -7
-            logger.error(f"{result.stderr}")
+            logger.error(f"{result.stderr.decode('utf-8')}")
 
     def set_thumb(self):
 
@@ -342,11 +370,11 @@ class Gallery:
             f"{self.folder_dir}",
             f'{self.thumb_filename}'
         ]
-        result = run(set_thumb_command, capture_output=True, check=True)
-        logger.info(f'{result.stdout}')
+        result = run(set_thumb_command, capture_output=True)
+        logger.info(result.stdout.decode('utf-8').split('\n')[0])
         if result.returncode != 0:
             self.status_code = -8
-            logger.error(f"{result.stderr}")
+            logger.error(f"{result.stderr.decode('utf-8')}")
 
     def download_page(self, page):
 
@@ -369,23 +397,21 @@ class Gallery:
         with open(filename, 'wb') as f:
             f.write(img_response.content)
 
-    def check_gallery(self):
+    def check_missing_pages(self):
 
-        logger.info('Checking downloaded gallery...')
-
-        # check for missing and extra pages
+        logger.info('Checking missing pages...')
         self.load_missing_pages()
-        self.check_extra_pages()
 
-        if self.status_code != -1:
-            return self.status_code
+        if not self.missing_pages:
+            logger.info('Downloaded all pages')
+
+            return
 
         # download all missing pages, and retry up to 3 times for failed pages
         tries = 0
         while len(self.missing_pages) != 0:
             if tries == 0:
                 print(f'\nDownloading {self.title} (#{self.id})')
-                logger.info(f'Title: {self.title}')
             if tries != 0:
                 logger.info(('Retrying failed downloads '
                              f'for the {tries}(th) time...\n'))
@@ -464,7 +490,6 @@ class Gallery:
             reader = PdfReader(pdf_path)
             if len(reader.pages) == self.num_pages:
                 logger.info('PDF file already exists with matching page count')
-                self.status_code = 1
 
                 return
 
@@ -489,10 +514,10 @@ class Gallery:
             self.status_code = -11
 
     def status(self):
-        # status_code >=0: Normal
-        # status_code <0: Error
+        # status_code >= -1: Normal
+        # status_code < -1: Error
         status_dict = {
-            0: f"Finished downloading {self.title} (#{self.id})",
+            0: f"{self.title} (#{self.id}) download finished",
             1: f"{self.title} (#{self.id}) already downloaded",
             2: (f"{self.title} (#{self.id}) has the same title as "
                 f"the already downloaded #{self.downloaded_metadata['id']}"),
@@ -514,57 +539,61 @@ class Gallery:
 
     def download(self):
 
-        def check_status():
-            logger.info(self.status())
-            if self.status_code == -1:
-
-                return True
-
-            elif self.status_code == 0:
-                logger.info(f'\n\n{self.status()}')
-                logger.info(f"\n{'-'*200}")
+        def skip_download():
+            if self.status_code < -1:
+                print(self.status())
+                logger.error(self.status())
 
                 return True
 
             elif self.status_code > 0:
+                logger.info(self.status())
                 print(self.status())
 
-                return False
+                return True
 
             else:
-                print(self.status())
-                logger.error(f'Status: {self.status()}')
-                logger.error(f"\n{'-'*200}")
 
                 return False
 
         self.download_metadata()
-        if not check_status():
+        if skip_download():
             return self.status_code
 
         self.check_blacklist()
-        if not check_status():
+        if skip_download():
             return self.status_code
 
-        self.check_dir()
-        if not check_status():
+        self.check_folder()
+        if skip_download():
             return self.status_code
 
-        self.check_gallery()
-        if not check_status():
+        self.check_extra_pages()
+        if skip_download():
+            return self.status_code
+
+        self.check_missing_pages()
+        if skip_download():
             return self.status_code
 
         self.check_pdf()
-        if not check_status():
+        if skip_download():
+            return self.status_code
+
+        # set tags after finishing download
+        self.set_tags()
+        if skip_download():
             return self.status_code
 
         self.status_code = 0
-        check_status()
+        logger.info(f'{self.status()}')
+        print(self.status())
+
+        return self.status_code
 
 
 if __name__ == '__main__':
     set_logging_config()
-    logger.info(f"\n{'-'*200}")
     logger.info('Program started')
     download_dir = os.path.abspath(f'{get_application_folder_dir()}/test/')
     id_list = input('Input gallery id: ')
@@ -572,5 +601,3 @@ if __name__ == '__main__':
     for gallery_id in id_list:
         gallery = Gallery(gallery_id, download_dir=download_dir)
         gallery.download()
-        if gallery.status_code == 0:
-            print(gallery.status())

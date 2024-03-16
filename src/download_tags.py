@@ -9,16 +9,17 @@ from bs4 import BeautifulSoup
 import os
 import json
 from subprocess import run
+from tqdm import tqdm
 import logging
 
 import nhentai_scraper
 import download_galleries
 
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('__main__.' + __name__)
 
 
-def get_gallery_id(url, headers=None, cookies=None):
+def get_gallery_ids(url, headers=None, cookies=None):
     # retrieves all <=25 gallery ids from a nhentai url
 
     if not headers:
@@ -31,12 +32,15 @@ def get_gallery_id(url, headers=None, cookies=None):
     response = nhentai_scraper.get_response(url,
                                             headers=headers,
                                             cookies=cookies)
+    if response.status_code == 404:
+        return None, None
+
     soup = BeautifulSoup(response.content, features='html.parser')
     gallery_count = soup.find('span', {'class': 'count'}).string
     page_count = int(gallery_count)//25 + 1
     gallery_list = soup.find_all('div', {'class': 'gallery'})
     for gallery in gallery_list:
-        gallery_id.append(gallery.find('a').get('href').split('/')[2])
+        gallery_id.append(f"#{gallery.find('a').get('href').split('/')[2]}")
 
     return gallery_id, page_count
 
@@ -44,8 +48,9 @@ def get_gallery_id(url, headers=None, cookies=None):
 # retrieves all gallery ids from a tag
 def search_tag(tag: str):
 
+    logger.info(f"\n{'-'*os.get_terminal_size().columns}")
     logger.info(f"Searching galleries from {tag}")
-    print(f"\n\nSearching galleries from {tag}...\n\n")
+    print(f"\n\nSearching galleries from {tag}...")
     tag_type, tag_name = tag.split(':')
     tag_url = f"https://nhentai.net/{tag_type}/{tag_name}/"
 
@@ -54,16 +59,32 @@ def search_tag(tag: str):
     headers = nhentai_scraper.load_headers(inputs_dir)
     cookies = nhentai_scraper.load_cookies(inputs_dir)
 
-    id_list, page_count = get_gallery_id(tag_url,
-                                         headers=headers,
-                                         cookies=cookies)
+    page_count = get_gallery_ids(
+        tag_url,
+        headers=headers,
+        cookies=cookies
+    )[1]
 
-    for page in range(2, page_count+1):
+    id_list = []
+
+    if page_count is None:
+        logger.error(f'Error 404 for {tag}')
+        print(f'Error 404 for {tag}')
+
+        return id_list
+
+    for page in tqdm(range(1, page_count+1)):
         logger.info(f"Searching page {page} from {tag}")
         page_url = tag_url + f'?page={page}'
-        id_list.extend(get_gallery_id(page_url,
-                                      headers=headers,
-                                      cookies=cookies)[0])
+        id_list.extend(
+            get_gallery_ids(
+                page_url,
+                headers=headers,
+                cookies=cookies
+            )[0]
+        )
+
+    print('\n')
 
     return id_list
 
@@ -85,7 +106,8 @@ def find_tag(tag, download_dir=''):
     find_tag_command = [
         'tag',
         '--find',
-        tag
+        tag,
+        download_dir
     ]
     result = run(find_tag_command, capture_output=True, check=True)
 
@@ -103,7 +125,7 @@ def find_tag(tag, download_dir=''):
     return matched_galleries_id
 
 
-def download_tags(tag_list, download_dir):
+def download_tags(tag_list, download_dir, skip_downloaded_ids=False):
 
     failed_galleries = {
         'initial_failed_galleries': [],
@@ -112,18 +134,21 @@ def download_tags(tag_list, download_dir):
     }
 
     for tag in tag_list:
-        try:
-            id_list = search_tag(tag)
-        except Exception as error:
-            logger.error(f'{error}')
+        id_list = search_tag(tag)
+        if not id_list:
             continue
 
-        # if sorted(find_tag(tag)) == sorted(id_list):
-        #     print(f'All galleries from {tag} has already been downloaded.')
-        #     logger.info(
-        #         f'All galleries from {tag} has already been downloaded.'
-        #     )
-        #     continue
+        if sorted(find_tag(tag, download_dir=download_dir)) == sorted(id_list):
+            print(f'All galleries from {tag} has already been downloaded.')
+            logger.info(
+                f'All galleries from {tag} has already been downloaded.'
+            )
+            continue
+
+        # only keep not yet downloaded ids in id_list
+        if skip_downloaded_ids:
+            newest_downloaded_id = sorted(find_tag(tag))[-1]
+            id_list = id_list[:id_list.index(newest_downloaded_id)]
 
         logger.info(f'Start downloading for {tag}')
         failed_galleries_extend = download_galleries.download_id_list(

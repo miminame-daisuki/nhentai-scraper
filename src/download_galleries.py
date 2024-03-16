@@ -26,7 +26,7 @@ def download_id_list(id_list, download_dir):
     finished_count = 0
     blacklist_count = 0
     for count, gallery_id in enumerate(id_list, start=1):
-        logger.info(f"\n{'-'*200}")
+        logger.info(f"\n{'-'*os.get_terminal_size().columns}")
         logger.info((f'Downloading number {count} '
                      f'out of {len(id_list)} galleries...'))
         gallery = nhentai_scraper.Gallery(gallery_id,
@@ -56,7 +56,7 @@ def download_id_list(id_list, download_dir):
             failed_galleries['initial_failed_galleries'],
             start=1
         ):
-            logger.info(f"\n{'-'*200}")
+            logger.info(f"\n{'-'*os.get_terminal_size().columns}")
             logger.info((f'Downloading number {count} '
                         f'out of {len(id_list)} galleries...'))
             gallery = nhentai_scraper.Gallery(gallery_id,
@@ -89,7 +89,7 @@ def download_id_list(id_list, download_dir):
     print(f'{blacklist_count} BLACKLISTED')
     print((f"{len(failed_galleries['failed_retry_galleries'])} "
            'failed retry galleries'))
-    print(f"\n{'-'*200}")
+    print(f"\n{'-'*os.get_terminal_size().columns}")
 
     return failed_galleries
 
@@ -105,7 +105,7 @@ def write_failed_galleries(failed_galleries, filename):
         for entry in failed_galleries:
             f.write(entry)
             f.write('\n')
-    print(f'\n\n\nFailed gallery id written to {filename}\n\n')
+    print(f'\n\nFailed gallery id written to {filename}')
 
 
 def confirm_settings():
@@ -135,7 +135,7 @@ def confirm_settings():
         else:
             break
 
-    print(f"\n{'-'*200}")
+    print(f"\n{'-'*os.get_terminal_size().columns}")
 
     return download_dir
 
@@ -143,7 +143,7 @@ def confirm_settings():
 def main():
 
     nhentai_scraper.set_logging_config()
-    logger.info(f"\n{'-'*200}")
+    logger.info(f"\n{'-'*os.get_terminal_size().columns}")
     logger.info('Program started')
     download_dir = confirm_settings()
     id_list = nhentai_scraper.load_input_list('download_id.txt')

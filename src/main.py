@@ -1,3 +1,4 @@
+import os
 import logging
 
 import nhentai_scraper
@@ -30,7 +31,9 @@ def main():
             'failed_download_id.txt'
         )
     else:
-        print('\n\n\nFinished all downloads!!!\n\n')
+        print('\n\nFinished all downloads!!!\n\n')
+        logger.info(f"\n{'-'*os.get_terminal_size().columns}")
+        logger.info('Finished all downloads')
 
 
 if __name__ == '__main__':
