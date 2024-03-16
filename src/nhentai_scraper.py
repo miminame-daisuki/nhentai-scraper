@@ -43,6 +43,8 @@ def set_logging_config(logging_config_filename=''):
 
     logging.config.dictConfig(logging_config)
 
+    logger.info(f"\n{'-'*200}")
+
 
 def get_application_folder_dir():
 
@@ -113,6 +115,15 @@ def get_response(url, headers=None, cookies=None,
     return response
 
 
+def check_tag_fileicon():
+    result_tag = run(['which', 'tag'], capture_output=True)
+    result_fileicon = run(['which', 'fileicon'], capture_output=True)
+    if result_tag.returncode == 0 and result_fileicon.returncode == 0:
+        return True
+    else:
+        return False
+
+
 class Gallery:
 
     def __init__(self, gallery_id, download_dir='',
@@ -129,10 +140,12 @@ class Gallery:
                 self.download_dir = download_dir
             else:
                 self.download_dir = os.path.abspath(
-                    f'{self.application_folder_path}/{download_dir}/')
+                    f'{self.application_folder_path}/{download_dir}/'
+                )
         else:
-            self.downloaded_dir = os.path.abspath(
-                f'{self.application_folder_path}/Downloaded/')
+            self.download_dir = os.path.abspath(
+                f'{self.application_folder_path}/Downloaded/'
+            )
             if not os.path.isdir(self.download_dir):
                 os.mkdir(self.download_dir)
         logger.info(f"Download directory set to: '{self.download_dir}'")
@@ -296,11 +309,12 @@ class Gallery:
         tags_string = tags_string[:-1]  # to exclude the final ','
 
         # set tags with tag
-        set_tags_command = ['tag',
-                            '-a',
-                            f'{tags_string}',
-                            f"{self.folder_dir}"
-                            ]
+        set_tags_command = [
+            'tag',
+            '-a',
+            f'{tags_string}',
+            f"{self.folder_dir}"
+        ]
         result = run(set_tags_command, capture_output=True, check=True)
         logger.info(f'{result.stdout}')
         if result.returncode != 0:
@@ -322,11 +336,12 @@ class Gallery:
         thumb_rgb.save(self.thumb_filename)
 
         # set thumbnail with filicon
-        set_thumb_command = ['fileicon',
-                             'set',
-                             f"{self.folder_dir}",
-                             f'{self.thumb_filename}'
-                             ]
+        set_thumb_command = [
+            'fileicon',
+            'set',
+            f"{self.folder_dir}",
+            f'{self.thumb_filename}'
+        ]
         result = run(set_thumb_command, capture_output=True, check=True)
         logger.info(f'{result.stdout}')
         if result.returncode != 0:
@@ -440,7 +455,8 @@ class Gallery:
         exclude_list = ['Icon\r', 'metadata.json', '.DS_Store',
                         'thumb.jpg', 'thumb.png']
         image_filenames = [
-            unicodedata.normalize('NFC', file) for file in image_filenames if file not in exclude_list
+            unicodedata.normalize('NFC', file) for file in image_filenames
+            if file not in exclude_list
         ]
 
         # check whether pdf already exists
@@ -459,9 +475,13 @@ class Gallery:
             zip(sort, image_filenames))]
 
         # open all image files and save to pdf
+        images = []
         try:
-            images = [Image.open(os.path.join(self.folder_dir, img_filename))
-                      for img_filename in image_filenames]
+            for img_filename in image_filenames:
+                image_path = os.path.join(self.folder_dir, img_filename)
+                with Image.open(image_path) as img:
+                    img_copy = img.copy()
+                images.append(img_copy)
             images[0].save(pdf_path, "PDF", resolution=100.0,
                            save_all=True, append_images=images[1:])
         except Exception as error:

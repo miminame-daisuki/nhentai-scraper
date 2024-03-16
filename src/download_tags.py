@@ -6,8 +6,9 @@ Created on Sat Feb 11 22:22:59 2024
 @author: ball
 """
 from bs4 import BeautifulSoup
-
 import os
+import json
+from subprocess import run
 import logging
 
 import nhentai_scraper
@@ -47,10 +48,12 @@ def search_tag(tag: str):
     print(f"\n\nSearching galleries from {tag}...\n\n")
     tag_type, tag_name = tag.split(':')
     tag_url = f"https://nhentai.net/{tag_type}/{tag_name}/"
+
     application_folder_path = nhentai_scraper.get_application_folder_dir()
     inputs_dir = os.path.abspath(f'{application_folder_path}/inputs/')
     headers = nhentai_scraper.load_headers(inputs_dir)
     cookies = nhentai_scraper.load_cookies(inputs_dir)
+
     id_list, page_count = get_gallery_id(tag_url,
                                          headers=headers,
                                          cookies=cookies)
@@ -65,24 +68,63 @@ def search_tag(tag: str):
     return id_list
 
 
-def main():
+def find_tag(tag, download_dir=''):
 
-    nhentai_scraper.set_logging_config()
-    logger.info(f"\n{'-'*200}")
-    logger.info('Program started')
-    download_dir = download_galleries.confirm_settings()
-    tag_list = nhentai_scraper.load_input_list('download_tags.txt')
+    application_folder_path = nhentai_scraper.get_application_folder_dir()
+
+    if download_dir:
+        if os.path.isabs(download_dir):
+            download_dir = download_dir
+        else:
+            download_dir = os.path.abspath(
+                f'{application_folder_path}/{download_dir}/')
+    else:
+        download_dir = os.path.abspath(
+            f'{application_folder_path}/Downloaded/')
+
+    find_tag_command = [
+        'tag',
+        '--find',
+        tag
+    ]
+    result = run(find_tag_command, capture_output=True, check=True)
+
+    matched_galleries = result.stdout.decode('utf-8')
+    # remove last one (blank stirng)
+    matched_galleries = matched_galleries.split('\n')[:-1]
+
+    matched_galleries_id = []
+    for gallery in matched_galleries:
+        metadata_filename = f'{gallery}/metadata.json'
+        with open(metadata_filename, 'r') as f:
+            matched_metadata = json.load(f)
+        matched_galleries_id.append(f"#{matched_metadata['id']}")
+
+    return matched_galleries_id
+
+
+def download_tags(tag_list, download_dir):
+
     failed_galleries = {
         'initial_failed_galleries': [],
         'failed_retry_galleries': [],
         'repeated_galleries': []
     }
+
     for tag in tag_list:
         try:
             id_list = search_tag(tag)
         except Exception as error:
             logger.error(f'{error}')
             continue
+
+        # if sorted(find_tag(tag)) == sorted(id_list):
+        #     print(f'All galleries from {tag} has already been downloaded.')
+        #     logger.info(
+        #         f'All galleries from {tag} has already been downloaded.'
+        #     )
+        #     continue
+
         logger.info(f'Start downloading for {tag}')
         failed_galleries_extend = download_galleries.download_id_list(
             id_list, download_dir
@@ -91,18 +133,5 @@ def main():
             failed_galleries[key].extend(
                 failed_galleries_extend[key]
             )
-    if len(failed_galleries['repeated_galleries']) != 0:
-        download_galleries.write_failed_galleries(
-            failed_galleries['repeated_galleries'], 'repeated_galleries.txt'
-        )
-    if len(failed_galleries['failed_retry_galleries']) != 0:
-        download_galleries.write_failed_galleries(
-            failed_galleries['failed_retry_galleries'],
-            'failed_download_id.txt'
-        )
-    else:
-        print('\n\n\nFinished all downloads!!!\n\n')
 
-
-if __name__ == '__main__':
-    main()
+    return failed_galleries

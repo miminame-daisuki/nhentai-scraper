@@ -28,6 +28,7 @@ group/
 - To search for downloaded galleries by title, don't include the parts in the paranthesis `[]`. Ex: To search for `[artist] title`, simply type `title`.
 
 ## To-do list
+- Fix [Errno 24] Too many open files from PIL with im.close()
 - use Path for paths
 - Download by author (download all galleries?, even the ones with the same title by using title-1, title-2 for example?) to automatically update downloaded galleries
 - Automatically detect input file contains artist name or gallery id?
@@ -38,10 +39,12 @@ group/
 - Create new log file every time program is started
 - Don't use TimeRotatingFileHandler (Implement automatic deletetion of old logs manually)
 - Capture ctrl-c
-- Error handling for not found tags
+- Error handling for not found tags in search_tag()
 - Download from mirror sites such as https://www2.hentai2.net/NUMBER_GOES_HERE.html or hitomi.la?
-- If Gallery.id == newest id from downloaded galleries, then skip (continue) to next artist to avoid checking every gallery
 - Write folder name using NFC of NFD?
+- Use tag to check whether # of galleries downloaded for an artist == gallery_count
+- Move set_tags() to the last of Gallery.download() so that find_tag() doesn't include non-finished donwloads?
+- Add documentation, comments, ...
 
 - Add diagnosis? (total slept time, failed url percentage, ...)
 - Is check_extra_pages needed?

@@ -40,6 +40,8 @@ def download_id_list(id_list, download_dir):
             failed_galleries['repeated_galleries'].append(
                 f"{gallery.status()}"
             )
+        elif gallery.status_code == -5:
+            blacklist_count += 1
         else:
             failed_galleries['initial_failed_galleries'].append(
                 f'{gallery_id}'
@@ -69,7 +71,7 @@ def download_id_list(id_list, download_dir):
                     f"{gallery.status()}"
                 )
             elif gallery.status_code == -5:
-                blacklist_count += 1
+                continue
             else:
                 failed_galleries['failed_retry_galleries'].append(
                     (f'{gallery_id}, status: '
@@ -79,15 +81,15 @@ def download_id_list(id_list, download_dir):
                     (f'Failed to download #{gallery_id}, due to '
                      f"{gallery.status()}")
                 )
-        print(f"\n{'-'*200}")
 
     print((f"\nFinished {finished_count} out of {len(id_list)} gallery "
            'downloads in total'))
     print((f"{len(failed_galleries['repeated_galleries'])} "
            'repeated galleries not downloaded'))
+    print(f'{blacklist_count} BLACKLISTED')
     print((f"{len(failed_galleries['failed_retry_galleries'])} "
            'failed retry galleries'))
-    print(f'{blacklist_count} BLACKLISTED')
+    print(f"\n{'-'*200}")
 
     return failed_galleries
 
