@@ -7,6 +7,7 @@ Created on Tue Feb 13 19:43:58 2024
 """
 
 import os
+from tqdm import tqdm
 import logging
 
 import nhentai_scraper
@@ -15,7 +16,7 @@ import nhentai_scraper
 logger = logging.getLogger('__main__.' + __name__)
 
 
-def download_id_list(id_list, download_dir):
+def download_id_list(id_list, download_dir, id_list_name=None):
 
     failed_galleries = {
         'initial_failed_galleries': [],
@@ -25,7 +26,10 @@ def download_id_list(id_list, download_dir):
 
     finished_count = 0
     blacklist_count = 0
-    for count, gallery_id in enumerate(id_list, start=1):
+    t = tqdm(enumerate(id_list, start=1), total=len(id_list))
+    for count, gallery_id in t:
+        if id_list_name is not None:
+            t.set_description(f"Downloading galleries from {id_list_name}")
         logger.info(f"\n{'-'*os.get_terminal_size().columns}")
         logger.info((f'Downloading number {count} '
                      f'out of {len(id_list)} galleries...'))
@@ -34,8 +38,6 @@ def download_id_list(id_list, download_dir):
         gallery.download()
         if gallery.status_code == 0 or gallery.status_code == 1:
             finished_count += 1
-            print((f'Finished {finished_count} '
-                   f'out of {len(id_list)} gallery downloads.'))
         elif gallery.status_code == 2:
             failed_galleries['repeated_galleries'].append(
                 f"{gallery.status()}"
@@ -52,10 +54,13 @@ def download_id_list(id_list, download_dir):
     # retry failed galleries
     if len(failed_galleries['initial_failed_galleries']) != 0:
         print('\nRetrying failed galleries...\n')
-        for count, gallery_id in enumerate(
-            failed_galleries['initial_failed_galleries'],
-            start=1
-        ):
+        t = tqdm(
+                enumerate(
+                    failed_galleries['initial_failed_galleries'], start=1
+                ),
+                total=len(failed_galleries['initial_failed_galleries'])
+            )
+        for count, gallery_id in t:
             logger.info(f"\n{'-'*os.get_terminal_size().columns}")
             logger.info((f'Downloading number {count} '
                         f'out of {len(id_list)} galleries...'))
@@ -64,8 +69,6 @@ def download_id_list(id_list, download_dir):
             gallery.download()
             if gallery.status_code == 0 or gallery.status_code == 1:
                 finished_count += 1
-                print((f'Finished {finished_count} '
-                       f'out of {len(id_list)} gallery downloads.'))
             elif gallery.status_code == 2:
                 failed_galleries['repeated_galleries'].append(
                     f"{gallery.status()}"
@@ -135,7 +138,7 @@ def confirm_settings():
         else:
             break
 
-    print(f"\n{'-'*os.get_terminal_size().columns}")
+    print('-'*os.get_terminal_size().columns)
 
     return download_dir
 

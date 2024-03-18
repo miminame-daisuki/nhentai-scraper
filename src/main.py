@@ -13,8 +13,8 @@ def main():
 
     nhentai_scraper.set_logging_config()
     logger.info('Program started')
-
     download_dir = download_galleries.confirm_settings()
+
     tag_list = nhentai_scraper.load_input_list('download_tags.txt')
     failed_galleries = download_tags.download_tags(
         tag_list,

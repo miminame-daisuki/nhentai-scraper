@@ -34,7 +34,6 @@ group/
 - Combine download_author.py and download_galleries.py into one file containing main() and put function definitions in new file
 - Fix logger name in .log files
 - Overwrite same gallery with newer one (determined from id or upload date)?
-- Add tqdm in outer loops?
 - Create new log file every time program is started
 - Don't use TimeRotatingFileHandler (Implement automatic deletetion of old logs manually)
 - Capture ctrl-c
@@ -42,6 +41,7 @@ group/
 - Write folder name using NFC of NFD?
 - Check download_dir settings in every function, and separate it into a new function
 - Add documentation, comments, ...
+- Review entire code
 
 - Add diagnosis? (total slept time, failed url percentage, ...)
 - Is check_extra_pages needed?

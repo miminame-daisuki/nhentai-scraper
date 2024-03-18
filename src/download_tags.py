@@ -84,8 +84,6 @@ def search_tag(tag: str):
             )[0]
         )
 
-    print('\n')
-
     return id_list
 
 
@@ -152,7 +150,7 @@ def download_tags(tag_list, download_dir, skip_downloaded_ids=False):
 
         logger.info(f'Start downloading for {tag}')
         failed_galleries_extend = download_galleries.download_id_list(
-            id_list, download_dir
+            id_list, download_dir, id_list_name=tag
         )
         for key in failed_galleries:
             failed_galleries[key].extend(

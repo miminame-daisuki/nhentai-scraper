@@ -409,16 +409,16 @@ class Gallery:
 
         # download all missing pages, and retry up to 3 times for failed pages
         tries = 0
+        leave_tqdm = True
         while len(self.missing_pages) != 0:
-            if tries == 0:
-                print(f'\nDownloading {self.title} (#{self.id})')
             if tries != 0:
+                leave_tqdm = False
                 logger.info(('Retrying failed downloads '
                              f'for the {tries}(th) time...\n'))
-                print(('Retrying failed downloads '
-                       f'for the {tries}(th) time...'))
+                tqdm.write(('Retrying failed downloads '
+                            f'for the {tries}(th) time...'))
 
-            self.download_missing_pages()
+            self.download_missing_pages(leave_tqdm=leave_tqdm)
             self.load_missing_pages()
 
             # record missing pages for initial download try
@@ -431,9 +431,11 @@ class Gallery:
                 self.status_code = -9
                 return
 
-    def download_missing_pages(self):
+    def download_missing_pages(self, leave_tqdm=True):
 
-        for page in tqdm(self.missing_pages):
+        t = tqdm(self.missing_pages, leave=leave_tqdm)
+        for page in t:
+            t.set_description(f"Downloading #{self.id}")
             self.download_page(page)
 
     def load_missing_pages(self):
@@ -541,14 +543,14 @@ class Gallery:
 
         def skip_download():
             if self.status_code < -1:
-                print(self.status())
+                tqdm.write(self.status())
                 logger.error(self.status())
 
                 return True
 
             elif self.status_code > 0:
                 logger.info(self.status())
-                print(self.status())
+                tqdm.write(self.status())
 
                 return True
 
@@ -587,7 +589,7 @@ class Gallery:
 
         self.status_code = 0
         logger.info(f'{self.status()}')
-        print(self.status())
+        tqdm.write(self.status())
 
         return self.status_code
 
