@@ -50,7 +50,7 @@ def search_tag(tag: str):
 
     logger.info(f"\n{'-'*os.get_terminal_size().columns}")
     logger.info(f"Searching galleries from {tag}")
-    print(f"\n\nSearching galleries from {tag}...")
+    print(f"\nSearching galleries from {tag}...")
     tag_type, tag_name = tag.split(':')
     tag_url = f"https://nhentai.net/{tag_type}/{tag_name}/"
 
@@ -73,7 +73,7 @@ def search_tag(tag: str):
 
         return id_list
 
-    for page in tqdm(range(1, page_count+1)):
+    for page in tqdm(range(1, page_count+1), leave=False):
         logger.info(f"Searching page {page} from {tag}")
         page_url = tag_url + f'?page={page}'
         id_list.extend(
@@ -104,7 +104,7 @@ def find_tag(tag, download_dir=''):
     find_tag_command = [
         'tag',
         '--find',
-        tag,
+        tag.replace('-', ' '),
         download_dir
     ]
     result = run(find_tag_command, capture_output=True, check=True)
