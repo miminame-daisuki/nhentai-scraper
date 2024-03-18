@@ -17,8 +17,7 @@ def main():
 
     tag_list = nhentai_scraper.load_input_list('download_tags.txt')
     failed_galleries = download_tags.download_tags(
-        tag_list,
-        download_dir
+        tag_list, download_dir
     )
 
     if len(failed_galleries['repeated_galleries']) != 0:

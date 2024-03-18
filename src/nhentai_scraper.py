@@ -29,18 +29,19 @@ logger = logging.getLogger('__main__.' + __name__)
 def set_logging_config(logging_config_filename=''):
     logging_dir = os.path.abspath(f'{get_application_folder_dir()}/log/')
     if not logging_config_filename:
-        logging_config_filename = os.path.join(logging_dir,
-                                               'logging_config.yaml')
+        logging_config_filename = os.path.join(
+            logging_dir, 'logging_config.yaml'
+        )
     with open(logging_config_filename) as f:
         if 'yaml' in logging_config_filename:
             logging_config = yaml.full_load(f)
         elif 'json' in logging_config_filename:
             logging_config = json.load(f)
 
-    logging_filename = os.path.join(logging_dir,
-                                    f'{__name__}.log')
+    logging_filename = os.path.join(
+        logging_dir, f'{__name__}.log'
+    )
     logging_config['handlers']['file']['filename'] = logging_filename
-
     logging.config.dictConfig(logging_config)
 
     logger.info(f"\n{'-'*os.get_terminal_size().columns}")
@@ -55,7 +56,8 @@ def get_application_folder_dir():
     # when running python script (placed inside ./src/)
     elif __file__:
         application_folder_dir = os.path.abspath(
-            f'{os.path.dirname(__file__)}/..')
+            f'{os.path.dirname(__file__)}/..'
+        )
 
     return application_folder_dir
 
@@ -90,8 +92,10 @@ def load_cookies(inputs_dir):
     return cookies
 
 
-def get_response(url, headers=None, cookies=None,
-                 sleep_time='default', timeout_time=61):
+def get_response(
+    url, headers=None, cookies=None,
+    sleep_time='default', timeout_time=61
+):
 
     if not headers:
         headers = {}
@@ -100,10 +104,7 @@ def get_response(url, headers=None, cookies=None,
 
     try:
         response = requests.get(
-            url,
-            headers=headers,
-            cookies=cookies,
-            timeout=timeout_time
+            url, headers=headers, cookies=cookies, timeout=timeout_time
         )
     except Exception as error:
         logger.error(f'An exception occured: {error}')
@@ -130,8 +131,10 @@ def check_tag_fileicon():
 
 class Gallery:
 
-    def __init__(self, gallery_id, download_dir='',
-                 headers=None, cookies=None):
+    def __init__(
+        self, gallery_id, download_dir='',
+        headers=None, cookies=None
+    ):
 
         self.id = str(gallery_id).split('#')[-1]
         logger.info(f'Gallery initiated for id: {gallery_id}')
@@ -157,7 +160,8 @@ class Gallery:
         logger.info(f"Download directory set to: '{self.download_dir}'")
 
         self.inputs_dir = os.path.abspath(
-            f'{self.application_folder_path}/inputs/')
+            f'{self.application_folder_path}/inputs/'
+        )
 
         self.headers = headers
         if not self.headers:
@@ -176,9 +180,9 @@ class Gallery:
         logger.info('Downloading gallery metadata from nhentai api...')
         api_url = f'https://nhentai.net/api/gallery/{int(self.id)}'
 
-        api_response = get_response(api_url,
-                                    headers=self.headers,
-                                    cookies=self.cookies)
+        api_response = get_response(
+            api_url, headers=self.headers, cookies=self.cookies
+        )
         if api_response.status_code == 403:
             self.status_code = -2
 
@@ -192,11 +196,13 @@ class Gallery:
         # retry for up to 3 times
         tries = 0
         while api_response.status_code != 200:
-            logger.error(('Failed to retrieve metadata with status code'
-                          f'{api_response.status_code}, retrying...'))
-            api_response = get_response(api_url,
-                                        headers=self.headers,
-                                        cookies=self.cookies)
+            logger.error(
+                ('Failed to retrieve metadata with status code'
+                 f'{api_response.status_code}, retrying...')
+            )
+            api_response = get_response(
+                api_url, headers=self.headers, cookies=self.cookies
+            )
             tries += 1
 
             if tries >= 3 and api_response != 200:
@@ -251,14 +257,6 @@ class Gallery:
             self.load_downloaded_metadata()
             logger.info('Folder exists with metadata loaded')
 
-            # check whether download is finished
-            # listed_tags = self.list_tags()
-            # if (int(self.downloaded_metadata['id']) == int(self.id) and
-            #         sorted(self.tags) == sorted(listed_tags)):
-            #     self.status_code = 1
-
-            #     return
-
             # check whether the gallery was downloaded with a different source
             if int(self.downloaded_metadata['id']) != int(self.id):
                 self.status_code = 2
@@ -272,8 +270,10 @@ class Gallery:
                     self.download_thumb()
                     self.set_thumb()
                 except Exception as error:
-                    logger.error(('An exception occured when'
-                                  f'downloading/setting thumbnail: {error}'))
+                    logger.error(
+                        ('An exception occured when'
+                         f'downloading/setting thumbnail: {error}')
+                    )
 
         else:
             os.mkdir(self.folder_dir)
@@ -285,17 +285,10 @@ class Gallery:
                 self.download_thumb()
                 self.set_thumb()
             except Exception as error:
-                logger.error(('An exception occured when downloading/setting'
-                              f'thumbnail: {error}'))
-
-    # def list_tags(self):
-
-    #     list_tag_command = ['tag', '--list', self.folder_dir]
-    #     result = run(list_tag_command, capture_output=True)
-    #     listed_tags = result.stdout.decode('utf-8').split('\t')[-1]
-    #     listed_tags = listed_tags.split('\n')[0].split(',')
-
-    #     return listed_tags
+                logger.error(
+                    ('An exception occured when downloading/setting'
+                     f'thumbnail: {error}')
+                )
 
     def load_downloaded_metadata(self):
 
@@ -315,16 +308,22 @@ class Gallery:
 
         logger.info('Retrieving thumbnail...')
         extension = self.get_img_extension(
-            self.metadata['images']['thumbnail'])
-        thumb_url = ('https://t3.nhentai.net/galleries/'
-                     f'{self.media_id}/thumb.{extension}')
-        thumb_response = get_response(thumb_url,
-                                      headers=self.headers,
-                                      cookies=self.cookies)
+            self.metadata['images']['thumbnail']
+        )
+        thumb_url = (
+            'https://t3.nhentai.net/galleries/'
+            f'{self.media_id}/thumb.{extension}'
+        )
+        thumb_response = get_response(
+            thumb_url, headers=self.headers, cookies=self.cookies
+        )
         if thumb_response.status_code != 200:
             self.status_code = -6
-            logger.error(('Something went wrong when retrieving thumbnail:'
-                          f'{thumb_response.status_code}'))
+            logger.error(
+                ('Something went wrong when retrieving thumbnail:'
+                 f'{thumb_response.status_code}')
+            )
+
             return
 
         self.thumb_filename = f'{self.folder_dir}/thumb.{extension}'
@@ -356,10 +355,16 @@ class Gallery:
         thumb_width, thumb_height = thumb.size
         thumb_size = max(thumb_width, thumb_height)
         thumb_square = Image.new(
-            'RGBA', (thumb_size, thumb_size), (0, 0, 0, 0))
-        thumb_square.paste(thumb,
-                           (int((thumb_size-thumb_width)/2),
-                            int((thumb_size-thumb_height)/2)))
+            'RGBA',
+            (thumb_size, thumb_size),
+            (0, 0, 0, 0)
+        )
+        thumb_square.paste(
+            thumb,
+            (int((thumb_size-thumb_width)/2),
+             int((thumb_size-thumb_height)/2)
+             )
+        )
         thumb_rgb = thumb_square.convert('RGB')
         thumb_rgb.save(self.thumb_filename)
 
@@ -381,15 +386,21 @@ class Gallery:
         logger.info(f'Retrieving Page {page}/{self.num_pages} url...')
 
         extension = self.get_img_extension(
-            self.metadata['images']['pages'][int(page)-1])
-        img_url = ('https://i5.nhentai.net/galleries/'
-                   f'{self.media_id}/{int(page)}.{extension}')
-        img_response = get_response(img_url,
-                                    headers=self.headers,
-                                    cookies=self.cookies)
+            self.metadata['images']['pages'][int(page)-1]
+        )
+        img_url = (
+            'https://i5.nhentai.net/galleries/'
+            f'{self.media_id}/{int(page)}.{extension}'
+        )
+        img_response = get_response(
+            img_url, headers=self.headers, cookies=self.cookies
+        )
         if img_response.status_code != 200:
-            logger.error(('Something went wrong with when getting response'
-                          f'for page {page}: {img_response.status_code}'))
+            logger.error(
+                ('Something went wrong with when getting response'
+                 f'for page {page}: {img_response.status_code}')
+            )
+
             return
 
         logger.info('Image downloaded')
@@ -413,10 +424,14 @@ class Gallery:
         while len(self.missing_pages) != 0:
             if tries != 0:
                 leave_tqdm = False
-                logger.info(('Retrying failed downloads '
-                             f'for the {tries}(th) time...\n'))
-                tqdm.write(('Retrying failed downloads '
-                            f'for the {tries}(th) time...'))
+                logger.info(
+                    ('Retrying failed downloads '
+                     f'for the {tries}(th) time...\n')
+                )
+                tqdm.write(
+                    ('Retrying failed downloads '
+                     f'for the {tries}(th) time...')
+                )
 
             self.download_missing_pages(leave_tqdm=leave_tqdm)
             self.load_missing_pages()
@@ -429,6 +444,7 @@ class Gallery:
             if tries > 3 and len(self.missing_pages) != 0:
                 logger.error(f'Failed pages: {self.missing_pages}')
                 self.status_code = -9
+
                 return
 
     def download_missing_pages(self, leave_tqdm=True):
@@ -458,12 +474,20 @@ class Gallery:
         # which should not happen
         extra_pages = []
         downloaded_pages = os.listdir(self.folder_dir)
-        non_page_files = ['Icon\r', 'metadata.json', 'thumb.jpg', 'thumb.png',
-                          '.DS_Store', f'{self.title}.pdf']
-        downloaded_pages = [unicodedata.normalize('NFC', page)
-                            for page in downloaded_pages
-                            if unicodedata.normalize('NFC', page)
-                            not in non_page_files]
+        non_page_files = [
+            'Icon\r',
+            'metadata.json',
+            'thumb.jpg',
+            'thumb.png',
+            '.DS_Store',
+            f'{self.title}.pdf'
+        ]
+        downloaded_pages = [
+            unicodedata.normalize('NFC', page)
+            for page in downloaded_pages
+            if unicodedata.normalize('NFC', page)
+            not in non_page_files
+        ]
         for downloaded_page in downloaded_pages:
             if (int(Path(downloaded_page).stem)
                     not in range(int(self.num_pages)+1)):
@@ -480,8 +504,13 @@ class Gallery:
         pdf_path = f"{self.folder_dir}/{self.title}.pdf"
         # load all image files and remove unwanted ones
         image_filenames = os.listdir(self.folder_dir)
-        exclude_list = ['Icon\r', 'metadata.json', '.DS_Store',
-                        'thumb.jpg', 'thumb.png']
+        exclude_list = [
+            'Icon\r',
+            'metadata.json',
+            '.DS_Store',
+            'thumb.jpg',
+            'thumb.png'
+        ]
         image_filenames = [
             unicodedata.normalize('NFC', file) for file in image_filenames
             if file not in exclude_list
@@ -498,8 +527,9 @@ class Gallery:
         logger.info('Converting images to PDF file...')
         # sort according to page number
         sort = [int(Path(page).stem) for page in image_filenames]
-        image_filenames = [file for _, file in sorted(
-            zip(sort, image_filenames))]
+        image_filenames = [
+            file for _, file in sorted(zip(sort, image_filenames))
+        ]
 
         # open all image files and save to pdf
         images = []
@@ -509,8 +539,10 @@ class Gallery:
                 with Image.open(image_path) as img:
                     img_copy = img.copy()
                 images.append(img_copy)
-            images[0].save(pdf_path, "PDF", resolution=100.0,
-                           save_all=True, append_images=images[1:])
+            images[0].save(
+                pdf_path, "PDF", resolution=100.0,
+                save_all=True, append_images=images[1:]
+            )
         except Exception as error:
             logger.error(f"{error}")
             self.status_code = -11
@@ -555,7 +587,6 @@ class Gallery:
                 return True
 
             else:
-
                 return False
 
         self.download_metadata()

@@ -29,9 +29,9 @@ def get_gallery_ids(url, headers=None, cookies=None):
 
     gallery_id = []
 
-    response = nhentai_scraper.get_response(url,
-                                            headers=headers,
-                                            cookies=cookies)
+    response = nhentai_scraper.get_response(
+        url, headers=headers, cookies=cookies
+    )
     if response.status_code == 404:
         return None, None
 
@@ -60,9 +60,7 @@ def search_tag(tag: str):
     cookies = nhentai_scraper.load_cookies(inputs_dir)
 
     page_count = get_gallery_ids(
-        tag_url,
-        headers=headers,
-        cookies=cookies
+        tag_url, headers=headers, cookies=cookies
     )[1]
 
     id_list = []

@@ -30,12 +30,17 @@ def download_id_list(id_list, download_dir, id_list_name=None):
     for count, gallery_id in t:
         if id_list_name is not None:
             t.set_description(f"Downloading galleries from {id_list_name}")
+
         logger.info(f"\n{'-'*os.get_terminal_size().columns}")
-        logger.info((f'Downloading number {count} '
-                     f'out of {len(id_list)} galleries...'))
-        gallery = nhentai_scraper.Gallery(gallery_id,
-                                          download_dir=download_dir)
+        logger.info(
+            (f'Downloading number {count} '
+             f'out of {len(id_list)} galleries...')
+        )
+        gallery = nhentai_scraper.Gallery(
+            gallery_id, download_dir=download_dir
+        )
         gallery.download()
+
         if gallery.status_code == 0 or gallery.status_code == 1:
             finished_count += 1
         elif gallery.status_code == 2:
@@ -48,12 +53,15 @@ def download_id_list(id_list, download_dir, id_list_name=None):
             failed_galleries['initial_failed_galleries'].append(
                 f'{gallery_id}'
             )
-            logger.error((f'Failed to download #{gallery_id}, due to '
-                          f"{gallery.status()}"))
+            logger.error(
+                (f'Failed to download #{gallery_id}, due to '
+                 f"{gallery.status()}")
+            )
 
     # retry failed galleries
     if len(failed_galleries['initial_failed_galleries']) != 0:
         print('\nRetrying failed galleries...\n')
+
         t = tqdm(
                 enumerate(
                     failed_galleries['initial_failed_galleries'], start=1
@@ -62,11 +70,16 @@ def download_id_list(id_list, download_dir, id_list_name=None):
             )
         for count, gallery_id in t:
             logger.info(f"\n{'-'*os.get_terminal_size().columns}")
-            logger.info((f'Downloading number {count} '
-                        f'out of {len(id_list)} galleries...'))
-            gallery = nhentai_scraper.Gallery(gallery_id,
-                                              download_dir=download_dir)
+            logger.info(
+                (f'Downloading number {count} '
+                 f'out of {len(id_list)} galleries...')
+            )
+
+            gallery = nhentai_scraper.Gallery(
+                gallery_id, download_dir=download_dir
+            )
             gallery.download()
+
             if gallery.status_code == 0 or gallery.status_code == 1:
                 finished_count += 1
             elif gallery.status_code == 2:
@@ -85,13 +98,19 @@ def download_id_list(id_list, download_dir, id_list_name=None):
                      f"{gallery.status()}")
                 )
 
-    print((f"\nFinished {finished_count} out of {len(id_list)} gallery "
-           'downloads in total'))
-    print((f"{len(failed_galleries['repeated_galleries'])} "
-           'repeated galleries not downloaded'))
+    print(
+        (f"\nFinished {finished_count} out of {len(id_list)} gallery "
+         'downloads in total')
+    )
+    print(
+        (f"{len(failed_galleries['repeated_galleries'])} "
+         'repeated galleries not downloaded')
+    )
     print(f'{blacklist_count} BLACKLISTED')
-    print((f"{len(failed_galleries['failed_retry_galleries'])} "
-           'failed retry galleries'))
+    print(
+        (f"{len(failed_galleries['failed_retry_galleries'])} "
+         'failed retry galleries')
+    )
     print(f"\n{'-'*os.get_terminal_size().columns}")
 
     return failed_galleries
@@ -101,8 +120,9 @@ def write_failed_galleries(failed_galleries, filename):
 
     # write the failed retry galleries to failed_download_id.txt
     application_folder_path = nhentai_scraper.get_application_folder_dir()
-    inputs_folder_dir = os.path.abspath((f'{application_folder_path}'
-                                         '/inputs/'))
+    inputs_folder_dir = os.path.abspath(
+        f'{application_folder_path}/inputs/'
+    )
     filename = os.path.join(inputs_folder_dir, filename)
     with open(filename, 'w') as f:
         for entry in failed_galleries:
