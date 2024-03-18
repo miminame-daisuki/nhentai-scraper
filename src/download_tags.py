@@ -87,17 +87,19 @@ def search_tag(tag: str):
 
 def find_tag(tag, download_dir=''):
 
-    application_folder_path = nhentai_scraper.get_application_folder_dir()
+    # application_folder_path = nhentai_scraper.get_application_folder_dir()
 
-    if download_dir:
-        if os.path.isabs(download_dir):
-            download_dir = download_dir
-        else:
-            download_dir = os.path.abspath(
-                f'{application_folder_path}/{download_dir}/')
-    else:
-        download_dir = os.path.abspath(
-            f'{application_folder_path}/Downloaded/')
+    # if download_dir:
+    #     if os.path.isabs(download_dir):
+    #         download_dir = download_dir
+    #     else:
+    #         download_dir = os.path.abspath(
+    #             f'{application_folder_path}/{download_dir}/')
+    # else:
+    #     download_dir = os.path.abspath(
+    #         f'{application_folder_path}/Downloaded/')
+
+    download_dir = nhentai_scraper.set_download_dir(download_dir)
 
     find_tag_command = [
         'tag',
@@ -143,7 +145,9 @@ def download_tags(tag_list, download_dir, skip_downloaded_ids=False):
 
         # only keep not yet downloaded ids in id_list
         if skip_downloaded_ids:
-            newest_downloaded_id = sorted(find_tag(tag))[-1]
+            newest_downloaded_id = sorted(
+                find_tag(tag, download_dir=download_dir)
+            )[-1]
             id_list = id_list[:id_list.index(newest_downloaded_id)]
 
         logger.info(f'Start downloading for {tag}')

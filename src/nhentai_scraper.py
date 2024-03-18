@@ -129,6 +129,28 @@ def check_tag_fileicon():
         return False
 
 
+def set_download_dir(download_dir=''):
+
+    application_folder_path = get_application_folder_dir()
+
+    if download_dir:
+        if os.path.isabs(download_dir):
+            pass
+        else:
+            download_dir = os.path.abspath(
+                f'{application_folder_path}/{download_dir}/'
+            )
+    else:
+        download_dir = os.path.abspath(
+            f'{application_folder_path}/Downloaded/'
+        )
+
+    if not os.path.isdir(download_dir):
+        os.mkdir(download_dir)
+
+    return download_dir
+
+
 class Gallery:
 
     def __init__(
@@ -142,20 +164,22 @@ class Gallery:
         self.application_folder_path = get_application_folder_dir()
 
         # set download_dir to the one provided, or use default directory
-        if download_dir:
-            if os.path.isabs(download_dir):
-                self.download_dir = download_dir
-            else:
-                self.download_dir = os.path.abspath(
-                    f'{self.application_folder_path}/{download_dir}/'
-                )
-        else:
-            self.download_dir = os.path.abspath(
-                f'{self.application_folder_path}/Downloaded/'
-            )
+        # if download_dir:
+        #     if os.path.isabs(download_dir):
+        #         self.download_dir = download_dir
+        #     else:
+        #         self.download_dir = os.path.abspath(
+        #             f'{self.application_folder_path}/{download_dir}/'
+        #         )
+        # else:
+        #     self.download_dir = os.path.abspath(
+        #         f'{self.application_folder_path}/Downloaded/'
+        #     )
 
-        if not os.path.isdir(self.download_dir):
-            os.mkdir(self.download_dir)
+        # if not os.path.isdir(self.download_dir):
+        #     os.mkdir(self.download_dir)
+
+        self.download_dir = set_download_dir(download_dir)
 
         logger.info(f"Download directory set to: '{self.download_dir}'")
 
@@ -425,11 +449,11 @@ class Gallery:
             if tries != 0:
                 leave_tqdm = False
                 logger.info(
-                    ('Retrying failed downloads '
+                    ('Retrying failed pages '
                      f'for the {tries}(th) time...\n')
                 )
                 tqdm.write(
-                    ('Retrying failed downloads '
+                    ('Retrying failed pages '
                      f'for the {tries}(th) time...')
                 )
 

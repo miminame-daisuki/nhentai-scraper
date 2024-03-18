@@ -155,6 +155,7 @@ def confirm_settings():
         confirm_download_dir = input((f'Download to {download_dir}?(y/n)'))
         if confirm_download_dir != 'y':
             download_dir = str(input('Download directory: '))
+            download_dir = nhentai_scraper.set_download_dir(download_dir)
         else:
             break
 
