@@ -50,7 +50,7 @@ def search_tag(tag: str):
 
     logger.info(f"\n{'-'*os.get_terminal_size().columns}")
     logger.info(f"Searching galleries from {tag}")
-    print(f"\nSearching galleries from {tag}...")
+    print(f"\nSearching galleries from {tag}...\n")
     tag_type, tag_name = tag.split(':')
     tag_url = f"https://nhentai.net/{tag_type}/{tag_name}/"
 

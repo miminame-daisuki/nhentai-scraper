@@ -452,12 +452,8 @@ class Gallery:
                     ('Retrying failed pages '
                      f'for the {tries}(th) time...\n')
                 )
-                tqdm.write(
-                    ('Retrying failed pages '
-                     f'for the {tries}(th) time...')
-                )
 
-            self.download_missing_pages(leave_tqdm=leave_tqdm)
+            self.download_missing_pages(tries, leave_tqdm=leave_tqdm)
             self.load_missing_pages()
 
             # record missing pages for initial download try
@@ -471,11 +467,16 @@ class Gallery:
 
                 return
 
-    def download_missing_pages(self, leave_tqdm=True):
+    def download_missing_pages(self, tries, leave_tqdm=True):
 
         t = tqdm(self.missing_pages, leave=leave_tqdm)
         for page in t:
-            t.set_description(f"Downloading #{self.id}")
+            if tries == 0:
+                t.set_description(f"Downloading #{self.id}")
+            else:
+                t.set_description(
+                    f'Retrying failed pages for the {tries}(th) time'
+                )
             self.download_page(page)
 
     def load_missing_pages(self):
@@ -585,12 +586,18 @@ class Gallery:
             -4: ('Error when downloading metadata '
                  f"(failed retry 3 times) for #{self.id}"),
             -5: f"BLACKLISTED #{self.id}",
-            -6: 'Error when downloading thmbnail',
-            -7: 'Error when setting tags',
-            -8: 'Error when setting thumbnail',
-            -9: 'Error when downloading missing pages (failed retry 3 times)',
-            -10: 'There are more pages downloaded than self.num_pages',
-            -11: 'Error when saving PDF',
+            -6: ('Error when downloading thmbnail '
+                 f"for {self.title} (*{self.id})"),
+            -7: ('Error when setting tags '
+                 f"for {self.title} (*{self.id})"),
+            -8: ('Error when setting thumbnail '
+                 f"for {self.title} (*{self.id})"),
+            -9: ('Error when downloading missing pages (failed retry 3 times) '
+                 f"for {self.title} (*{self.id})"),
+            -10: ('There are more pages downloaded than self.num_pages '
+                  f"for {self.title} (*{self.id})"),
+            -11: ('Error when saving PDF '
+                  f"for {self.title} (*{self.id})"),
         }
 
         return status_dict[self.status_code]
