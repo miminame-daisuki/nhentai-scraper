@@ -29,7 +29,7 @@ group/
 
 ## To-do list
 - use Path for paths
-- Download by author (download all galleries?, even the ones with the same title by using title-1, title-2 for example?) to automatically update downloaded galleries
+- Download by author (put galleries with same title in `Repeated downloads` folder?) to automatically update downloaded galleries
 - Automatically detect input file contains artist name or gallery id?
 - Combine download_author.py and download_galleries.py into one file containing main() and put function definitions in new file
 - Fix logger name in .log files
@@ -40,10 +40,12 @@ group/
 - Download from mirror sites such as https://www2.hentai2.net/NUMBER_GOES_HERE.html or hitomi.la?
 - Write folder name using NFC of NFD?
 - Check download_dir settings in every function, and separate it into a new function
+- download_list = search_tag() - find_tag()
 - Add documentation, comments, ...
 - Review entire code
 
 - Add diagnosis? (total slept time, failed url percentage, ...)
+- Truncate tqdm.write for long gallery titles with `self.title[:os.get_terminal_size().column] + '...'`?
 - Is check_extra_pages needed?
 - Ask whether to use tag and fileicon when starting program
 - Check whether tag and fileicon has been installed

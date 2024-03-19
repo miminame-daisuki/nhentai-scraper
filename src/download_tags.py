@@ -85,20 +85,9 @@ def search_tag(tag: str):
     return id_list
 
 
-def find_tag(tag, download_dir=''):
+def search_finished_downloads(tag, download_dir=''):
 
-    # application_folder_path = nhentai_scraper.get_application_folder_dir()
-
-    # if download_dir:
-    #     if os.path.isabs(download_dir):
-    #         download_dir = download_dir
-    #     else:
-    #         download_dir = os.path.abspath(
-    #             f'{application_folder_path}/{download_dir}/')
-    # else:
-    #     download_dir = os.path.abspath(
-    #         f'{application_folder_path}/Downloaded/')
-
+    # search for finished download galleries in download_dir
     download_dir = nhentai_scraper.set_download_dir(download_dir)
 
     find_tag_command = [
@@ -110,6 +99,18 @@ def find_tag(tag, download_dir=''):
     result = run(find_tag_command, capture_output=True, check=True)
 
     matched_galleries = result.stdout.decode('utf-8')
+
+    if not matched_galleries:
+        find_tag_command = [
+            'tag',
+            '--find',
+            tag,
+            download_dir
+        ]
+        result = run(find_tag_command, capture_output=True, check=True)
+
+        matched_galleries = result.stdout.decode('utf-8')
+
     # remove last one (blank stirng)
     matched_galleries = matched_galleries.split('\n')[:-1]
 
@@ -132,23 +133,30 @@ def download_tags(tag_list, download_dir, skip_downloaded_ids=False):
     }
 
     for tag in tag_list:
-        id_list = search_tag(tag)
-        if not id_list:
-            continue
 
-        if sorted(find_tag(tag, download_dir=download_dir)) == sorted(id_list):
+        id_list = search_tag(tag)
+        matched_galleries_id = search_finished_downloads(
+            tag, download_dir=download_dir
+        )
+
+        if sorted(matched_galleries_id) == sorted(id_list):
             print(f'All galleries from {tag} has already been downloaded.')
+            print(f"\n{'-'*os.get_terminal_size().columns}")
             logger.info(
                 f'All galleries from {tag} has already been downloaded.'
             )
             continue
 
-        # only keep not yet downloaded ids in id_list
+        # only keep not yet finished downloaded ids in id_list
         if skip_downloaded_ids:
-            newest_downloaded_id = sorted(
-                find_tag(tag, download_dir=download_dir)
-            )[-1]
-            id_list = id_list[:id_list.index(newest_downloaded_id)]
+            # newest_downloaded_id = sorted(
+            #     search_finished_downloads(tag, download_dir=download_dir)
+            # )[-1]
+            # id_list = id_list[:id_list.index(newest_downloaded_id)]
+            id_list = list(set(id_list) - set(matched_galleries_id))
+
+        if not id_list:
+            continue
 
         logger.info(f'Start downloading for {tag}')
         failed_galleries_extend = download_galleries.download_id_list(
