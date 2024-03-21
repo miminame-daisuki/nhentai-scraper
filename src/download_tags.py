@@ -32,7 +32,7 @@ def get_gallery_ids(url, headers=None, cookies=None):
     response = nhentai_scraper.get_response(
         url, headers=headers, cookies=cookies
     )
-    if response.status_code == 404:
+    if response.status_code != 200:
         return None, None
 
     soup = BeautifulSoup(response.content, features='html.parser')
@@ -66,21 +66,23 @@ def search_tag(tag: str):
     id_list = []
 
     if page_count is None:
-        logger.error(f'Error 404 for {tag}')
-        print(f'Error 404 for {tag}')
+        logger.error(f'Failed to retrieve {tag}')
+        print(f'Failed to retrieve {tag}')
 
         return id_list
 
     for page in tqdm(range(1, page_count+1), leave=False):
         logger.info(f"Searching page {page} from {tag}")
         page_url = tag_url + f'?page={page}'
-        id_list.extend(
-            get_gallery_ids(
-                page_url,
-                headers=headers,
-                cookies=cookies
-            )[0]
-        )
+        gallery_id = get_gallery_ids(
+            page_url,
+            headers=headers, cookies=cookies
+        )[0]
+
+        if not gallery_id:
+            logger.error(f'Failed to retrieve id_list for page {page}')
+            continue
+        id_list.extend(gallery_id)
 
     return id_list
 
@@ -140,7 +142,7 @@ def download_tags(tag_list, download_dir, skip_downloaded_ids=False):
         )
 
         if sorted(matched_galleries_id) == sorted(id_list):
-            print(f'All galleries from {tag} has already been downloaded.')
+            print(f'All galleries from {tag} have already been downloaded.')
             print(f"\n{'-'*os.get_terminal_size().columns}")
             logger.info(
                 f'All galleries from {tag} has already been downloaded.'

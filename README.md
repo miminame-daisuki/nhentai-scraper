@@ -28,6 +28,7 @@ group/
 - To search for downloaded galleries by title, don't include the parts in the paranthesis `[]`. Ex: To search for `[artist] title`, simply type `title`.
 
 ## To-do list
+- Add download_favorites
 - use Path for paths
 - Download by author (put galleries with same title in `Repeated downloads` folder?) to automatically update downloaded galleries
 - Automatically detect input file contains artist name or gallery id?
