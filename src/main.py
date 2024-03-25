@@ -21,8 +21,8 @@ def main():
         skip_downloaded_ids = False
 
     download_list = nhentai_scraper.load_input_list('download_list.txt')
-    blacklist_list = nhentai_scraper.load_input_list('.blacklists.txt')
-    repeats_list = nhentai_scraper.load_input_list('.repeated_galleries.txt')
+    blacklist_list = nhentai_scraper.load_input_list('blacklist_id.txt')
+    repeats_list = nhentai_scraper.load_input_list('repeated_galleries.txt')
 
     gallery_results = {
         'finished': [],
@@ -95,11 +95,11 @@ def main():
 
         if gallery_results['repeats']:
             download_galleries.write_gallery_results(
-                gallery_results['repeats'], '.repeated_galleries.txt'
+                gallery_results['repeats'], 'repeated_galleries.txt'
             )
         if gallery_results['blacklists']:
             download_galleries.write_gallery_results(
-                gallery_results['blacklists'], '.blacklists.txt'
+                gallery_results['blacklists'], 'blacklist_id.txt'
             )
 
     if gallery_results['retry_fails']:
