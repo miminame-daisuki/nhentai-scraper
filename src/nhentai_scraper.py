@@ -155,37 +155,18 @@ class Gallery:
 
     def __init__(
         self, gallery_id, download_dir='',
-        headers=None, cookies=None
+        additional_tags=None, headers=None, cookies=None
     ):
 
         self.id = str(gallery_id).split('#')[-1]
         logger.info(f'Gallery initiated for id: {gallery_id}')
 
         self.application_folder_path = get_application_folder_dir()
-
-        # set download_dir to the one provided, or use default directory
-        # if download_dir:
-        #     if os.path.isabs(download_dir):
-        #         self.download_dir = download_dir
-        #     else:
-        #         self.download_dir = os.path.abspath(
-        #             f'{self.application_folder_path}/{download_dir}/'
-        #         )
-        # else:
-        #     self.download_dir = os.path.abspath(
-        #         f'{self.application_folder_path}/Downloaded/'
-        #     )
-
-        # if not os.path.isdir(self.download_dir):
-        #     os.mkdir(self.download_dir)
-
         self.download_dir = set_download_dir(download_dir)
-
-        logger.info(f"Download directory set to: '{self.download_dir}'")
-
         self.inputs_dir = os.path.abspath(
             f'{self.application_folder_path}/inputs/'
         )
+        logger.info(f"Download directory set to: '{self.download_dir}'")
 
         self.headers = headers
         if not self.headers:
@@ -198,6 +179,7 @@ class Gallery:
 
         self.title = ''
         self.downloaded_metadata = {'id': ''}
+        self.additional_tags = additional_tags
 
     def download_metadata(self):
 
@@ -241,9 +223,12 @@ class Gallery:
         else:
             self.title = self.metadata['title']['english']
         self.title = self.title.replace('/', '_')
+        self.num_pages = self.metadata['num_pages']
         self.tags = [f"{tag['type']}:{tag['name']}"
                      for tag in self.metadata['tags']]
-        self.num_pages = self.metadata['num_pages']
+
+        if self.additional_tags is not None:
+            self.tags.append(self.additional_tags)
 
         logger.info('Metadata downloaded')
         logger.info(f'Title: {self.title}')
@@ -354,9 +339,26 @@ class Gallery:
         with open(self.thumb_filename, 'wb') as f:
             f.write(thumb_response.content)
 
-    def set_tags(self):
+    def check_tags(self):
+
+        logger.info('Checking tags...')
+
+        show_tags_command = [
+            'tag',
+            '--list',
+            '--no-name',
+            self.folder_dir
+        ]
+
+        result = run(show_tags_command, capture_output=True)
+
+        if result.stdout:
+            self.status_code = 1
+
+            return
 
         logger.info('Setting tags...')
+
         tags_string = ''.join(f'{tag},' for tag in self.tags)
         tags_string = tags_string[:-1]  # to exclude the final ','
 
@@ -645,7 +647,7 @@ class Gallery:
             return self.status_code
 
         # set tags after finishing download
-        self.set_tags()
+        self.check_tags()
         if skip_download():
             return self.status_code
 

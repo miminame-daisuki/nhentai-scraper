@@ -37,6 +37,8 @@ def get_gallery_ids(url, headers=None, cookies=None):
 
     soup = BeautifulSoup(response.content, features='html.parser')
     gallery_count = soup.find('span', {'class': 'count'}).string
+    gallery_count = gallery_count.replace('(', '').replace(')', '')
+    gallery_count = gallery_count.replace(',', '')
     page_count = int(gallery_count)//25 + 1
     gallery_list = soup.find_all('div', {'class': 'gallery'})
     for gallery in gallery_list:
@@ -45,14 +47,18 @@ def get_gallery_ids(url, headers=None, cookies=None):
     return gallery_id, page_count
 
 
-# retrieves all gallery ids from a tag
-def search_tag(tag: str):
+# retrieves all gallery ids from a tag or favorites
+def search_type(type: str):
 
     logger.info(f"\n{'-'*os.get_terminal_size().columns}")
-    logger.info(f"Searching galleries from {tag}")
-    print(f"\nSearching galleries from {tag}...\n")
-    tag_type, tag_name = tag.split(':')
-    tag_url = f"https://nhentai.net/{tag_type}/{tag_name}/"
+    logger.info(f"Searching galleries from {type}")
+    print(f"\nSearching galleries from {type}...\n")
+
+    if ':' in type:
+        tag_type, tag_name = type.split(':')
+        url = f"https://nhentai.net/{tag_type}/{tag_name}/"
+    elif type == 'favorites':
+        url = 'https://nhentai.net/favorites/'
 
     application_folder_path = nhentai_scraper.get_application_folder_dir()
     inputs_dir = os.path.abspath(f'{application_folder_path}/inputs/')
@@ -60,20 +66,20 @@ def search_tag(tag: str):
     cookies = nhentai_scraper.load_cookies(inputs_dir)
 
     page_count = get_gallery_ids(
-        tag_url, headers=headers, cookies=cookies
+        url, headers=headers, cookies=cookies
     )[1]
 
     id_list = []
 
     if page_count is None:
-        logger.error(f'Failed to retrieve {tag}')
-        print(f'Failed to retrieve {tag}')
+        logger.error(f'Failed to retrieve {type}')
+        print(f'Failed to retrieve {type}')
 
-        return id_list
+        return None
 
     for page in tqdm(range(1, page_count+1), leave=False):
-        logger.info(f"Searching page {page} from {tag}")
-        page_url = tag_url + f'?page={page}'
+        logger.info(f"Searching page {page} from {type}")
+        page_url = url + f'?page={page}'
         gallery_id = get_gallery_ids(
             page_url,
             headers=headers, cookies=cookies
@@ -126,47 +132,47 @@ def search_finished_downloads(tag, download_dir=''):
     return matched_galleries_id
 
 
-def download_tags(tag_list, download_dir, skip_downloaded_ids=False):
+def download_tag():
+    pass
 
-    failed_galleries = {
-        'initial_failed_galleries': [],
-        'failed_retry_galleries': [],
-        'repeated_galleries': []
-    }
 
-    for tag in tag_list:
+# def download_tags(tag_list, download_dir, skip_downloaded_ids=False):
 
-        id_list = search_tag(tag)
-        matched_galleries_id = search_finished_downloads(
-            tag, download_dir=download_dir
-        )
+#     failed_galleries = {
+#         'initial_failed_galleries': [],
+#         'failed_retry_galleries': [],
+#         'repeated_galleries': []
+#     }
 
-        if sorted(matched_galleries_id) == sorted(id_list):
-            print(f'All galleries from {tag} have already been downloaded.')
-            print(f"\n{'-'*os.get_terminal_size().columns}")
-            logger.info(
-                f'All galleries from {tag} has already been downloaded.'
-            )
-            continue
+#     for tag in tag_list:
 
-        # only keep not yet finished downloaded ids in id_list
-        if skip_downloaded_ids:
-            # newest_downloaded_id = sorted(
-            #     search_finished_downloads(tag, download_dir=download_dir)
-            # )[-1]
-            # id_list = id_list[:id_list.index(newest_downloaded_id)]
-            id_list = list(set(id_list) - set(matched_galleries_id))
+#         id_list = search_type(tag)
+#         matched_galleries_id = search_finished_downloads(
+#             tag, download_dir=download_dir
+#         )
 
-        if not id_list:
-            continue
+#         if sorted(matched_galleries_id) == sorted(id_list):
+#             print(f'All galleries from {tag} have already been downloaded.')
+#             print(f"\n{'-'*os.get_terminal_size().columns}")
+#             logger.info(
+#                 f'All galleries from {tag} has already been downloaded.'
+#             )
+#             continue
 
-        logger.info(f'Start downloading for {tag}')
-        failed_galleries_extend = download_galleries.download_id_list(
-            id_list, download_dir, id_list_name=tag
-        )
-        for key in failed_galleries:
-            failed_galleries[key].extend(
-                failed_galleries_extend[key]
-            )
+#         # only keep not yet finished downloaded ids in id_list
+#         if skip_downloaded_ids:
+#             id_list = list(set(id_list) - set(matched_galleries_id))
 
-    return failed_galleries
+#         if not id_list:
+#             continue
+
+#         logger.info(f'Start downloading for {tag}')
+#         failed_galleries_extend = download_galleries.download_id_list(
+#             id_list, download_dir, id_list_name=tag
+#         )
+#         for key in failed_galleries:
+#             failed_galleries[key].extend(
+#                 failed_galleries_extend[key]
+#             )
+
+#     return failed_galleries

@@ -29,12 +29,15 @@ group/
 
 ## To-do list
 - Add download_favorites
+- Put favorites in separate folder or add a `favorite` tag for each favorited gallery?
+- Add `.blacklisted_id.txt` in `inputs/` to skip download
 - use Path for paths
 - Download by author (put galleries with same title in `Repeated downloads` folder?) to automatically update downloaded galleries
 - Automatically detect input file contains artist name or gallery id?
+- Use only one input `download_list.txt` file and use '#' or 'tag:tag: or 'favorites' to separate different kind of inputs?
 - Combine download_author.py and download_galleries.py into one file containing main() and put function definitions in new file
 - Fix logger name in .log files
-- Overwrite same gallery with newer one (determined from id or upload date)?
+- Overwrite same gallery with newer one (determined from id or upload date)? No, keep all downloaded galleries
 - Create new log file every time program is started
 - Don't use TimeRotatingFileHandler (Implement automatic deletetion of old logs manually)
 - Capture ctrl-c
@@ -48,6 +51,7 @@ group/
 - Add diagnosis? (total slept time, failed url percentage, ...)
 - Truncate tqdm.write for long gallery titles with `self.title[:os.get_terminal_size().column] + '...'`?
 - Is check_extra_pages needed?
+- Is retry failed galleries needed?
 - Ask whether to use tag and fileicon when starting program
 - Check whether tag and fileicon has been installed
 - Logging for confirm_settings()

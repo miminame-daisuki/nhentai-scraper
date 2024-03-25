@@ -14,19 +14,97 @@ def main():
     nhentai_scraper.set_logging_config()
     logger.info('Program started')
     download_dir = download_galleries.confirm_settings()
+    skip_downloaded_ids = input('Skip downloaded galleries?(y/n)')
+    if skip_downloaded_ids == 'y':
+        skip_downloaded_ids = True
+    else:
+        skip_downloaded_ids = False
 
-    tag_list = nhentai_scraper.load_input_list('download_tags.txt')
-    failed_galleries = download_tags.download_tags(
-        tag_list, download_dir
-    )
+    download_list = nhentai_scraper.load_input_list('download_list.txt')
+    blacklist_list = nhentai_scraper.load_input_list('.blacklists.txt')
+    repeats_list = nhentai_scraper.load_input_list('.repeated_galleries.txt')
 
-    if len(failed_galleries['repeated_galleries']) != 0:
-        download_galleries.write_failed_galleries(
-            failed_galleries['repeated_galleries'], 'repeated_galleries.txt'
-        )
-    if len(failed_galleries['failed_retry_galleries']) != 0:
-        download_galleries.write_failed_galleries(
-            failed_galleries['failed_retry_galleries'],
+    gallery_results = {
+        'finished': [],
+        'repeats': [],
+        'blacklists': [],
+        'initial_fails': [],
+        'retry_fails': [],
+    }
+
+    for entry in download_list:
+
+        # entry is `favorites` or a tag
+        if entry == 'favorites' or ':' in entry:
+            id_list = download_tags.search_type(entry)
+            matched_galleries_id = download_tags.search_finished_downloads(
+                entry, download_dir=download_dir
+            )
+
+            # only keep not yet finished downloaded ids in id_list
+            if skip_downloaded_ids:
+                id_list = list(
+                    set(id_list)
+                    - set(matched_galleries_id)
+                    - set(blacklist_list)
+                    - set(repeats_list)
+                )
+
+            # Failed to retrieve id_list
+            if id_list is None:
+                continue
+
+            elif not id_list:
+                print(
+                    f'All galleries from {entry} have already been downloaded.'
+                )
+                print(f"\n{'-'*os.get_terminal_size().columns}")
+                logger.info(
+                    f'All galleries from {entry} has already been downloaded.'
+                )
+                continue
+
+            if entry == 'favorites':
+                additional_tags = 'favorites'
+            else:
+                additional_tags = None
+
+            logger.info(f'Start downloading for {entry}')
+            download_galleries.download_id_list(
+                id_list, download_dir,
+                gallery_results=gallery_results,
+                additional_tags=additional_tags, id_list_name=entry
+            )
+
+        # entry is a gallery id
+        elif '#' in entry:
+            logger.info(f"\n{'-'*os.get_terminal_size().columns}")
+            gallery = nhentai_scraper.Gallery(
+                entry, download_dir=download_dir
+            )
+            gallery.download()
+
+            download_galleries.record_gallery_results(
+                gallery_results, gallery, initial_try=True
+            )
+
+        else:
+            print(f'{entry} is neither a tag nor a gallery id')
+            print(f"\n{'-'*os.get_terminal_size().columns}")
+            logger.error(f'{entry} is neither a tag nor a gallery id')
+
+        if gallery_results['repeats']:
+            download_galleries.write_gallery_results(
+                gallery_results['repeats'], '.repeated_galleries.txt'
+            )
+        if gallery_results['blacklists']:
+            download_galleries.write_gallery_results(
+                gallery_results['blacklists'], '.blacklists.txt'
+            )
+
+    if gallery_results['retry_fails']:
+        download_galleries.write_gallery_results(
+            gallery_results['retry_fails'],
             'failed_download_id.txt'
         )
     else:
