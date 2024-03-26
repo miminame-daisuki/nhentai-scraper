@@ -18,17 +18,16 @@ logger = logging.getLogger('__main__.' + __name__)
 
 def download_id_list(
     id_list, download_dir,
-    gallery_results=None, additional_tags=None, id_list_name=None
+    additional_tags=None, id_list_name=None
 ):
 
-    if gallery_results is None:
-        gallery_results = {
-            'finished': [],
-            'repeats': [],
-            'blacklists': [],
-            'initial_fails': [],
-            'retry_fails': [],
-        }
+    gallery_results = {
+        'finished': [],
+        'repeats': [],
+        'blacklists': [],
+        'initial_fails': [],
+        'retry_fails': [],
+    }
 
     progress_bar = tqdm(enumerate(id_list, start=1), total=len(id_list))
     for count, gallery_id in progress_bar:
@@ -83,9 +82,9 @@ def record_gallery_results(gallery_results, gallery, initial_try=True):
     if gallery.status_code == 0 or gallery.status_code == 1:
         gallery_results['finished'].append(gallery.id)
     elif gallery.status_code == 2:
-        gallery_results['repeats'].append(gallery.status())
+        gallery_results['repeats'].append(f'#{gallery.id}')
     elif gallery.status_code == -5:
-        gallery_results['blacklists'].append(gallery.id)
+        gallery_results['blacklists'].append(f'#{gallery.id}')
     else:
         if initial_try:
             gallery_results['initial_fails'].append(gallery.status())
@@ -132,10 +131,10 @@ def write_gallery_results(gallery_results, filename):
             f.write(entry)
             f.write('\n')
 
-    print(f'\n\nFailed gallery id written to {filename}')
-
 
 def confirm_settings():
+
+    settings = {}
 
     while True:
         x = input('Confirm updated cf_clearance?(y/n)')
@@ -155,10 +154,18 @@ def confirm_settings():
             download_dir = nhentai_scraper.set_download_dir(download_dir)
         else:
             break
+    settings['download_dir'] = download_dir
+
+    skip_downloaded_ids = input('Skip downloaded galleries?(y/n)')
+    if skip_downloaded_ids == 'y':
+        skip_downloaded_ids = True
+    else:
+        skip_downloaded_ids = False
+    settings['skip_downloaded_ids'] = skip_downloaded_ids
 
     print('-'*os.get_terminal_size().columns)
 
-    return download_dir
+    return settings
 
 
 # def main():

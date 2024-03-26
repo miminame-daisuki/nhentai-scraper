@@ -13,7 +13,6 @@ from tqdm import tqdm
 import logging
 
 import nhentai_scraper
-import download_galleries
 
 
 logger = logging.getLogger('__main__.' + __name__)
@@ -48,16 +47,16 @@ def get_gallery_ids(url, headers=None, cookies=None):
 
 
 # retrieves all gallery ids from a tag or favorites
-def search_type(type: str):
+def search_tag(tag: str):
 
     logger.info(f"\n{'-'*os.get_terminal_size().columns}")
-    logger.info(f"Searching galleries from {type}")
-    print(f"\nSearching galleries from {type}...\n")
+    logger.info(f"Searching galleries from {tag}")
+    print(f"\nSearching galleries from {tag}...\n")
 
-    if ':' in type:
-        tag_type, tag_name = type.split(':')
+    if ':' in tag:
+        tag_type, tag_name = tag.split(':')
         url = f"https://nhentai.net/{tag_type}/{tag_name}/"
-    elif type == 'favorites':
+    elif tag == 'favorites':
         url = 'https://nhentai.net/favorites/'
 
     application_folder_path = nhentai_scraper.get_application_folder_dir()
@@ -72,13 +71,13 @@ def search_type(type: str):
     id_list = []
 
     if page_count is None:
-        logger.error(f'Failed to retrieve {type}')
-        print(f'Failed to retrieve {type}')
+        logger.error(f'Failed to retrieve {tag}')
+        print(f'Failed to retrieve {tag}')
 
         return None
 
     for page in tqdm(range(1, page_count+1), leave=False):
-        logger.info(f"Searching page {page} from {type}")
+        logger.info(f"Searching page {page} from {tag}")
         page_url = url + f'?page={page}'
         gallery_id = get_gallery_ids(
             page_url,
