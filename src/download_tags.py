@@ -13,6 +13,7 @@ from tqdm import tqdm
 import logging
 
 import nhentai_scraper
+import download_galleries
 
 
 logger = logging.getLogger('__main__.' + __name__)
@@ -131,47 +132,53 @@ def search_finished_downloads(tag, download_dir=''):
     return matched_galleries_id
 
 
-def download_tag():
-    pass
+def download_tag(tag, download_dir, skip_downloaded_ids=False):
 
+    id_list = search_tag(tag)
 
-# def download_tags(tag_list, download_dir, skip_downloaded_ids=False):
+    # Failed to retrieve id_list
+    if id_list is None:
+        return None
 
-#     failed_galleries = {
-#         'initial_failed_galleries': [],
-#         'failed_retry_galleries': [],
-#         'repeated_galleries': []
-#     }
+    matched_galleries_id = search_finished_downloads(
+        tag, download_dir=download_dir
+    )
 
-#     for tag in tag_list:
+    # only keep not yet finished downloaded ids in id_list
+    if skip_downloaded_ids:
 
-#         id_list = search_type(tag)
-#         matched_galleries_id = search_finished_downloads(
-#             tag, download_dir=download_dir
-#         )
+        blacklist = nhentai_scraper.load_input_list('blacklist.txt')
+        repeat_ids = nhentai_scraper.load_input_list('repeated_galleries.txt')
 
-#         if sorted(matched_galleries_id) == sorted(id_list):
-#             print(f'All galleries from {tag} have already been downloaded.')
-#             print(f"\n{'-'*os.get_terminal_size().columns}")
-#             logger.info(
-#                 f'All galleries from {tag} has already been downloaded.'
-#             )
-#             continue
+        blacklist_ids = [id for id in blacklist if '#' in id]
 
-#         # only keep not yet finished downloaded ids in id_list
-#         if skip_downloaded_ids:
-#             id_list = list(set(id_list) - set(matched_galleries_id))
+        id_list = list(
+            set(id_list)
+            - set(matched_galleries_id)
+            - set(blacklist_ids)
+            - set(repeat_ids)
+        )
 
-#         if not id_list:
-#             continue
+    if not id_list:
+        print(
+            f'All galleries from {tag} have already been downloaded.'
+        )
+        print(f"\n{'-'*os.get_terminal_size().columns}")
+        logger.info(
+            f'All galleries from {tag} has already been downloaded.'
+        )
 
-#         logger.info(f'Start downloading for {tag}')
-#         failed_galleries_extend = download_galleries.download_id_list(
-#             id_list, download_dir, id_list_name=tag
-#         )
-#         for key in failed_galleries:
-#             failed_galleries[key].extend(
-#                 failed_galleries_extend[key]
-#             )
+        return None
 
-#     return failed_galleries
+    if tag == 'favorites':
+        additional_tags = 'favorites'
+    else:
+        additional_tags = None
+
+    logger.info(f'Start downloading for {tag}')
+    gallery_results = download_galleries.download_id_list(
+        id_list, download_dir,
+        additional_tags=additional_tags, id_list_name=tag
+    )
+
+    return gallery_results

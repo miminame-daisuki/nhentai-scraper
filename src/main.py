@@ -19,13 +19,13 @@ def main():
     skip_downloaded_ids = settings['skip_downloaded_ids']
 
     download_list = nhentai_scraper.load_input_list('download_list.txt')
-    blacklist_list = nhentai_scraper.load_input_list('blacklist_id.txt')
-    repeats_list = nhentai_scraper.load_input_list('repeated_galleries.txt')
+    blacklist = nhentai_scraper.load_input_list('blacklist.txt')
+    repeat_ids = nhentai_scraper.load_input_list('repeated_galleries.txt')
 
     gallery_results = {
         'finished': [],
-        'repeats': repeats_list,
-        'blacklists': blacklist_list,
+        'repeats': repeat_ids,
+        'blacklists': blacklist,
         'initial_fails': [],
         'retry_fails': [],
     }
@@ -34,44 +34,13 @@ def main():
 
         # entry is `favorites` or a tag
         if entry == 'favorites' or ':' in entry:
-            id_list = download_tags.search_tag(entry)
-            matched_galleries_id = download_tags.search_finished_downloads(
-                entry, download_dir=download_dir
+            gallery_results_extend = download_tags.download_tag(
+                entry, download_dir,
+                skip_downloaded_ids=skip_downloaded_ids
             )
 
-            # only keep not yet finished downloaded ids in id_list
-            if skip_downloaded_ids:
-                id_list = list(
-                    set(id_list)
-                    - set(matched_galleries_id)
-                    - set(blacklist_list)
-                    - set(repeats_list)
-                )
-
-            # Failed to retrieve id_list
-            if id_list is None:
+            if gallery_results_extend is None:
                 continue
-
-            elif not id_list:
-                print(
-                    f'All galleries from {entry} have already been downloaded.'
-                )
-                print(f"\n{'-'*os.get_terminal_size().columns}")
-                logger.info(
-                    f'All galleries from {entry} has already been downloaded.'
-                )
-                continue
-
-            if entry == 'favorites':
-                additional_tags = 'favorites'
-            else:
-                additional_tags = None
-
-            logger.info(f'Start downloading for {entry}')
-            gallery_results_extend = download_galleries.download_id_list(
-                id_list, download_dir,
-                additional_tags=additional_tags, id_list_name=entry
-            )
 
             for key in gallery_results:
                 gallery_results[key].extend(gallery_results_extend[key])
@@ -79,6 +48,7 @@ def main():
         # entry is a gallery id
         elif '#' in entry:
             logger.info(f"\n{'-'*os.get_terminal_size().columns}")
+
             gallery = nhentai_scraper.Gallery(
                 entry, download_dir=download_dir
             )
@@ -89,9 +59,10 @@ def main():
             )
 
         else:
+            logger.info(f"\n{'-'*os.get_terminal_size().columns}")
+            logger.error(f'{entry} is neither a tag nor a gallery id')
             print(f'{entry} is neither a tag nor a gallery id')
             print(f"\n{'-'*os.get_terminal_size().columns}")
-            logger.error(f'{entry} is neither a tag nor a gallery id')
 
         if gallery_results['repeats']:
             download_galleries.write_gallery_results(

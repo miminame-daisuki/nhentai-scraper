@@ -7,6 +7,7 @@ Created on Tue Feb 13 19:43:58 2024
 """
 
 import os
+from pathlib import Path
 from tqdm import tqdm
 import logging
 
@@ -135,6 +136,10 @@ def write_gallery_results(gallery_results, filename):
 def confirm_settings():
 
     settings = {}
+
+    # inputs_path = Path(f'{application_folder_path}/inputs').absolute()
+    # if 'cookies.json' not in [file.name for file in inputs_path.iterdir()]:
+    #     pass
 
     while True:
         x = input('Confirm updated cf_clearance?(y/n)')

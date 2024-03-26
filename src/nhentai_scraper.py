@@ -239,7 +239,8 @@ class Gallery:
         logger.info('Checking blacklist...')
         if not blacklist:
             blacklist = load_input_list('blacklist.txt')
-        if any(tag in self.tags for tag in blacklist):
+            blacklist_tags = [tag for tag in blacklist if ':' in tag]
+        if any(tag in self.tags for tag in blacklist_tags):
             self.status_code = -5
         else:
             logger.info('Clear')
