@@ -590,17 +590,17 @@ class Gallery:
                  f"(failed retry 3 times) for #{self.id}"),
             -5: f"BLACKLISTED #{self.id}",
             -6: ('Error when downloading thmbnail '
-                 f"for {self.title} (*{self.id})"),
+                 f"for {self.title} (#{self.id})"),
             -7: ('Error when setting tags '
-                 f"for {self.title} (*{self.id})"),
+                 f"for {self.title} (#{self.id})"),
             -8: ('Error when setting thumbnail '
-                 f"for {self.title} (*{self.id})"),
+                 f"for {self.title} (#{self.id})"),
             -9: ('Error when downloading missing pages (failed retry 3 times) '
-                 f"for {self.title} (*{self.id})"),
+                 f"for {self.title} (#{self.id})"),
             -10: ('There are more pages downloaded than self.num_pages '
-                  f"for {self.title} (*{self.id})"),
+                  f"for {self.title} (#{self.id})"),
             -11: ('Error when saving PDF '
-                  f"for {self.title} (*{self.id})"),
+                  f"for {self.title} (#{self.id})"),
         }
 
         return status_dict[self.status_code]

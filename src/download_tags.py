@@ -97,12 +97,13 @@ def search_finished_downloads(tag, download_dir=''):
 
     # search for finished download galleries in download_dir
     download_dir = nhentai_scraper.set_download_dir(download_dir)
+    # download_dir = download_dir.replace(' ', r'\ ')
 
     find_tag_command = [
         'tag',
         '--find',
         tag.replace('-', ' '),
-        download_dir
+        rf'{download_dir}'
     ]
     result = run(find_tag_command, capture_output=True, check=True)
 
@@ -113,7 +114,7 @@ def search_finished_downloads(tag, download_dir=''):
             'tag',
             '--find',
             tag,
-            download_dir
+            rf'{download_dir}'
         ]
         result = run(find_tag_command, capture_output=True, check=True)
 
@@ -140,23 +141,21 @@ def download_tag(tag, download_dir, skip_downloaded_ids=False):
     if id_list is None:
         return None
 
-    matched_galleries_id = search_finished_downloads(
-        tag, download_dir=download_dir
-    )
-
     # only keep not yet finished downloaded ids in id_list
     if skip_downloaded_ids:
 
-        blacklist = nhentai_scraper.load_input_list('blacklist.txt')
+        matched_galleries_id = search_finished_downloads(
+            tag, download_dir=download_dir
+        )
         repeat_ids = nhentai_scraper.load_input_list('repeated_galleries.txt')
-
+        blacklist = nhentai_scraper.load_input_list('blacklist.txt')
         blacklist_ids = [id for id in blacklist if '#' in id]
 
         id_list = list(
             set(id_list)
             - set(matched_galleries_id)
-            - set(blacklist_ids)
             - set(repeat_ids)
+            - set(blacklist_ids)
         )
 
     if not id_list:

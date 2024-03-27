@@ -8,6 +8,9 @@ Created on Tue Feb 13 19:43:58 2024
 
 import os
 from pathlib import Path
+import sys
+from subprocess import run
+import json
 from tqdm import tqdm
 import logging
 
@@ -88,7 +91,7 @@ def record_gallery_results(gallery_results, gallery, initial_try=True):
         gallery_results['blacklists'].append(f'#{gallery.id}')
     else:
         if initial_try:
-            gallery_results['initial_fails'].append(gallery.status())
+            gallery_results['initial_fails'].append(f'#{gallery.id}')
         else:
             gallery_results['retry_fails'].append(gallery.status())
         logger.error(gallery.status())
@@ -137,9 +140,57 @@ def confirm_settings():
 
     settings = {}
 
-    # inputs_path = Path(f'{application_folder_path}/inputs').absolute()
-    # if 'cookies.json' not in [file.name for file in inputs_path.iterdir()]:
-    #     pass
+    # confirm download location
+    application_folder_path = nhentai_scraper.get_application_folder_dir()
+    download_dir = os.path.abspath(
+        f'{application_folder_path}/Downloaded/'
+    )
+    while True:
+        confirm_download_dir = input((f'Download to {download_dir}?(y/n)'))
+        if confirm_download_dir != 'y':
+            download_dir = input('Download directory: ')
+            download_dir = nhentai_scraper.set_download_dir(download_dir)
+        else:
+            break
+    settings['download_dir'] = download_dir
+
+    # create `cookies.json` and `headers.json` if not present in `inputs/`
+    inputs_path = Path(f'{application_folder_path}/inputs').absolute()
+    if 'cookies.json' not in [file.name for file in inputs_path.iterdir()]:
+        cookies = {}
+        cookies['cf_clearance'] = input('cf_clearance: ')
+        cookies['sessionid'] = input('sessionid :')
+        with open(inputs_path / 'cookies.json', 'w') as f:
+            json.dump(cookies, f, indent=4)
+    if 'headers.json' not in [file.name for file in inputs_path.iterdir()]:
+        headers = {}
+        headers['User-Agent'] = input('User-Agent: ')
+        with open(inputs_path / 'headers.json', 'w') as f:
+            json.dump(headers, f, indent=4)
+
+    # check `fileicon` and `tag` installation
+    check_fileicon_command = [
+        'which',
+        'fileicon'
+    ]
+    result = run(check_fileicon_command, capture_output=True)
+    if result.returncode != 0:
+        print(
+            "Please install 'fileicon' from "
+            "'https://github.com/mklement0/fileicon'"
+        )
+        sys.exit('fileicon not installed')
+    check_tag_command = [
+        'which',
+        'tag'
+    ]
+    result = run(check_tag_command, capture_output=True)
+    if result.returncode != 0:
+        print(
+            "Please install 'tag' from "
+            "'https://github.com/jdberry/tag'"
+        )
+        sys.exit('tag not installed')
 
     while True:
         x = input('Confirm updated cf_clearance?(y/n)')
@@ -147,19 +198,6 @@ def confirm_settings():
             continue
         else:
             break
-
-    # confirm download location
-    download_dir = os.path.abspath(
-        f'{nhentai_scraper.get_application_folder_dir()}/Downloaded/'
-    )
-    while True:
-        confirm_download_dir = input((f'Download to {download_dir}?(y/n)'))
-        if confirm_download_dir != 'y':
-            download_dir = str(input('Download directory: '))
-            download_dir = nhentai_scraper.set_download_dir(download_dir)
-        else:
-            break
-    settings['download_dir'] = download_dir
 
     skip_downloaded_ids = input('Skip downloaded galleries?(y/n)')
     if skip_downloaded_ids == 'y':
