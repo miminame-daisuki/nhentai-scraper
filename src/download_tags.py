@@ -19,7 +19,7 @@ import download_galleries
 logger = logging.getLogger('__main__.' + __name__)
 
 
-def get_gallery_ids(url, headers=None, cookies=None):
+def search_url(url, headers=None, cookies=None):
     # retrieves all <=25 gallery ids from a nhentai url
 
     if not headers:
@@ -52,6 +52,36 @@ def get_gallery_ids(url, headers=None, cookies=None):
     return gallery_id, page_count
 
 
+def search_api(search: str, headers=None, cookies=None):
+
+    search_url = 'https://nhentai.net/api/galleries/search?query='
+    search_url += search
+
+    if not headers:
+        headers = {}
+    if not cookies:
+        cookies = {}
+
+    gallery_id = []
+
+    response = nhentai_scraper.get_response(
+        search_url, headers=headers, cookies=cookies
+    )
+
+    if response.status_code == 403:
+        return None, 'Error 403'
+    elif response.status_code == 404:
+        return None, 'Error 404'
+    elif response.status_code != 200:
+        return None, None
+
+    api_metadata = response.json()
+    page_count = api_metadata['num_pages']
+    gallery_id = [f"#{gallery['id']}" for gallery in api_metadata['result']]
+
+    return gallery_id, page_count
+
+
 # retrieves all gallery ids from a tag or favorites
 def search_tag(tag: str):
 
@@ -70,7 +100,7 @@ def search_tag(tag: str):
     headers = nhentai_scraper.load_headers(inputs_dir)
     cookies = nhentai_scraper.load_cookies(inputs_dir)
 
-    page_count = get_gallery_ids(
+    page_count = search_url(
         url, headers=headers, cookies=cookies
     )[1]
 
@@ -98,7 +128,7 @@ def search_tag(tag: str):
     for page in tqdm(range(1, page_count+1), leave=False):
         logger.info(f"Searching page {page} from {tag}")
         page_url = url + f'?page={page}'
-        gallery_id = get_gallery_ids(
+        gallery_id = search_url(
             page_url,
             headers=headers, cookies=cookies
         )[0]

@@ -26,3 +26,5 @@ group/
 
 ## Tips
 - To search for downloaded galleries by title, don't include the parts in the paranthesis `[]`. Ex: To search for `[artist] title`, simply type `title`.
+- Reindex spotlight
+- Use/Change VPN if constantly getting Error 403
