@@ -19,11 +19,18 @@ import unicodedata
 from tqdm import tqdm
 from pypdf import PdfReader
 from pathlib import Path
+import signal
 import logging
 import logging.config
 
 
 logger = logging.getLogger('__main__.' + __name__)
+
+
+def exit_gracefully(signum, frame):
+    logger.info(f"\n{'-'*os.get_terminal_size().columns}")
+    logger.info('Program terminated with Ctrl-C')
+    sys.exit(0)
 
 
 def set_logging_config(logging_config_filename=''):
@@ -660,6 +667,7 @@ class Gallery:
 
 
 if __name__ == '__main__':
+    signal.signal(signal.SIGINT, exit_gracefully)
     set_logging_config()
     logger.info('Program started')
     download_dir = os.path.abspath(f'{get_application_folder_dir()}/test/')

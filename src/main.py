@@ -1,5 +1,6 @@
 import os
 import logging
+import signal
 
 import nhentai_scraper
 import download_galleries
@@ -70,7 +71,7 @@ def main():
             )
         if gallery_results['blacklists']:
             download_galleries.write_gallery_results(
-                gallery_results['blacklists'], 'blacklist_id.txt'
+                gallery_results['blacklists'], 'blacklist.txt'
             )
 
     if gallery_results['retry_fails']:
@@ -85,4 +86,5 @@ def main():
 
 
 if __name__ == '__main__':
+    signal.signal(signal.SIGINT, nhentai_scraper.exit_gracefully)
     main()
