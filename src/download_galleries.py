@@ -102,7 +102,8 @@ def record_gallery_results(gallery_results, gallery, initial_try=True):
 def print_gallery_results(gallery_results):
 
     total_download_counts = 0
-    for id_list in gallery_results.values():
+    keys = ['finished', 'repeats', 'blacklists', 'retry_fails']
+    for id_list in keys:
         total_download_counts += len(id_list)
 
     print(
@@ -136,6 +137,21 @@ def write_gallery_results(gallery_results, filename):
             f.write('\n')
 
 
+def write_cookies(inputs_path: Path):
+    cookies = {}
+    cookies['cf_clearance'] = input('cf_clearance: ')
+    cookies['sessionid'] = input('sessionid :')
+    with open(inputs_path / 'cookies.json', 'w') as f:
+        json.dump(cookies, f, indent=4)
+
+
+def write_headers(inputs_path: Path):
+    headers = {}
+    headers['User-Agent'] = input('User-Agent: ')
+    with open(inputs_path / 'headers.json', 'w') as f:
+        json.dump(headers, f, indent=4)
+
+
 def confirm_settings():
 
     settings = {}
@@ -157,16 +173,13 @@ def confirm_settings():
     # create `cookies.json` and `headers.json` if not present in `inputs/`
     inputs_path = Path(f'{application_folder_path}/inputs').absolute()
     if 'cookies.json' not in [file.name for file in inputs_path.iterdir()]:
-        cookies = {}
-        cookies['cf_clearance'] = input('cf_clearance: ')
-        cookies['sessionid'] = input('sessionid :')
-        with open(inputs_path / 'cookies.json', 'w') as f:
-            json.dump(cookies, f, indent=4)
+        write_cookies(inputs_path)
+    else:
+        x = input('Update cookies? (y/n)')
+        if x != 'n':
+            write_cookies(inputs_path)
     if 'headers.json' not in [file.name for file in inputs_path.iterdir()]:
-        headers = {}
-        headers['User-Agent'] = input('User-Agent: ')
-        with open(inputs_path / 'headers.json', 'w') as f:
-            json.dump(headers, f, indent=4)
+        write_headers(inputs_path)
 
     # check `fileicon` and `tag` installation
     check_fileicon_command = [
@@ -191,13 +204,6 @@ def confirm_settings():
             "'https://github.com/jdberry/tag'"
         )
         sys.exit('tag not installed')
-
-    while True:
-        x = input('Confirm updated cf_clearance?(y/n)')
-        if x != 'y':
-            continue
-        else:
-            break
 
     skip_downloaded_ids = input('Skip downloaded galleries?(y/n)')
     if skip_downloaded_ids == 'y':

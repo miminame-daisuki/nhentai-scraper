@@ -32,7 +32,12 @@ def get_gallery_ids(url, headers=None, cookies=None):
     response = nhentai_scraper.get_response(
         url, headers=headers, cookies=cookies
     )
-    if response.status_code != 200:
+
+    if response.status_code == 403:
+        return None, 'Error 403'
+    elif response.status_code == 404:
+        return None, 'Error 404'
+    elif response.status_code != 200:
         return None, None
 
     soup = BeautifulSoup(response.content, features='html.parser')
@@ -71,9 +76,22 @@ def search_tag(tag: str):
 
     id_list = []
 
-    if page_count is None:
+    if page_count == 'Error 403':
+        print('Error 403 - Forbidden (try updating `cf_clearance`)')
+        logger.error('Error 403 - Forbidden (try updating `cf_clearance`)')
+
+        return None
+
+    elif page_count == 'Error 404':
+        print(f'Error 404 - Not Found for {tag}')
+        logger.error(f'Error 404 - Not Found for {tag}')
+
+        return None
+
+    elif page_count is None:
         logger.error(f'Failed to retrieve {tag}')
         print(f'Failed to retrieve {tag}')
+        print(f"\n{'-'*os.get_terminal_size().columns}")
 
         return None
 
