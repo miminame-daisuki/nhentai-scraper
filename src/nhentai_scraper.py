@@ -20,6 +20,7 @@ from pathlib import Path
 import signal
 import logging
 import logging.config
+from typing import Union, Optional
 
 import load_inputs
 import misc
@@ -29,7 +30,10 @@ from nhentai_urls import API_GALLERY_URL, THUMB_BASE_URL, IMG_BASE_URL
 logger = logging.getLogger('__main__.' + __name__)
 
 
-def create_session(cookies=None, headers=None):
+def create_session(
+    cookies: Optional[dict] = None,
+    headers: Optional[dict] = None
+) -> requests.sessions.Session:
 
     session = requests.Session()
 
@@ -47,11 +51,11 @@ def create_session(cookies=None, headers=None):
 
 
 def get_response(
-    url,
-    params=None,
-    session=None,
-    headers=None, cookies=None,
-    sleep_time='default', timeout_time=60
+    url: str,
+    session: requests.sessions.Session,
+    params: Optional[dict] = None,
+    sleep_time: Optional[float] = None,
+    timeout_time: Optional[float] = 60.
 ):
 
     if session is None:
@@ -59,10 +63,6 @@ def get_response(
 
     if params is None:
         params = {}
-    # if not headers:
-    #     headers = {}
-    # if not cookies:
-    #     cookies = {}
 
     try:
         response = session.get(
@@ -74,7 +74,7 @@ def get_response(
         response.status_code = 'No_response'
 
     # sleep for sleep_time after each get_response
-    if sleep_time == 'default':
+    if sleep_time is None:
         sleep_time = 3*random.random()+1.5
     logger.info(f'Sleeping for {sleep_time:.3f} seconds...')
     time.sleep(sleep_time)
@@ -85,15 +85,22 @@ def get_response(
 class Gallery:
 
     def __init__(
-        self, gallery_id, download_dir='',
-        additional_tags=None, headers=None, cookies=None
+        self,
+        gallery_id: Union[int, str],
+        session: requests.sessions.Session,
+        download_dir: Optional[Union[str, Path]] = None,
+        additional_tags: Optional[list[str]] = None,
+        headers: Optional[dict] = None,
+        cookies: Optional[dict] = None
     ):
 
         self.id = str(gallery_id).split('#')[-1]
         logger.info(f'Gallery initiated for id: {gallery_id}')
 
         self.application_folder_path = misc.get_application_folder_dir()
-        self.download_dir = misc.set_download_dir(download_dir)
+
+        if download_dir is None:
+            self.download_dir = misc.set_download_dir(download_dir)
         self.inputs_dir = os.path.abspath(
             f'{self.application_folder_path}/inputs/'
         )
@@ -112,23 +119,25 @@ class Gallery:
         self.downloaded_metadata = {'id': ''}
         self.additional_tags = additional_tags
 
-    def download_metadata(self):
+        self.session = session
+
+    def download_metadata(self) -> dict:
 
         logger.info('Downloading gallery metadata from nhentai api...')
         api_url = f'{API_GALLERY_URL}/{int(self.id)}'
 
         api_response = get_response(
-            api_url, headers=self.headers, cookies=self.cookies
+            api_url, self.session
         )
         if api_response.status_code == 403:
             self.status_code = -2
 
-            return
+            return {}
 
         elif api_response.status_code == 404:
             self.status_code = -3
 
-            return
+            return {}
 
         # retry for up to 3 times
         tries = 0
@@ -138,14 +147,14 @@ class Gallery:
                  f'{api_response.status_code}, retrying...')
             )
             api_response = get_response(
-                api_url, headers=self.headers, cookies=self.cookies
+                api_url, self.session
             )
             tries += 1
 
             if tries >= 3 and api_response != 200:
                 self.status_code = -4
 
-                return
+                return {}
 
         self.metadata = api_response.json()
         self.media_id = self.metadata['media_id']
@@ -159,24 +168,26 @@ class Gallery:
                      for tag in self.metadata['tags']]
 
         if self.additional_tags is not None:
-            self.tags.append(self.additional_tags)
+            self.tags.extend(self.additional_tags)
 
         logger.info('Metadata downloaded')
         logger.info(f'Title: {self.title}')
 
         return self.metadata
 
-    def check_blacklist(self, blacklist=None):
+    def check_blacklist(self, blacklist: Optional[list[str]] = None):
+
         logger.info('Checking blacklist...')
         if not blacklist:
             blacklist = load_inputs.load_input_list('blacklist.txt')
             blacklist_tags = [tag for tag in blacklist if ':' in tag]
+
         if any(tag in self.tags for tag in blacklist_tags):
             self.status_code = -5
         else:
             logger.info('Clear')
 
-    def get_img_extension(self, img_metadata):
+    def get_img_extension(self, img_metadata: dict) -> str:
 
         if img_metadata['t'] == 'j':
             extension = 'jpg'
@@ -231,7 +242,7 @@ class Gallery:
                      f'thumbnail: {error}')
                 )
 
-    def load_downloaded_metadata(self):
+    def load_downloaded_metadata(self) -> dict:
 
         metadata_filename = f'{self.folder_dir}/metadata.json'
         with open(metadata_filename, 'r') as f:
@@ -255,7 +266,7 @@ class Gallery:
             f'{THUMB_BASE_URL}/{self.media_id}/thumb.{extension}'
         )
         thumb_response = get_response(
-            thumb_url, headers=self.headers, cookies=self.cookies
+            thumb_url, self.session
         )
         if thumb_response.status_code != 200:
             self.status_code = -6
@@ -338,7 +349,7 @@ class Gallery:
             self.status_code = -8
             logger.error(f"{result.stderr.decode('utf-8')}")
 
-    def download_page(self, page):
+    def download_page(self, page: Union[str, int]):
 
         logger.info(f'Retrieving Page {page}/{self.num_pages} url...')
 
@@ -349,7 +360,7 @@ class Gallery:
             f'{IMG_BASE_URL}/{self.media_id}/{int(page)}.{extension}'
         )
         img_response = get_response(
-            img_url, headers=self.headers, cookies=self.cookies
+            img_url, self.session
         )
         if img_response.status_code != 200:
             logger.error(
@@ -399,7 +410,11 @@ class Gallery:
 
                 return
 
-    def download_missing_pages(self, tries, leave_tqdm=True):
+    def download_missing_pages(
+        self,
+        tries: int,
+        leave_tqdm: Optional[bool] = True
+    ):
 
         t = tqdm(self.missing_pages, leave=leave_tqdm)
         for page in t:
@@ -411,7 +426,7 @@ class Gallery:
                 )
             self.download_page(page)
 
-    def load_missing_pages(self):
+    def load_missing_pages(self) -> list[str]:
 
         # check whether all page numbers are downloaded against self.num_pages
         self.missing_pages = []
@@ -425,12 +440,13 @@ class Gallery:
 
         return self.missing_pages
 
-    def check_extra_pages(self):
+    def check_extra_pages(self) -> list[str]:
 
         # check whether there are more pages downloaded than self.num_pages
         # which should not happen
         extra_pages = []
         downloaded_pages = os.listdir(self.folder_dir)
+
         non_page_files = [
             'Icon\r',
             'metadata.json',
@@ -439,12 +455,14 @@ class Gallery:
             '.DS_Store',
             f'{self.title}.pdf'
         ]
+
         downloaded_pages = [
             unicodedata.normalize('NFC', page)
             for page in downloaded_pages
             if unicodedata.normalize('NFC', page)
             not in non_page_files
         ]
+
         for downloaded_page in downloaded_pages:
             if (int(Path(downloaded_page).stem)
                     not in range(int(self.num_pages)+1)):
@@ -504,9 +522,10 @@ class Gallery:
             logger.error(f"{error}")
             self.status_code = -11
 
-    def status(self):
+    def status(self) -> str:
         # status_code >= -1: Normal
         # status_code < -1: Error
+
         status_dict = {
             0: f"{self.title} (#{self.id}) download finished",
             1: f"{self.title} (#{self.id}) already downloaded",
@@ -534,7 +553,7 @@ class Gallery:
 
         return status_dict[self.status_code]
 
-    def download(self):
+    def download(self) -> int:
 
         def skip_download():
             if self.status_code < -1:
@@ -590,13 +609,20 @@ class Gallery:
 
 if __name__ == '__main__':
     signal.signal(signal.SIGINT, misc.exit_gracefully)
+
     misc.set_logging_config()
     logger.info(f"\n{'-'*os.get_terminal_size().columns}")
     logger.info('Program started')
+
     application_folder_path = load_inputs.get_application_folder_dir()
     download_dir = os.path.abspath(f'{application_folder_path}/test/')
-    id_list = input('Input gallery id: ')
-    id_list = id_list.split(' ')
+
+    session = create_session()
+
+    id_list = input('Input gallery id: ').split(' ')
+
     for gallery_id in id_list:
-        gallery = Gallery(gallery_id, download_dir=download_dir)
+        gallery = Gallery(
+            gallery_id, session, download_dir=download_dir
+        )
         gallery.download()

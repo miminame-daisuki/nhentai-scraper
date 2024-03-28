@@ -26,6 +26,8 @@ def main():
     blacklist = load_inputs.load_input_list('blacklist.txt')
     repeat_ids = load_inputs.load_input_list('repeated_galleries.txt')
 
+    session = nhentai_scraper.create_session()
+
     gallery_results = {
         'finished': [],
         'repeats': repeat_ids,
@@ -40,6 +42,7 @@ def main():
         if entry == 'favorites' or ':' in entry:
             gallery_results_extend = download_tags.download_tag(
                 entry, download_dir,
+                session,
                 skip_downloaded_ids=skip_downloaded_ids
             )
 
@@ -54,7 +57,7 @@ def main():
             logger.info(f"\n{'-'*os.get_terminal_size().columns}")
 
             gallery = nhentai_scraper.Gallery(
-                entry, download_dir=download_dir
+                entry, session, download_dir=download_dir
             )
             gallery.download()
 

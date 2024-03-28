@@ -7,10 +7,13 @@ Created on Sat Feb 11 22:22:59 2024
 """
 from bs4 import BeautifulSoup
 import os
+from pathlib import Path
 import json
+import requests
 from subprocess import run
 from tqdm import tqdm
 import logging
+from typing import Union, Optional
 
 import nhentai_scraper
 import download_galleries
@@ -22,18 +25,16 @@ from nhentai_urls import NHENTAI_URL, FAVORITES_URL, API_SEARCH_URL
 logger = logging.getLogger('__main__.' + __name__)
 
 
-def search_url(url, headers=None, cookies=None):
+def search_url(
+    url: str,
+    session: requests.sessions.Session
+) -> tuple[list[str], int]:
     # retrieves all <=25 gallery ids from a nhentai url
-
-    if not headers:
-        headers = {}
-    if not cookies:
-        cookies = {}
 
     gallery_id = []
 
     response = nhentai_scraper.get_response(
-        url, headers=headers, cookies=cookies
+        url, session
     )
 
     if response.status_code == 403:
@@ -44,10 +45,12 @@ def search_url(url, headers=None, cookies=None):
         return None, None
 
     soup = BeautifulSoup(response.content, features='html.parser')
+
     gallery_count = soup.find('span', {'class': 'count'}).string
     gallery_count = gallery_count.replace('(', '').replace(')', '')
     gallery_count = gallery_count.replace(',', '')
     page_count = int(gallery_count)//25 + 1
+
     gallery_list = soup.find_all('div', {'class': 'gallery'})
     for gallery in gallery_list:
         gallery_id.append(f"#{gallery.find('a').get('href').split('/')[2]}")
@@ -55,19 +58,17 @@ def search_url(url, headers=None, cookies=None):
     return gallery_id, page_count
 
 
-def search_api(search: str, headers=None, cookies=None):
+def search_api(
+    search: str,
+    session: requests.sessions.Session
+) -> tuple[list[str], int]:
 
-    search_url = API_SEARCH_URL + search
-
-    if not headers:
-        headers = {}
-    if not cookies:
-        cookies = {}
+    url = API_SEARCH_URL + search
 
     gallery_id = []
 
     response = nhentai_scraper.get_response(
-        search_url, headers=headers, cookies=cookies
+        url, session
     )
 
     if response.status_code == 403:
@@ -78,14 +79,17 @@ def search_api(search: str, headers=None, cookies=None):
         return None, None
 
     api_metadata = response.json()
-    page_count = api_metadata['num_pages']
+    page_count = int(api_metadata['num_pages'])
     gallery_id = [f"#{gallery['id']}" for gallery in api_metadata['result']]
 
     return gallery_id, page_count
 
 
 # retrieves all gallery ids from a tag or favorites
-def search_tag(tag: str):
+def search_tag(
+    tag: str,
+    session: requests.sessions.Session
+) -> Optional[list[str]]:
 
     logger.info(f"\n{'-'*os.get_terminal_size().columns}")
     logger.info(f"Searching galleries from {tag}")
@@ -97,11 +101,8 @@ def search_tag(tag: str):
     elif tag == 'favorites':
         url = FAVORITES_URL
 
-    headers = load_inputs.load_json('headers.json')
-    cookies = load_inputs.load_json('cookies.json')
-
     page_count = search_url(
-        url, headers=headers, cookies=cookies
+        url, session
     )[1]
 
     id_list = []
@@ -130,7 +131,7 @@ def search_tag(tag: str):
         page_url = url + f'?page={page}'
         gallery_id = search_url(
             page_url,
-            headers=headers, cookies=cookies
+            session
         )[0]
 
         if not gallery_id:
@@ -141,7 +142,10 @@ def search_tag(tag: str):
     return id_list
 
 
-def search_finished_downloads(tag, download_dir=''):
+def search_finished_downloads(
+    tag: str,
+    download_dir: Optional[str, Path] = ''
+) -> list[str]:
 
     # search for finished download galleries in download_dir
     download_dir = misc.set_download_dir(download_dir)
@@ -181,9 +185,14 @@ def search_finished_downloads(tag, download_dir=''):
     return matched_galleries_id
 
 
-def download_tag(tag, download_dir, skip_downloaded_ids=False):
+def download_tag(
+    tag: str,
+    download_dir: Union[str, Path],
+    session: requests.sessions.Session,
+    skip_downloaded_ids: Optional[bool] = False
+) -> dict:
 
-    id_list = search_tag(tag)
+    id_list = search_tag(tag, session)
 
     # Failed to retrieve id_list
     if id_list is None:
@@ -218,13 +227,13 @@ def download_tag(tag, download_dir, skip_downloaded_ids=False):
         return None
 
     if tag == 'favorites':
-        additional_tags = 'favorites'
+        additional_tags = ['favorites']
     else:
         additional_tags = None
 
     logger.info(f'Start downloading for {tag}')
     gallery_results = download_galleries.download_id_list(
-        id_list, download_dir,
+        id_list, download_dir, session,
         additional_tags=additional_tags, id_list_name=tag
     )
 

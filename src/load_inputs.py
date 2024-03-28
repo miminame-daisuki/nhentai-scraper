@@ -3,29 +3,35 @@ import sys
 from subprocess import run
 from pathlib import Path
 import json
+from typing import Union, Optional
 
 import misc
 
 
-def load_input_list(filename):
+def load_input_list(filename: str) -> list[str]:
 
     application_folder_path = misc.get_application_folder_dir()
     inputs_folder_dir = os.path.abspath(f'{application_folder_path}/inputs/')
+
     filename = f'{inputs_folder_dir}/{filename}'
     with open(filename) as f:
         id_list = f.read().splitlines()
+
     id_list = [entry for entry in id_list if not entry == '']
 
     return id_list
 
 
-def load_json(filename, inputs_dir=''):
+def load_json(
+    filename: Union[str, Path],
+    inputs_dir: Optional[Union[str, Path]] = None
+) -> dict:
 
     if filename.split('.')[-1] != 'json':
         print('Not json file')
         return {}
 
-    if not inputs_dir:
+    if inputs_dir is None:
         application_folder_path = misc.get_application_folder_dir()
         inputs_dir = os.path.abspath(f'{application_folder_path}/inputs/')
 
@@ -51,7 +57,7 @@ def write_headers(inputs_path: Path):
         json.dump(headers, f, indent=4)
 
 
-def confirm_settings():
+def confirm_settings() -> dict:
 
     settings = {}
 
@@ -112,4 +118,3 @@ def check_fileicon_tag_install():
             "'https://github.com/jdberry/tag'"
         )
         sys.exit('tag not installed')
-

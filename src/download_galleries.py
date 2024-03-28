@@ -8,12 +8,11 @@ Created on Tue Feb 13 19:43:58 2024
 
 import os
 from pathlib import Path
-import sys
-from subprocess import run
+import requests
 from tqdm import tqdm
 import logging
+from typing import Union, Optional
 
-import load_inputs
 import nhentai_scraper
 import misc
 
@@ -22,9 +21,12 @@ logger = logging.getLogger('__main__.' + __name__)
 
 
 def download_id_list(
-    id_list, download_dir,
-    additional_tags=None, id_list_name=None
-):
+    id_list: list[str],
+    download_dir: Union[str, Path],
+    session: requests.sessions.Session,
+    additional_tags: Optional[list[str]] = None,
+    id_list_name: Optional[str] = None
+) -> dict:
 
     gallery_results = {
         'finished': [],
@@ -47,7 +49,7 @@ def download_id_list(
              f'out of {len(id_list)} galleries...')
         )
         gallery = nhentai_scraper.Gallery(
-            gallery_id, download_dir=download_dir,
+            gallery_id, session, download_dir=download_dir,
             additional_tags=additional_tags
         )
         gallery.download()
@@ -70,7 +72,7 @@ def download_id_list(
             )
 
             gallery = nhentai_scraper.Gallery(
-                gallery_id, download_dir=download_dir,
+                gallery_id, session, download_dir=download_dir,
                 additional_tags=additional_tags
             )
             gallery.download()
@@ -82,7 +84,11 @@ def download_id_list(
     return gallery_results
 
 
-def record_gallery_results(gallery_results, gallery, initial_try=True):
+def record_gallery_results(
+    gallery_results: dict,
+    gallery: nhentai_scraper.Gallery,
+    initial_try: Optional[bool] = True
+) -> dict:
 
     if gallery.status_code == 0 or gallery.status_code == 1:
         gallery_results['finished'].append(gallery.id)
@@ -100,7 +106,7 @@ def record_gallery_results(gallery_results, gallery, initial_try=True):
     return gallery_results
 
 
-def print_gallery_results(gallery_results):
+def print_gallery_results(gallery_results: dict):
 
     total_download_counts = 0
     keys = ['finished', 'repeats', 'blacklists', 'retry_fails']
@@ -123,7 +129,10 @@ def print_gallery_results(gallery_results):
     print(f"\n{'-'*os.get_terminal_size().columns}")
 
 
-def write_gallery_results(gallery_results, filename):
+def write_gallery_results(
+    gallery_results: dict,
+        filename: Union[str, Path]
+):
 
     # write the failed retry galleries to failed_download_id.txt
     application_folder_path = misc.get_application_folder_dir()
