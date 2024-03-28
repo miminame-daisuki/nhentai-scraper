@@ -65,6 +65,10 @@ def get_application_folder_dir():
         application_folder_dir = os.path.abspath(
             f'{os.path.dirname(__file__)}/..'
         )
+    else:
+        application_folder_dir = os.path.abspath(
+            f'{os.getcwd()}/..'
+        )
 
     return application_folder_dir
 
@@ -99,19 +103,58 @@ def load_cookies(inputs_dir):
     return cookies
 
 
+def load_json(filename, inputs_dir=''):
+    if filename.split('.')[-1] != 'json':
+        print('Not json file')
+        return {}
+
+    if not inputs_dir:
+        inputs_dir = get_application_folder_dir() + '/inputs'
+    json_filename = f'{inputs_dir}/{filename}'
+    with open(json_filename) as f:
+        json_dict = json.load(f)
+
+    return json_dict
+
+
+def create_session(cookies=None, headers=None):
+
+    session = requests.Session()
+
+    if cookies is None:
+        cookies = load_json('cookies.json')
+    if headers is None:
+        headers = load_json('headers.json')
+
+    cookiejar = requests.cookies.cookiejar_from_dict(cookies)
+
+    session.cookies = cookiejar
+    session.headers.update(headers)
+
+    return session
+
+
 def get_response(
-    url, headers=None, cookies=None,
-    sleep_time='default', timeout_time=61
+    url,
+    params=None,
+    session=None,
+    headers=None, cookies=None,
+    sleep_time='default', timeout_time=60
 ):
 
-    if not headers:
-        headers = {}
-    if not cookies:
-        cookies = {}
+    if session is None:
+        session = create_session()
+
+    if params is None:
+        params = {}
+    # if not headers:
+    #     headers = {}
+    # if not cookies:
+    #     cookies = {}
 
     try:
-        response = requests.get(
-            url, headers=headers, cookies=cookies, timeout=timeout_time
+        response = session.get(
+            url, params=params, timeout=timeout_time
         )
     except Exception as error:
         logger.error(f'An exception occured: {error}')
