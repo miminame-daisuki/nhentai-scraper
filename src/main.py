@@ -5,6 +5,8 @@ import signal
 import nhentai_scraper
 import download_galleries
 import download_tags
+import load_inputs
+import misc
 
 
 logger = logging.getLogger(__name__)
@@ -12,16 +14,17 @@ logger = logging.getLogger(__name__)
 
 def main():
 
-    nhentai_scraper.set_logging_config()
+    misc.set_logging_config()
+    logger.info(f"\n{'-'*os.get_terminal_size().columns}")
     logger.info('Program started')
 
-    settings = download_galleries.confirm_settings()
+    settings = load_inputs.confirm_settings()
     download_dir = settings['download_dir']
     skip_downloaded_ids = settings['skip_downloaded_ids']
 
-    download_list = nhentai_scraper.load_input_list('download_list.txt')
-    blacklist = nhentai_scraper.load_input_list('blacklist.txt')
-    repeat_ids = nhentai_scraper.load_input_list('repeated_galleries.txt')
+    download_list = load_inputs.load_input_list('download_list.txt')
+    blacklist = load_inputs.load_input_list('blacklist.txt')
+    repeat_ids = load_inputs.load_input_list('repeated_galleries.txt')
 
     gallery_results = {
         'finished': [],

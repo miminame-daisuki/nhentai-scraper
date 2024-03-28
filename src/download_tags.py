@@ -14,6 +14,9 @@ import logging
 
 import nhentai_scraper
 import download_galleries
+import load_inputs
+import misc
+from nhentai_urls import NHENTAI_URL, FAVORITES_URL, API_SEARCH_URL
 
 
 logger = logging.getLogger('__main__.' + __name__)
@@ -54,8 +57,7 @@ def search_url(url, headers=None, cookies=None):
 
 def search_api(search: str, headers=None, cookies=None):
 
-    search_url = 'https://nhentai.net/api/galleries/search?query='
-    search_url += search
+    search_url = API_SEARCH_URL + search
 
     if not headers:
         headers = {}
@@ -91,14 +93,12 @@ def search_tag(tag: str):
 
     if ':' in tag:
         tag_type, tag_name = tag.split(':')
-        url = f"https://nhentai.net/{tag_type}/{tag_name}/"
+        url = f"{NHENTAI_URL}/{tag_type}/{tag_name}/"
     elif tag == 'favorites':
-        url = 'https://nhentai.net/favorites/'
+        url = FAVORITES_URL
 
-    application_folder_path = nhentai_scraper.get_application_folder_dir()
-    inputs_dir = os.path.abspath(f'{application_folder_path}/inputs/')
-    headers = nhentai_scraper.load_headers(inputs_dir)
-    cookies = nhentai_scraper.load_cookies(inputs_dir)
+    headers = load_inputs.load_json('headers.json')
+    cookies = load_inputs.load_json('cookies.json')
 
     page_count = search_url(
         url, headers=headers, cookies=cookies
@@ -144,7 +144,7 @@ def search_tag(tag: str):
 def search_finished_downloads(tag, download_dir=''):
 
     # search for finished download galleries in download_dir
-    download_dir = nhentai_scraper.set_download_dir(download_dir)
+    download_dir = misc.set_download_dir(download_dir)
     # download_dir = download_dir.replace(' ', r'\ ')
 
     find_tag_command = [
@@ -195,8 +195,8 @@ def download_tag(tag, download_dir, skip_downloaded_ids=False):
         matched_galleries_id = search_finished_downloads(
             tag, download_dir=download_dir
         )
-        repeat_ids = nhentai_scraper.load_input_list('repeated_galleries.txt')
-        blacklist = nhentai_scraper.load_input_list('blacklist.txt')
+        repeat_ids = load_inputs.load_input_list('repeated_galleries.txt')
+        blacklist = load_inputs.load_input_list('blacklist.txt')
         blacklist_ids = [id for id in blacklist if '#' in id]
 
         id_list = list(

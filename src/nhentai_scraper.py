@@ -10,9 +10,7 @@ import requests
 import random
 import time
 import json
-import yaml
 import os
-import sys
 from PIL import Image
 from subprocess import run
 import unicodedata
@@ -23,98 +21,12 @@ import signal
 import logging
 import logging.config
 
+import load_inputs
+import misc
+from nhentai_urls import API_GALLERY_URL, THUMB_BASE_URL, IMG_BASE_URL
+
 
 logger = logging.getLogger('__main__.' + __name__)
-
-
-def exit_gracefully(signum, frame):
-    logger.info(f"\n{'-'*os.get_terminal_size().columns}")
-    logger.info('Program terminated with Ctrl-C')
-    sys.exit(0)
-
-
-def set_logging_config(logging_config_filename=''):
-    logging_dir = os.path.abspath(f'{get_application_folder_dir()}/log/')
-    if not logging_config_filename:
-        logging_config_filename = os.path.join(
-            logging_dir, 'logging_config.yaml'
-        )
-    with open(logging_config_filename) as f:
-        if 'yaml' in logging_config_filename:
-            logging_config = yaml.full_load(f)
-        elif 'json' in logging_config_filename:
-            logging_config = json.load(f)
-
-    logging_filename = os.path.join(
-        logging_dir, f'{__name__}.log'
-    )
-    logging_config['handlers']['file']['filename'] = logging_filename
-    logging.config.dictConfig(logging_config)
-
-    logger.info(f"\n{'-'*os.get_terminal_size().columns}")
-
-
-def get_application_folder_dir():
-
-    application_folder_dir = ''
-    # when running executable
-    if getattr(sys, 'frozen', False):
-        application_folder_dir = os.path.dirname(sys.executable)
-    # when running python script (placed inside ./src/)
-    elif __file__:
-        application_folder_dir = os.path.abspath(
-            f'{os.path.dirname(__file__)}/..'
-        )
-    else:
-        application_folder_dir = os.path.abspath(
-            f'{os.getcwd()}/..'
-        )
-
-    return application_folder_dir
-
-
-def load_input_list(filename):
-
-    application_folder_path = get_application_folder_dir()
-    inputs_folder_dir = os.path.abspath(f'{application_folder_path}/inputs/')
-    filename = f'{inputs_folder_dir}/{filename}'
-    with open(filename) as f:
-        id_list = f.read().splitlines()
-    id_list = [entry for entry in id_list if not entry == '']
-
-    return id_list
-
-
-def load_headers(inputs_dir):
-
-    headers_filename = f'{inputs_dir}/headers.json'
-    with open(headers_filename) as f:
-        headers = json.load(f)
-
-    return headers
-
-
-def load_cookies(inputs_dir):
-
-    cookies_filename = f'{inputs_dir}/cookies.json'
-    with open(cookies_filename) as f:
-        cookies = json.load(f)
-
-    return cookies
-
-
-def load_json(filename, inputs_dir=''):
-    if filename.split('.')[-1] != 'json':
-        print('Not json file')
-        return {}
-
-    if not inputs_dir:
-        inputs_dir = get_application_folder_dir() + '/inputs'
-    json_filename = f'{inputs_dir}/{filename}'
-    with open(json_filename) as f:
-        json_dict = json.load(f)
-
-    return json_dict
 
 
 def create_session(cookies=None, headers=None):
@@ -122,9 +34,9 @@ def create_session(cookies=None, headers=None):
     session = requests.Session()
 
     if cookies is None:
-        cookies = load_json('cookies.json')
+        cookies = load_inputs.load_json('cookies.json')
     if headers is None:
-        headers = load_json('headers.json')
+        headers = load_inputs.load_json('headers.json')
 
     cookiejar = requests.cookies.cookiejar_from_dict(cookies)
 
@@ -170,37 +82,6 @@ def get_response(
     return response
 
 
-def check_tag_fileicon():
-    result_tag = run(['which', 'tag'], capture_output=True)
-    result_fileicon = run(['which', 'fileicon'], capture_output=True)
-    if result_tag.returncode == 0 and result_fileicon.returncode == 0:
-        return True
-    else:
-        return False
-
-
-def set_download_dir(download_dir=''):
-
-    application_folder_path = get_application_folder_dir()
-
-    if download_dir:
-        if os.path.isabs(download_dir):
-            pass
-        else:
-            download_dir = os.path.abspath(
-                f'{application_folder_path}/{download_dir}/'
-            )
-    else:
-        download_dir = os.path.abspath(
-            f'{application_folder_path}/Downloaded/'
-        )
-
-    if not os.path.isdir(download_dir):
-        os.mkdir(download_dir)
-
-    return download_dir
-
-
 class Gallery:
 
     def __init__(
@@ -211,19 +92,19 @@ class Gallery:
         self.id = str(gallery_id).split('#')[-1]
         logger.info(f'Gallery initiated for id: {gallery_id}')
 
-        self.application_folder_path = get_application_folder_dir()
-        self.download_dir = set_download_dir(download_dir)
+        self.application_folder_path = misc.get_application_folder_dir()
+        self.download_dir = misc.set_download_dir(download_dir)
         self.inputs_dir = os.path.abspath(
             f'{self.application_folder_path}/inputs/'
         )
         logger.info(f"Download directory set to: '{self.download_dir}'")
 
+        if headers is None:
+            headers = load_inputs.load_json('headers.json')
         self.headers = headers
-        if not self.headers:
-            self.headers = load_headers(self.inputs_dir)
+        if cookies is None:
+            cookies = load_inputs.load_json('cookies.json')
         self.cookies = cookies
-        if not self.cookies:
-            self.cookies = load_cookies(self.inputs_dir)
 
         self.status_code = -1
 
@@ -234,7 +115,7 @@ class Gallery:
     def download_metadata(self):
 
         logger.info('Downloading gallery metadata from nhentai api...')
-        api_url = f'https://nhentai.net/api/gallery/{int(self.id)}'
+        api_url = f'{API_GALLERY_URL}/{int(self.id)}'
 
         api_response = get_response(
             api_url, headers=self.headers, cookies=self.cookies
@@ -288,7 +169,7 @@ class Gallery:
     def check_blacklist(self, blacklist=None):
         logger.info('Checking blacklist...')
         if not blacklist:
-            blacklist = load_input_list('blacklist.txt')
+            blacklist = load_inputs.load_input_list('blacklist.txt')
             blacklist_tags = [tag for tag in blacklist if ':' in tag]
         if any(tag in self.tags for tag in blacklist_tags):
             self.status_code = -5
@@ -371,8 +252,7 @@ class Gallery:
             self.metadata['images']['thumbnail']
         )
         thumb_url = (
-            'https://t3.nhentai.net/galleries/'
-            f'{self.media_id}/thumb.{extension}'
+            f'{THUMB_BASE_URL}/{self.media_id}/thumb.{extension}'
         )
         thumb_response = get_response(
             thumb_url, headers=self.headers, cookies=self.cookies
@@ -466,8 +346,7 @@ class Gallery:
             self.metadata['images']['pages'][int(page)-1]
         )
         img_url = (
-            'https://i5.nhentai.net/galleries/'
-            f'{self.media_id}/{int(page)}.{extension}'
+            f'{IMG_BASE_URL}/{self.media_id}/{int(page)}.{extension}'
         )
         img_response = get_response(
             img_url, headers=self.headers, cookies=self.cookies
@@ -710,10 +589,12 @@ class Gallery:
 
 
 if __name__ == '__main__':
-    signal.signal(signal.SIGINT, exit_gracefully)
-    set_logging_config()
+    signal.signal(signal.SIGINT, misc.exit_gracefully)
+    misc.set_logging_config()
+    logger.info(f"\n{'-'*os.get_terminal_size().columns}")
     logger.info('Program started')
-    download_dir = os.path.abspath(f'{get_application_folder_dir()}/test/')
+    application_folder_path = load_inputs.get_application_folder_dir()
+    download_dir = os.path.abspath(f'{application_folder_path}/test/')
     id_list = input('Input gallery id: ')
     id_list = id_list.split(' ')
     for gallery_id in id_list:
