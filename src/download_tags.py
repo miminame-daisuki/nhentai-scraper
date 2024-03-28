@@ -27,14 +27,18 @@ logger = logging.getLogger('__main__.' + __name__)
 
 def search_url(
     url: str,
-    session: requests.sessions.Session
+    session: requests.sessions.Session,
+    params: Optional[dict] = None
 ) -> tuple[list[str], int]:
     # retrieves all <=25 gallery ids from a nhentai url
+
+    if params is None:
+        params = {}
 
     gallery_id = []
 
     response = nhentai_scraper.get_response(
-        url, session
+        url, session, params=params
     )
 
     if response.status_code == 403:
@@ -60,15 +64,17 @@ def search_url(
 
 def search_api(
     search: str,
-    session: requests.sessions.Session
-) -> tuple[list[str], int]:
-
-    url = API_SEARCH_URL + search
+    session: requests.sessions.Session,
+    params: Optional[dict] = None
+) -> tuple[Optional[list[str]], Union[int, str]]:
 
     gallery_id = []
 
+    query = {'query': search}
+    if params is not None:
+        query = query | params
     response = nhentai_scraper.get_response(
-        url, session
+        API_SEARCH_URL, session, params=query
     )
 
     if response.status_code == 403:
@@ -95,15 +101,16 @@ def search_tag(
     logger.info(f"Searching galleries from {tag}")
     print(f"\nSearching galleries from {tag}...\n")
 
-    if ':' in tag:
+    if tag.startswith('search: '):
+        search = tag.split('search: ')[1]
+        page_count = search_api(search, session)[1]
+    elif ':' in tag:
         tag_type, tag_name = tag.split(':')
         url = f"{NHENTAI_URL}/{tag_type}/{tag_name}/"
+        page_count = search_url(url, session)[1]
     elif tag == 'favorites':
         url = FAVORITES_URL
-
-    page_count = search_url(
-        url, session
-    )[1]
+        page_count = search_url(url, session)[1]
 
     id_list = []
 
@@ -128,13 +135,13 @@ def search_tag(
 
     for page in tqdm(range(1, page_count+1), leave=False):
         logger.info(f"Searching page {page} from {tag}")
-        page_url = url + f'?page={page}'
-        gallery_id = search_url(
-            page_url,
-            session
-        )[0]
+        params = {'page': page}
+        if tag.startswith('search: '):
+            gallery_id = search_api(search, session, params=params)[0]
+        elif ':' in tag or tag == 'favorites':
+            gallery_id = search_url(url, session, params=params)[0]
 
-        if not gallery_id:
+        if  gallery_id is None:
             logger.error(f'Failed to retrieve id_list for page {page}')
             continue
         id_list.extend(gallery_id)

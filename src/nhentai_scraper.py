@@ -19,7 +19,6 @@ from pypdf import PdfReader
 from pathlib import Path
 import signal
 import logging
-import logging.config
 from typing import Union, Optional
 
 import load_inputs
@@ -95,14 +94,14 @@ class Gallery:
     ):
 
         self.id = str(gallery_id).split('#')[-1]
-        logger.info(f'Gallery initiated for id: {gallery_id}')
+        logger.info(f'Gallery initialized for id: {gallery_id}')
 
-        self.application_folder_path = misc.get_application_folder_dir()
+        application_folder_path = misc.get_application_folder_dir()
 
         if download_dir is None:
             self.download_dir = misc.set_download_dir(download_dir)
         self.inputs_dir = os.path.abspath(
-            f'{self.application_folder_path}/inputs/'
+            f'{application_folder_path}/inputs/'
         )
         logger.info(f"Download directory set to: '{self.download_dir}'")
 
@@ -157,6 +156,15 @@ class Gallery:
                 return {}
 
         self.metadata = api_response.json()
+        self._parse_metadata()
+
+        logger.info('Metadata downloaded')
+        logger.info(f'Title: {self.title}')
+
+        return self.metadata
+
+    def _parse_metadata(self):
+
         self.media_id = self.metadata['media_id']
         if self.metadata['title']['japanese']:
             self.title = self.metadata['title']['japanese']
@@ -169,11 +177,6 @@ class Gallery:
 
         if self.additional_tags is not None:
             self.tags.extend(self.additional_tags)
-
-        logger.info('Metadata downloaded')
-        logger.info(f'Title: {self.title}')
-
-        return self.metadata
 
     def check_blacklist(self, blacklist: Optional[list[str]] = None):
 
@@ -262,12 +265,9 @@ class Gallery:
         extension = self.get_img_extension(
             self.metadata['images']['thumbnail']
         )
-        thumb_url = (
-            f'{THUMB_BASE_URL}/{self.media_id}/thumb.{extension}'
-        )
-        thumb_response = get_response(
-            thumb_url, self.session
-        )
+        thumb_url = (f'{THUMB_BASE_URL}/{self.media_id}/thumb.{extension}')
+
+        thumb_response = get_response(thumb_url, self.session)
         if thumb_response.status_code != 200:
             self.status_code = -6
             logger.error(
