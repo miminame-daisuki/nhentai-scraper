@@ -3,6 +3,7 @@ import sys
 import json
 import yaml
 import logging
+import logging.config
 
 
 logger = logging.getLogger('__main__.' + __name__)

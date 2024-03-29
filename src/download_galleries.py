@@ -110,8 +110,8 @@ def print_gallery_results(gallery_results: dict):
 
     total_download_counts = 0
     keys = ['finished', 'repeats', 'blacklists', 'retry_fails']
-    for id_list in keys:
-        total_download_counts += len(id_list)
+    for key in keys:
+        total_download_counts += len(gallery_results[key])
 
     print(
         (f"\nFinished {len(gallery_results['finished'])} "

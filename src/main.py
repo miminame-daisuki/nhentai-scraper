@@ -85,6 +85,9 @@ def main():
             gallery_results['retry_fails'],
             'failed_download_id.txt'
         )
+        print('\n\nFailed downloads written to failed_download_id.txt\n\n')
+        logger.info('\n\nFailed downloads written to failed_download_id.txt\n\n')
+
     else:
         print('\n\nFinished all downloads!!!\n\n')
         logger.info(f"\n{'-'*os.get_terminal_size().columns}")
@@ -92,5 +95,5 @@ def main():
 
 
 if __name__ == '__main__':
-    signal.signal(signal.SIGINT, nhentai_scraper.exit_gracefully)
+    signal.signal(signal.SIGINT, misc.exit_gracefully)
     main()

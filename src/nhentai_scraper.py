@@ -100,6 +100,8 @@ class Gallery:
 
         if download_dir is None:
             self.download_dir = misc.set_download_dir(download_dir)
+        else:
+            self.download_dir = download_dir
         self.inputs_dir = os.path.abspath(
             f'{application_folder_path}/inputs/'
         )

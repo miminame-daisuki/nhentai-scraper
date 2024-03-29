@@ -151,7 +151,7 @@ def search_tag(
 
 def search_finished_downloads(
     tag: str,
-    download_dir: Optional[str, Path] = ''
+    download_dir: Optional[Union[str, Path]] = ''
 ) -> list[str]:
 
     # search for finished download galleries in download_dir

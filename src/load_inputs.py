@@ -13,7 +13,8 @@ def load_input_list(filename: str) -> list[str]:
     application_folder_path = misc.get_application_folder_dir()
     inputs_folder_dir = os.path.abspath(f'{application_folder_path}/inputs/')
 
-    filename = f'{inputs_folder_dir}/{filename}'
+    filename = Path(f'{inputs_folder_dir}/{filename}')
+    filename.touch(exist_ok=True)
     with open(filename) as f:
         id_list = f.read().splitlines()
 
