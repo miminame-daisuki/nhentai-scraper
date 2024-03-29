@@ -29,6 +29,55 @@ from nhentai_urls import API_GALLERY_URL, THUMB_BASE_URL, IMG_BASE_URL
 logger = logging.getLogger('__main__.' + __name__)
 
 
+class Session(requests.Session):
+    def __init__(
+        self,
+        cookies: Optional[dict] = None,
+        headers: Optional[dict] = None
+    ):
+
+        if cookies is None:
+            cookies = load_inputs.load_json('cookies.json')
+        if headers is None:
+            headers = load_inputs.load_json('headers.json')
+
+        cookiejar = requests.cookies.cookiejar_from_dict(cookies)
+
+        self.cookies = cookiejar
+        self.headers.update(headers)
+
+    def __repr__(self):
+        return f'Session(cookies={self.cookies}, headers={self.headers})'
+
+    def get_response(
+        self,
+        url: str,
+        params: Optional[dict] = None,
+        sleep_time: Optional[float] = None,
+        timeout_time: Optional[float] = 60.
+    ):
+
+        if params is None:
+            params = {}
+
+        try:
+            response = self.get(
+                url, params=params, timeout=timeout_time
+            )
+        except Exception as error:
+            logger.error(f'An exception occured: {error}')
+            response = lambda: None
+            response.status_code = 'No_response'
+
+        # sleep for sleep_time after each get_response
+        if sleep_time is None:
+            sleep_time = 3*random.random()+1.5
+        logger.info(f'Sleeping for {sleep_time:.3f} seconds...')
+        time.sleep(sleep_time)
+
+        return response
+
+
 def create_session(
     cookies: Optional[dict] = None,
     headers: Optional[dict] = None
@@ -57,9 +106,6 @@ def get_response(
     timeout_time: Optional[float] = 60.
 ):
 
-    if session is None:
-        session = create_session()
-
     if params is None:
         params = {}
 
@@ -86,33 +132,18 @@ class Gallery:
     def __init__(
         self,
         gallery_id: Union[int, str],
-        session: requests.sessions.Session,
+        session: Optional[requests.sessions.Session] = None,
         download_dir: Optional[Union[str, Path]] = None,
         additional_tags: Optional[list[str]] = None,
-        headers: Optional[dict] = None,
-        cookies: Optional[dict] = None
     ):
 
         self.id = str(gallery_id).split('#')[-1]
-        logger.info(f'Gallery initialized for id: {gallery_id}')
-
-        application_folder_path = misc.get_application_folder_dir()
+        logger.info(f'Gallery initialized for id: {self.id}')
 
         if download_dir is None:
-            self.download_dir = misc.set_download_dir(download_dir)
-        else:
-            self.download_dir = download_dir
-        self.inputs_dir = os.path.abspath(
-            f'{application_folder_path}/inputs/'
-        )
+            download_dir = misc.set_download_dir()
+        self.download_dir = download_dir
         logger.info(f"Download directory set to: '{self.download_dir}'")
-
-        if headers is None:
-            headers = load_inputs.load_json('headers.json')
-        self.headers = headers
-        if cookies is None:
-            cookies = load_inputs.load_json('cookies.json')
-        self.cookies = cookies
 
         self.status_code = -1
 
@@ -120,11 +151,25 @@ class Gallery:
         self.downloaded_metadata = {'id': ''}
         self.additional_tags = additional_tags
 
+        if session is None:
+            session = create_session()
         self.session = session
 
-    def download_metadata(self) -> dict:
+        self.get_metadata()
 
-        logger.info('Downloading gallery metadata from nhentai api...')
+    def __str__(self):
+        return f'{self.title} (#{self.id})'
+
+    def __repr__(self):
+        return (
+            f'Gallery(#{self.id}, {self.session}, '
+            f'download_dir={self.download_dir}, '
+            f'additional_tags={self.additional_tags})'
+        )
+
+    def get_metadata(self) -> dict:
+
+        logger.info('Retreiving gallery metadata from nhentai api...')
         api_url = f'{API_GALLERY_URL}/{int(self.id)}'
 
         api_response = get_response(
@@ -160,7 +205,7 @@ class Gallery:
         self.metadata = api_response.json()
         self._parse_metadata()
 
-        logger.info('Metadata downloaded')
+        logger.info('Metadata retrieved')
         logger.info(f'Title: {self.title}')
 
         return self.metadata
@@ -573,7 +618,6 @@ class Gallery:
             else:
                 return False
 
-        self.download_metadata()
         if skip_download():
             return self.status_code
 
@@ -625,6 +669,6 @@ if __name__ == '__main__':
 
     for gallery_id in id_list:
         gallery = Gallery(
-            gallery_id, session, download_dir=download_dir
+            gallery_id, download_dir=download_dir
         )
         gallery.download()
