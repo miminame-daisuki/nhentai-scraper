@@ -1,4 +1,4 @@
-# NHentai scraper
+# NHentai Scraper
 English | [繁體中文](https://github.com/miminame-daisuki/nhentai-scraper/blob/main/README_zh-TW.md)
 
 Scraper/Downloader for [nhentai](https://nhentai.net), specifically designed for MacOS.
@@ -53,9 +53,12 @@ Example using Safari:
     6. Repeat Step 3-iv., except that it should be displaying a lot more information this time.
     7. Locate `Cookie` and `User-Agent` under the `Request` section.
 
-4. Execute the program either by:
+4. Depending on your installation, execute the program either by:
     - Double clicking the `main` unix executable file.
-    - Running `python main.py` (located in the `src/` folder) in your terminal.
+    - Running `python main.py` (located in the `src/` folder) in your terminal.  
+    (If you want the program to continue running even when the computer is in sleep, do either of the following:
+    - Double click the main_`no_sleep.command` file in the `src/` folder
+    - Run `caffeinate python main.py` inside the `src/` folder.)
 
 5. Follow the instructions, and copy-paste your cookies & user agent from Step 3. when prompted.
 
@@ -64,10 +67,6 @@ Example using Safari:
 7. To end the program, simply press `Ctrl-c`.
 
 8. The next time you start the program, it will continue to download any unfinished galleries.
-
-* If you want the program to continue to run even when the computer is in sleep, insted of Step 4., 
-    - Double click the main_`no_sleep.command` file in the `src/` folder
-    - Run `caffeinate python main.py` inside the `src/` folder.
 
 ## Some Tips when Using the Program
 - [Reindex spotlight](https://support.apple.com/en-us/102321) if it is not skipping a praticular tag, even though all galleries from the tag have already been downloaded. 
