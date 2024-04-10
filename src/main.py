@@ -80,7 +80,7 @@ def main():
                 gallery_results['blacklists'], 'blacklist.txt'
             )
 
-        print(f"\n{'-'*os.get_terminal_size().columns}")
+        print(f"{'-'*os.get_terminal_size().columns}")
 
     if gallery_results['retry_fails']:
         download_galleries.write_gallery_results(
@@ -88,7 +88,9 @@ def main():
             'failed_download_id.txt'
         )
         print('\n\nFailed downloads written to failed_download_id.txt\n\n')
-        logger.info('\n\nFailed downloads written to failed_download_id.txt\n\n')
+        logger.info(
+            '\n\nFailed downloads written to failed_download_id.txt\n\n'
+        )
 
     else:
         print('\n\nFinished all downloads!!!\n\n')

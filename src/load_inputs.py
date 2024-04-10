@@ -43,15 +43,19 @@ def load_json(
     return json_dict
 
 
-def write_cookies(inputs_path: Path):
-    cookies = {}
-    cookies['cf_clearance'] = input('cf_clearance: ')
-    cookies['sessionid'] = input('sessionid :')
+def write_cookies(inputs_path: Path) -> None:
+    # cookies = {}
+    # cookies['cf_clearance'] = input('cf_clearance: ')
+    # cookies['sessionid'] = input('sessionid :')
+    cookies = input('Cookie: ')
+    cookies = {
+        line.split('=')[0]: line.split('=')[1] for line in cookies.split('; ')
+    }
     with open(inputs_path / 'cookies.json', 'w') as f:
         json.dump(cookies, f, indent=4)
 
 
-def write_headers(inputs_path: Path):
+def write_headers(inputs_path: Path) -> None:
     headers = {}
     headers['User-Agent'] = input('User-Agent: ')
     with open(inputs_path / 'headers.json', 'w') as f:
@@ -67,6 +71,7 @@ def confirm_settings() -> dict:
     download_dir = os.path.abspath(
         f'{application_folder_path}/Downloaded/'
     )
+    download_dir = str(misc.set_download_dir())
     while True:
         confirm_download_dir = input((f'Download to {download_dir}?(y/n)'))
         if confirm_download_dir != 'y':
@@ -101,7 +106,7 @@ def confirm_settings() -> dict:
     return settings
 
 
-def check_fileicon_tag_install():
+def check_fileicon_tag_install() -> None:
     check_fileicon_command = ['which', 'fileicon']
     result = run(check_fileicon_command, capture_output=True)
     if result.returncode != 0:

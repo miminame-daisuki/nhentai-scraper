@@ -146,7 +146,7 @@ def search_tag(
         elif ':' in tag or tag == 'favorites':
             gallery_id = search_url(url, session, params=params)[0]
 
-        if  gallery_id is None:
+        if gallery_id is None:
             logger.error(f'Failed to retrieve id_list for page {page}')
             continue
         id_list.extend(gallery_id)
@@ -161,7 +161,6 @@ def search_finished_downloads(
 
     # search for finished download galleries in download_dir
     download_dir = misc.set_download_dir(download_dir)
-    # download_dir = download_dir.replace(' ', r'\ ')
 
     find_tag_command = [
         'tag',
@@ -202,7 +201,7 @@ def download_tag(
     download_dir: Union[str, Path],
     session: requests.sessions.Session,
     skip_downloaded_ids: Optional[bool] = False
-) -> dict:
+) -> dict[str, list[str]]:
 
     id_list = search_tag(tag, session)
 

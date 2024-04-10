@@ -104,7 +104,7 @@ def get_response(
     params: Optional[dict] = None,
     sleep_time: Optional[float] = None,
     timeout_time: Optional[float] = 60.
-):
+) -> requests.Response:
 
     if params is None:
         params = {}
@@ -151,10 +151,10 @@ class Gallery:
 
         self.get_metadata()
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f'{self.title} (#{self.id})'
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return (
             f'Gallery(#{self.id}, {self.session}, '
             f'download_dir={self.download_dir}, '
@@ -162,11 +162,11 @@ class Gallery:
         )
 
     @property
-    def id(self):
+    def id(self) -> str:
         return self.__id
 
     @id.setter
-    def id(self, id_):
+    def id(self, id_: Union[str, int]):
         id_ = str(id_).split('#')[-1]
         logger.info(f'Gallery initialized for id: #{id_}')
         self.__id = id_
@@ -176,9 +176,9 @@ class Gallery:
         return self.__download_dir
 
     @download_dir.setter
-    def download_dir(self, dir):
+    def download_dir(self, dir: Union[str, Path]):
         if dir is None:
-            dir = misc.set_download_dir()
+            dir = str(misc.set_download_dir())
         logger.info(f"Download directory set to: '{dir}'")
         self.__download_dir = dir
 
@@ -225,7 +225,7 @@ class Gallery:
 
         return self.metadata
 
-    def _parse_metadata(self):
+    def _parse_metadata(self) -> None:
 
         self.media_id = self.metadata['media_id']
         if self.metadata['title']['japanese']:
@@ -240,7 +240,7 @@ class Gallery:
         if self.additional_tags is not None:
             self.tags.extend(self.additional_tags)
 
-    def check_blacklist(self, blacklist: Optional[list[str]] = None):
+    def check_blacklist(self, blacklist: Optional[list[str]] = None) -> None:
 
         logger.info('Checking blacklist...')
         if not blacklist:
@@ -252,18 +252,16 @@ class Gallery:
         else:
             logger.info('Clear')
 
-    def get_img_extension(self, img_metadata: dict) -> str:
+    def get_img_extension(self, img_metadata: dict[str, str]) -> str:
 
         if img_metadata['t'] == 'j':
-            extension = 'jpg'
+            return 'jpg'
         elif img_metadata['t'] == 'p':
-            extension = 'png'
+            return 'png'
         elif img_metadata['t'] == 'g':
-            extension = 'gif'
+            return 'gif'
 
-        return extension
-
-    def check_folder(self):
+    def check_folder(self) -> None:
 
         logger.info('Checking folder...')
         # replace '/' with '_' for folder directory
@@ -315,13 +313,13 @@ class Gallery:
 
         return self.downloaded_metadata
 
-    def save_metadata(self):
+    def save_metadata(self) -> None:
 
         filename = f'{self.folder_dir}/metadata.json'
         with open(filename, 'w', encoding='utf-8') as f:
             json.dump(self.metadata, f, ensure_ascii=False, indent=4)
 
-    def download_thumb(self):
+    def download_thumb(self) -> None:
 
         logger.info('Retrieving thumbnail...')
         extension = self.get_img_extension(
@@ -336,7 +334,7 @@ class Gallery:
         while thumb_response.status_code != 200:
             logger.error(
                 'Something went wrong when retrieving thumbnail:'
-                 f'{thumb_response.status_code}, retrying...'
+                f'{thumb_response.status_code}, retrying...'
             )
             thumb_response = get_response(thumb_url, self.session)
             tries += 1
@@ -350,7 +348,7 @@ class Gallery:
         with open(self.thumb_filename, 'wb') as f:
             f.write(thumb_response.content)
 
-    def check_tags(self):
+    def check_tags(self) -> None:
 
         logger.info('Checking tags...')
 
@@ -385,7 +383,7 @@ class Gallery:
             self.status_code = -7
             logger.error(f"{result.stderr.decode('utf-8')}")
 
-    def set_thumb(self):
+    def set_thumb(self) -> None:
 
         # resizing thumbnail to be square
         thumb = Image.open(self.thumb_filename)
@@ -418,7 +416,7 @@ class Gallery:
             self.status_code = -8
             logger.error(f"{result.stderr.decode('utf-8')}")
 
-    def download_page(self, page: Union[str, int]):
+    def download_page(self, page: Union[str, int]) -> None:
 
         logger.info(f'Retrieving Page {page}/{self.num_pages} url...')
 
@@ -443,7 +441,7 @@ class Gallery:
         with open(filename, 'wb') as f:
             f.write(img_response.content)
 
-    def check_missing_pages(self):
+    def check_missing_pages(self) -> None:
 
         logger.info('Checking missing pages...')
         self.load_missing_pages()
@@ -486,7 +484,7 @@ class Gallery:
         pages: list[str],
         tries: Optional[int] = 0,
         leave_tqdm: Optional[bool] = True
-    ):
+    ) -> None:
 
         t = tqdm(self.missing_pages, leave=leave_tqdm)
         for page in t:
@@ -545,7 +543,7 @@ class Gallery:
 
         return extra_pages
 
-    def check_pdf(self):
+    def check_pdf(self) -> None:
 
         logger.info('Checking PDF...')
         pdf_path = f"{self.folder_dir}/{self.title}.pdf"

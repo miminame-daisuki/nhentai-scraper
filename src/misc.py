@@ -31,30 +31,24 @@ def get_application_folder_dir() -> str:
     return application_folder_dir
 
 
-def set_download_dir(download_dir: Optional[Union[str, Path]] = None) -> str:
+def set_download_dir(download_dir: Optional[Union[str, Path]] = None) -> Path:
 
     application_folder_path = get_application_folder_dir()
     if download_dir is None:
-        download_dir = os.path.abspath(
-            f'{application_folder_path}/Downloaded/'
-        )
-    else:
-        if os.path.isabs(download_dir):
-            pass
-        else:
-            download_dir = os.path.abspath(
-                f'{application_folder_path}/{download_dir}/'
-            )
+        download_dir = Path(application_folder_path) / 'Downloaded'
+    if not Path(download_dir).is_absolute():
+        download_dir = Path(application_folder_path) / download_dir
+    download_dir = download_dir.absolute()
 
-    if not os.path.isdir(download_dir):
-        os.mkdir(download_dir)
+    if not download_dir.is_dir():
+        download_dir.mkdir()
 
     return download_dir
 
 
 def set_logging_config(
     logging_config_filename: Optional[Union[str, Path]] = None
-):
+) -> None:
 
     if logging_config_filename is None:
         application_folder_path = get_application_folder_dir()
@@ -76,7 +70,7 @@ def set_logging_config(
     logging.config.dictConfig(logging_config)
 
 
-def exit_gracefully(signum: signal.Signals, frame):
+def exit_gracefully(signum: signal.Signals, frame) -> None:
 
     logger.info(f"\n{'-'*os.get_terminal_size().columns}")
     logger.info('Program terminated with Ctrl-C')

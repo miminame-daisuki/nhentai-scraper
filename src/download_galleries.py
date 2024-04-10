@@ -26,7 +26,7 @@ def download_id_list(
     session: requests.sessions.Session,
     additional_tags: Optional[list[str]] = None,
     id_list_name: Optional[str] = None
-) -> dict:
+) -> dict[str, list[str]]:
 
     gallery_results = {
         'finished': [],
@@ -85,13 +85,13 @@ def download_id_list(
 
 
 def record_gallery_results(
-    gallery_results: dict,
+    gallery_results: dict[str, list[str]],
     gallery: nhentai_scraper.Gallery,
     initial_try: Optional[bool] = True
-) -> dict:
+) -> dict[str, list[str]]:
 
     if gallery.status_code == 0 or gallery.status_code == 1:
-        gallery_results['finished'].append(gallery.id)
+        gallery_results['finished'].append(f'#{gallery.id}')
     elif gallery.status_code == 2:
         gallery_results['repeats'].append(f'#{gallery.id}')
     elif gallery.status_code == -5:
@@ -106,7 +106,7 @@ def record_gallery_results(
     return gallery_results
 
 
-def print_gallery_results(gallery_results: dict):
+def print_gallery_results(gallery_results: dict[str, list[str]]) -> None:
 
     total_download_counts = 0
     keys = ['finished', 'repeats', 'blacklists', 'retry_fails']
@@ -124,14 +124,14 @@ def print_gallery_results(gallery_results: dict):
     print(f"{len(gallery_results['blacklists'])} BLACKLISTED")
     print(
         (f"{len(gallery_results['retry_fails'])} "
-         'failed retry galleries')
+         'failed retry galleries\n')
     )
 
 
 def write_gallery_results(
-    gallery_results: dict,
-        filename: Union[str, Path]
-):
+    gallery_results: dict[str, list[str]],
+    filename: Union[str, Path]
+) -> None:
 
     # write the failed retry galleries to failed_download_id.txt
     application_folder_path = misc.get_application_folder_dir()
@@ -144,28 +144,3 @@ def write_gallery_results(
         for entry in gallery_results:
             f.write(entry)
             f.write('\n')
-
-
-# def main():
-
-#     nhentai_scraper.set_logging_config()
-#     logger.info(f"\n{'-'*os.get_terminal_size().columns}")
-#     logger.info('Program started')
-#     download_dir = confirm_settings()
-#     id_list = nhentai_scraper.load_input_list('download_id.txt')
-#     failed_galleries = download_id_list(id_list, download_dir)
-#     if len(failed_galleries['repeated_galleries']) != 0:
-#         write_failed_galleries(
-#             failed_galleries['repeated_galleries'], 'repeated_galleries.txt'
-#         )
-#     if len(failed_galleries['failed_retry_galleries']) != 0:
-#         write_failed_galleries(
-#             failed_galleries['failed_retry_galleries'],
-#             'failed_download_id.txt'
-#         )
-#     else:
-#         print('\n\n\nFinished all downloads!!!\n\n')
-
-
-# if __name__ == '__main__':
-#     main()
