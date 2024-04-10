@@ -49,7 +49,7 @@ def download_id_list(
              f'out of {len(id_list)} galleries...')
         )
         gallery = nhentai_scraper.Gallery(
-            gallery_id, session, download_dir=download_dir,
+            gallery_id, session=session, download_dir=download_dir,
             additional_tags=additional_tags
         )
         gallery.download()
@@ -72,7 +72,7 @@ def download_id_list(
             )
 
             gallery = nhentai_scraper.Gallery(
-                gallery_id, session, download_dir=download_dir,
+                gallery_id, session=session, download_dir=download_dir,
                 additional_tags=additional_tags
             )
             gallery.download()
@@ -126,7 +126,6 @@ def print_gallery_results(gallery_results: dict):
         (f"{len(gallery_results['retry_fails'])} "
          'failed retry galleries')
     )
-    print(f"\n{'-'*os.get_terminal_size().columns}")
 
 
 def write_gallery_results(

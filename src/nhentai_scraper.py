@@ -131,29 +131,23 @@ class Gallery:
 
     def __init__(
         self,
-        gallery_id: Union[int, str],
+        id_: Union[int, str],
         session: Optional[requests.sessions.Session] = None,
         download_dir: Optional[Union[str, Path]] = None,
         additional_tags: Optional[list[str]] = None,
     ):
 
-        self.id = str(gallery_id).split('#')[-1]
-        logger.info(f'Gallery initialized for id: {self.id}')
-
-        if download_dir is None:
-            download_dir = misc.set_download_dir()
+        self.id = id_
+        if session is None:
+            session = create_session()
+        self.session = session
         self.download_dir = download_dir
-        logger.info(f"Download directory set to: '{self.download_dir}'")
+        self.additional_tags = additional_tags
 
         self.status_code = -1
 
         self.title = ''
         self.downloaded_metadata = {'id': ''}
-        self.additional_tags = additional_tags
-
-        if session is None:
-            session = create_session()
-        self.session = session
 
         self.get_metadata()
 
@@ -166,6 +160,27 @@ class Gallery:
             f'download_dir={self.download_dir}, '
             f'additional_tags={self.additional_tags})'
         )
+
+    @property
+    def id(self):
+        return self.__id
+
+    @id.setter
+    def id(self, id_):
+        id_ = str(id_).split('#')[-1]
+        logger.info(f'Gallery initialized for id: #{id_}')
+        self.__id = id_
+
+    @property
+    def download_dir(self):
+        return self.__download_dir
+
+    @download_dir.setter
+    def download_dir(self, dir):
+        if dir is None:
+            dir = misc.set_download_dir()
+        logger.info(f"Download directory set to: '{dir}'")
+        self.__download_dir = dir
 
     def get_metadata(self) -> dict:
 
@@ -189,7 +204,7 @@ class Gallery:
         tries = 0
         while api_response.status_code != 200:
             logger.error(
-                ('Failed to retrieve metadata with status code'
+                ('Failed to retrieve metadata with status code '
                  f'{api_response.status_code}, retrying...')
             )
             api_response = get_response(
@@ -315,14 +330,21 @@ class Gallery:
         thumb_url = (f'{THUMB_BASE_URL}/{self.media_id}/thumb.{extension}')
 
         thumb_response = get_response(thumb_url, self.session)
-        if thumb_response.status_code != 200:
-            self.status_code = -6
-            logger.error(
-                ('Something went wrong when retrieving thumbnail:'
-                 f'{thumb_response.status_code}')
-            )
 
-            return
+        # retry for up to 3 times
+        tries = 0
+        while thumb_response.status_code != 200:
+            logger.error(
+                'Something went wrong when retrieving thumbnail:'
+                 f'{thumb_response.status_code}, retrying...'
+            )
+            thumb_response = get_response(thumb_url, self.session)
+            tries += 1
+
+            if tries >= 3 and thumb_response != 200:
+                self.status_code = -6
+
+                return
 
         self.thumb_filename = f'{self.folder_dir}/thumb.{extension}'
         with open(self.thumb_filename, 'wb') as f:
@@ -403,12 +425,11 @@ class Gallery:
         extension = self.get_img_extension(
             self.metadata['images']['pages'][int(page)-1]
         )
-        img_url = (
-            f'{IMG_BASE_URL}/{self.media_id}/{int(page)}.{extension}'
-        )
+        img_url = f'{IMG_BASE_URL}/{self.media_id}/{int(page)}.{extension}'
         img_response = get_response(
             img_url, self.session
         )
+
         if img_response.status_code != 200:
             logger.error(
                 ('Something went wrong with when getting response'
@@ -443,7 +464,10 @@ class Gallery:
                      f'for the {tries}(th) time...\n')
                 )
 
-            self.download_missing_pages(tries, leave_tqdm=leave_tqdm)
+            self.download_pages(
+                self.missing_pages,
+                tries=tries, leave_tqdm=leave_tqdm
+            )
             self.load_missing_pages()
 
             # record missing pages for initial download try
@@ -457,9 +481,10 @@ class Gallery:
 
                 return
 
-    def download_missing_pages(
+    def download_pages(
         self,
-        tries: int,
+        pages: list[str],
+        tries: Optional[int] = 0,
         leave_tqdm: Optional[bool] = True
     ):
 
@@ -574,9 +599,9 @@ class Gallery:
         # status_code < -1: Error
 
         status_dict = {
-            0: f"{self.title} (#{self.id}) download finished",
-            1: f"{self.title} (#{self.id}) already downloaded",
-            2: (f"{self.title} (#{self.id}) has the same title as "
+            0: f"{str(self)} download finished",
+            1: f"{str(self)} already downloaded",
+            2: (f"{str(self)} has the same title as "
                 f"the already downloaded #{self.downloaded_metadata['id']}"),
             -1: 'Download not finished...',
             -2: 'Error 403 - Forbidden (try updating `cf_clearance`)',
@@ -584,18 +609,14 @@ class Gallery:
             -4: ('Error when downloading metadata '
                  f"(failed retry 3 times) for #{self.id}"),
             -5: f"BLACKLISTED #{self.id}",
-            -6: ('Error when downloading thmbnail '
-                 f"for {self.title} (#{self.id})"),
-            -7: ('Error when setting tags '
-                 f"for {self.title} (#{self.id})"),
-            -8: ('Error when setting thumbnail '
-                 f"for {self.title} (#{self.id})"),
+            -6: f'Error when downloading thmbnail for {str(self)}',
+            -7: f'Error when setting tags for {str(self)}',
+            -8: f'Error when setting thumbnail for {str(self)}',
             -9: ('Error when downloading missing pages (failed retry 3 times) '
-                 f"for {self.title} (#{self.id})"),
+                 f"for {str(self)}"),
             -10: ('There are more pages downloaded than self.num_pages '
-                  f"for {self.title} (#{self.id})"),
-            -11: ('Error when saving PDF '
-                  f"for {self.title} (#{self.id})"),
+                  f"for {str(self)}"),
+            -11: f'Error when saving PDF for {str(self)}',
         }
 
         return status_dict[self.status_code]
@@ -660,7 +681,7 @@ if __name__ == '__main__':
     logger.info(f"\n{'-'*os.get_terminal_size().columns}")
     logger.info('Program started')
 
-    application_folder_path = load_inputs.get_application_folder_dir()
+    application_folder_path = misc.get_application_folder_dir()
     download_dir = os.path.abspath(f'{application_folder_path}/test/')
 
     session = create_session()

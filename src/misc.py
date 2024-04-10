@@ -33,8 +33,8 @@ def get_application_folder_dir() -> str:
 
 def set_download_dir(download_dir: Optional[Union[str, Path]] = None) -> str:
 
+    application_folder_path = get_application_folder_dir()
     if download_dir is None:
-        application_folder_path = get_application_folder_dir()
         download_dir = os.path.abspath(
             f'{application_folder_path}/Downloaded/'
         )

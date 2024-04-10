@@ -57,7 +57,7 @@ def main():
             logger.info(f"\n{'-'*os.get_terminal_size().columns}")
 
             gallery = nhentai_scraper.Gallery(
-                entry, session, download_dir=download_dir
+                entry, session=session, download_dir=download_dir
             )
             gallery.download()
 
@@ -79,6 +79,8 @@ def main():
             download_galleries.write_gallery_results(
                 gallery_results['blacklists'], 'blacklist.txt'
             )
+
+        print(f"\n{'-'*os.get_terminal_size().columns}")
 
     if gallery_results['retry_fails']:
         download_galleries.write_gallery_results(

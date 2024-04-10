@@ -70,11 +70,16 @@ def search_api(
 
     gallery_id = []
 
-    query = {'query': search}
-    if params is not None:
-        query = query | params
+    # query = {'query': search}
+    # if params is not None:
+    #     query = query | params
+    # response = nhentai_scraper.get_response(
+    #     API_SEARCH_URL, session, params=query
+    # )
+
+    url = API_SEARCH_URL + '?query=' + search
     response = nhentai_scraper.get_response(
-        API_SEARCH_URL, session, params=query
+        url, session, params=params
     )
 
     if response.status_code == 403:
@@ -151,7 +156,7 @@ def search_tag(
 
 def search_finished_downloads(
     tag: str,
-    download_dir: Optional[Union[str, Path]] = ''
+    download_dir: Optional[Union[str, Path]] = None
 ) -> list[str]:
 
     # search for finished download galleries in download_dir
