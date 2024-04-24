@@ -234,8 +234,12 @@ class Gallery:
             self.title = self.metadata['title']['english']
         self.title = self.title.replace('/', '_')
         self.num_pages = self.metadata['num_pages']
-        self.tags = [f"{tag['type']}:{tag['name']}"
-                     for tag in self.metadata['tags']]
+        self.tags = [
+            f"{tag['type']}:{tag['name']}" for tag in self.metadata['tags']
+        ]
+        self.thumb_extension = self.get_img_extension(
+            self.metadata['images']['thumbnail']
+        )
 
         if self.additional_tags is not None:
             self.tags.extend(self.additional_tags)
@@ -278,31 +282,21 @@ class Gallery:
 
                 return
 
-            # download and set thumbnail if thumbnail file doesn't exist
-            if 'thumb.jpg' not in os.listdir(self.folder_dir)\
-                    and 'thumb.png' not in os.listdir(self.folder_dir):
-                try:
-                    self.download_thumb()
-                    self.set_thumb()
-                except Exception as error:
-                    logger.error(
-                        ('An exception occured when'
-                         f'downloading/setting thumbnail: {error}')
-                    )
-
         else:
             os.mkdir(self.folder_dir)
             self.save_metadata()
             logger.info('Folder created with metadata saved')
 
-            # download and set thumbnail
+        # download and set thumbnail if thumbnail file doesn't exist
+        if (f'thumb.{self.thumb_extension}'
+                not in os.listdir(self.folder_dir)):
             try:
                 self.download_thumb()
                 self.set_thumb()
             except Exception as error:
                 logger.error(
-                    ('An exception occured when downloading/setting'
-                     f'thumbnail: {error}')
+                    'An exception occured when'
+                    f'downloading/setting thumbnail: {error}'
                 )
 
     def load_downloaded_metadata(self) -> dict:
@@ -322,10 +316,9 @@ class Gallery:
     def download_thumb(self) -> None:
 
         logger.info('Retrieving thumbnail...')
-        extension = self.get_img_extension(
-            self.metadata['images']['thumbnail']
+        thumb_url = (
+            f'{THUMB_BASE_URL}/{self.media_id}/thumb.{self.thumb_extension}'
         )
-        thumb_url = (f'{THUMB_BASE_URL}/{self.media_id}/thumb.{extension}')
 
         thumb_response = get_response(thumb_url, self.session)
 
@@ -344,7 +337,7 @@ class Gallery:
 
                 return
 
-        self.thumb_filename = f'{self.folder_dir}/thumb.{extension}'
+        self.thumb_filename = f'{self.folder_dir}/thumb.{self.thumb_extension}'
         with open(self.thumb_filename, 'wb') as f:
             f.write(thumb_response.content)
 
@@ -520,8 +513,7 @@ class Gallery:
         non_page_files = [
             'Icon\r',
             'metadata.json',
-            'thumb.jpg',
-            'thumb.png',
+            f'thumb.{self.thumb_extension}',
             '.DS_Store',
             f'{self.title}.pdf'
         ]
@@ -534,8 +526,8 @@ class Gallery:
         ]
 
         for downloaded_page in downloaded_pages:
-            if (int(Path(downloaded_page).stem)
-                    not in range(int(self.num_pages)+1)):
+            if (Path(downloaded_page).stem
+                    not in [str(i) for i in range(1, int(self.num_pages)+1)]):
                 extra_pages.append(downloaded_page)
 
         if len(extra_pages) != 0:
@@ -553,8 +545,7 @@ class Gallery:
             'Icon\r',
             'metadata.json',
             '.DS_Store',
-            'thumb.jpg',
-            'thumb.png'
+            f'thumb.{self.thumb_extension}',
         ]
         image_filenames = [
             unicodedata.normalize('NFC', file) for file in image_filenames
@@ -687,7 +678,5 @@ if __name__ == '__main__':
     id_list = input('Input gallery id: ').split(' ')
 
     for gallery_id in id_list:
-        gallery = Gallery(
-            gallery_id, download_dir=download_dir
-        )
+        gallery = Gallery(gallery_id, download_dir=download_dir)
         gallery.download()

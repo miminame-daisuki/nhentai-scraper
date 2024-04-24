@@ -1,4 +1,5 @@
 import os
+import datetime
 from pathlib import Path
 import sys
 import json
@@ -38,7 +39,7 @@ def set_download_dir(download_dir: Optional[Union[str, Path]] = None) -> Path:
         download_dir = Path(application_folder_path) / 'Downloaded'
     if not Path(download_dir).is_absolute():
         download_dir = Path(application_folder_path) / download_dir
-    download_dir = download_dir.absolute()
+    download_dir = Path(download_dir).absolute()
 
     if not download_dir.is_dir():
         download_dir.mkdir()
@@ -64,7 +65,7 @@ def set_logging_config(
             logging_config = json.load(f)
 
     logging_filename = os.path.join(
-        logging_dir, f'{__name__}.log'
+        logging_dir, f'{str(datetime.date.today())}.log'
     )
     logging_config['handlers']['file']['filename'] = logging_filename
     logging.config.dictConfig(logging_config)
