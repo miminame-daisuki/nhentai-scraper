@@ -287,18 +287,6 @@ class Gallery:
             self.save_metadata()
             logger.info('Folder created with metadata saved')
 
-        # download and set thumbnail if thumbnail file doesn't exist
-        if (f'thumb.{self.thumb_extension}'
-                not in os.listdir(self.folder_dir)):
-            try:
-                self.download_thumb()
-                self.set_thumb()
-            except Exception as error:
-                logger.error(
-                    'An exception occured when'
-                    f'downloading/setting thumbnail: {error}'
-                )
-
     def load_downloaded_metadata(self) -> dict:
 
         metadata_filename = f'{self.folder_dir}/metadata.json'
@@ -312,6 +300,27 @@ class Gallery:
         filename = f'{self.folder_dir}/metadata.json'
         with open(filename, 'w', encoding='utf-8') as f:
             json.dump(self.metadata, f, ensure_ascii=False, indent=4)
+
+    def check_thumb(self) -> None:
+
+        logger.info('Checking thumbnail...')
+        check_thumb_command = [
+            'fileicon',
+            'test',
+            f"{self.folder_dir}"
+        ]
+        result = run(check_thumb_command, capture_output=True)
+        if result.returncode == 0:
+            logger.info('Thumbnail already set')
+
+            return
+
+        # download and set thumbnail if thumbnail file doesn't exist
+        if f'thumb.{self.thumb_extension}' not in os.listdir(self.folder_dir):
+            self.download_thumb()
+            self.resize_thumb()
+
+        self.set_thumb()
 
     def download_thumb(self) -> None:
 
@@ -340,6 +349,41 @@ class Gallery:
         self.thumb_filename = f'{self.folder_dir}/thumb.{self.thumb_extension}'
         with open(self.thumb_filename, 'wb') as f:
             f.write(thumb_response.content)
+
+    def resize_thumb(self) -> None:
+        # resizing thumbnail to be square
+        with Image.open(self.thumb_filename) as thumb:
+            thumb_width, thumb_height = thumb.size
+            thumb_size = max(thumb_width, thumb_height)
+            thumb_square = Image.new(
+                'RGBA',
+                (thumb_size, thumb_size),
+                (0, 0, 0, 0)
+            )
+            thumb_square.paste(
+                thumb,
+                (
+                    int((thumb_size-thumb_width)/2),
+                    int((thumb_size-thumb_height)/2)
+                )
+            )
+            thumb_rgb = thumb_square.convert('RGB')
+            thumb_rgb.save(self.thumb_filename)
+
+    def set_thumb(self) -> None:
+
+        logger.info('Setting thumbnail...')
+        set_thumb_command = [
+            'fileicon',
+            'set',
+            f"{self.folder_dir}",
+            f'{self.thumb_filename}'
+        ]
+        result = run(set_thumb_command, capture_output=True)
+        logger.info(result.stdout.decode('utf-8').split('\n')[0])
+        if result.returncode != 0:
+            self.status_code = -8
+            logger.error(f"{result.stderr.decode('utf-8')}")
 
     def check_tags(self) -> None:
 
@@ -374,39 +418,6 @@ class Gallery:
         result = run(set_tags_command, capture_output=True)
         if result.returncode != 0:
             self.status_code = -7
-            logger.error(f"{result.stderr.decode('utf-8')}")
-
-    def set_thumb(self) -> None:
-
-        # resizing thumbnail to be square
-        thumb = Image.open(self.thumb_filename)
-        thumb_width, thumb_height = thumb.size
-        thumb_size = max(thumb_width, thumb_height)
-        thumb_square = Image.new(
-            'RGBA',
-            (thumb_size, thumb_size),
-            (0, 0, 0, 0)
-        )
-        thumb_square.paste(
-            thumb,
-            (int((thumb_size-thumb_width)/2),
-             int((thumb_size-thumb_height)/2)
-             )
-        )
-        thumb_rgb = thumb_square.convert('RGB')
-        thumb_rgb.save(self.thumb_filename)
-
-        # set thumbnail with filicon
-        set_thumb_command = [
-            'fileicon',
-            'set',
-            f"{self.folder_dir}",
-            f'{self.thumb_filename}'
-        ]
-        result = run(set_thumb_command, capture_output=True)
-        logger.info(result.stdout.decode('utf-8').split('\n')[0])
-        if result.returncode != 0:
-            self.status_code = -8
             logger.error(f"{result.stderr.decode('utf-8')}")
 
     def download_page(self, page: Union[str, int]) -> None:
@@ -451,8 +462,7 @@ class Gallery:
             if tries != 0:
                 leave_tqdm = False
                 logger.info(
-                    ('Retrying failed pages '
-                     f'for the {tries}(th) time...\n')
+                    f'Retrying failed pages for the {tries}(th) time...'
                 )
 
             self.download_pages(
@@ -636,6 +646,10 @@ class Gallery:
             return self.status_code
 
         self.check_folder()
+        if skip_download():
+            return self.status_code
+
+        self.check_thumb()
         if skip_download():
             return self.status_code
 
