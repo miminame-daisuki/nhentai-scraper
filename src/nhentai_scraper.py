@@ -555,6 +555,7 @@ class Gallery:
         image_filenames = os.listdir(self.folder_dir)
         exclude_list = [
             'Icon\r',
+            '._Icon\r',
             'metadata.json',
             '.DS_Store',
             f'thumb.{self.thumb_extension}',
