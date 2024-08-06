@@ -522,6 +522,7 @@ class Gallery:
         downloaded_pages = os.listdir(self.folder_dir)
 
         non_page_files = [
+            '._Icon\r',
             'Icon\r',
             'metadata.json',
             f'thumb.{self.thumb_extension}',
