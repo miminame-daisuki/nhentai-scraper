@@ -121,6 +121,7 @@ def search_tag(
 
     if page_count == 'Error 403':
         print('Error 403 - Forbidden (try updating `cf_clearance`)')
+        print(f"\n{'-'*os.get_terminal_size().columns}")
         logger.error('Error 403 - Forbidden (try updating `cf_clearance`)')
 
         return None
@@ -160,7 +161,7 @@ def search_finished_downloads(
 ) -> list[str]:
 
     # search for finished download galleries in download_dir
-    download_dir = misc.set_download_dir(download_dir)
+    download_dir = str(misc.set_download_dir(download_dir))
 
     find_tag_command = [
         'tag',

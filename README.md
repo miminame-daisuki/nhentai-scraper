@@ -17,8 +17,11 @@ Scraper/Downloader for [nhentai](https://nhentai.net), specifically designed for
 - [tag](https://github.com/jdberry/tag)
 
 ### Python Dependencies
--
--
+- [Requests](https://pypi.org/project/requests/)
+- [Beautiful Soup 4](https://pypi.org/project/beautifulsoup4/)
+- [Pillow](https://pypi.org/project/pillow/)
+- [pypdf](https://pypi.org/project/pypdf/)
+- [tqdm](https://github.com/tqdm/tqdm)
 -
 
 ## Installation
@@ -31,9 +34,11 @@ Scraper/Downloader for [nhentai](https://nhentai.net), specifically designed for
 1. Create a file called `download_id.txt` inside the folder `inputs/`, and place the gallery id/ tag name/ artist name ... you wish to download in the file, separated by line breaks.  
 Example:
 ```
-artist/
-tag/
-group/
+artist:
+tag:
+group:
+search:
+#
 ```
 
 2. (Optional) Create another file called `blacklist.txt` inside the `inputs/` folder, and place the list of tags you want to avoid downloading, separated by line breaks.  
