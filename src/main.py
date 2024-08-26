@@ -21,8 +21,11 @@ def main():
     settings = load_inputs.confirm_settings()
     download_dir = settings['download_dir']
     skip_downloaded_ids = settings['skip_downloaded_ids']
+    skip_to_tag = settings['skip_to_tag']
 
-    download_list = load_inputs.load_input_list('download_list.txt')
+    download_list = load_inputs.load_input_list(
+        'download_list.txt', skip_to_tag=skip_to_tag
+    )
     blacklist = load_inputs.load_input_list('blacklist.txt')
     repeat_ids = load_inputs.load_input_list('repeated_galleries.txt')
 

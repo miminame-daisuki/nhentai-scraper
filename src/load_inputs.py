@@ -8,19 +8,28 @@ from typing import Union, Optional
 import misc
 
 
-def load_input_list(filename: str) -> list[str]:
+def load_input_list(
+    filename: str, skip_to_tag: Optional[str] = ''
+) -> list[str]:
 
     application_folder_path = misc.get_application_folder_dir()
-    inputs_folder_dir = os.path.abspath(f'{application_folder_path}/inputs/')
+    if filename[0] != '/':
+        inputs_folder_dir = os.path.abspath(f'{application_folder_path}/inputs/')
+        filename = Path(f'{inputs_folder_dir}/{filename}')
+    else:
+        filename = Path(filename)
 
-    filename = Path(f'{inputs_folder_dir}/{filename}')
     filename.touch(exist_ok=True)
     with open(filename) as f:
-        id_list = f.read().splitlines()
+        download_list = f.read().splitlines()
 
-    id_list = [entry for entry in id_list if not entry == '']
+    download_list = [entry for entry in download_list if not entry == '']
 
-    return id_list
+    if skip_to_tag:
+        skip_to_index = download_list.index(skip_to_tag)
+        download_list = download_list[skip_to_index:]
+
+    return download_list
 
 
 def load_json(
@@ -100,6 +109,8 @@ def confirm_settings() -> dict:
     else:
         skip_downloaded_ids = False
     settings['skip_downloaded_ids'] = skip_downloaded_ids
+
+    settings['skip_to_tag'] = input('Skip to tag?(Press Enter for no skip)')
 
     print('-'*os.get_terminal_size().columns)
 
