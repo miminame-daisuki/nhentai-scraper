@@ -7,7 +7,7 @@ Scraper/Downloader for [nhentai](https://nhentai.net), specifically designed for
 - Automatically sets thumbnail and tags to folder for each gallery.
 - Combines downloaded images into pdf.
 - Downloads from a user-given list of gallery ids or searches/tags/artists/groups/parodies...
-- Can also download from [Favorites](https://nhentai.net/favorites/) on nhentai
+- Can also download from [Favorites on nhentai](https://nhentai.net/favorites/).
 - Prevents downloads from user-defined blacklists.
 - Skips already-downloaded galleries.
 - Supports running while computer is in sleep.
