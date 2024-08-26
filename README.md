@@ -24,7 +24,7 @@ Scraper/Downloader for [nhentai](https://nhentai.net), specifically designed for
 ## Installation
 ### Unix executable (only requires the [CLI dependencies](#cli-dependencies))
 - Download the unix executable from [Releases](https://github.com/miminame-daisuki/nhentai-scraper/releases).
-### Source code (requires both the [CLI](#cli-dependencies) and the [python dependencies](#python-dependencies))
+### Source code (requires both the [CLI](#cli-dependencies) and the [Python dependencies](#python-dependencies))
 - Run `git clone https://github.com/miminame-daisuki/nhentai-scraper` in your terminal.
 
 ## Basic Usage
@@ -47,7 +47,7 @@ tag:males only
 Example using Safari:
     1. Go to [nhentai](https://nhentai.net).
     2. Clear the CloudFlare captcha.
-    3. From the `Develop` menu, click on `Show Web Inspector`. (Follow https://developer.apple.com/documentation/safari-developer-tools/enabling-developer-features if you haven't enabled it.)
+    3. From the `Develop` menu, click on `Show Web Inspector`. (Follow [these steps](https://developer.apple.com/documentation/safari-developer-tools/enabling-developer-features) if you haven't enabled it.)
     4. Select `nhentai.net` in the `Name` column. It should be displaying almost nothing (except for the `https://nhentai.net/` url in the `URL` line under the `Summary` section).
     5. Reload the page.
     6. Repeat Step 3-iv., except that it should be displaying a lot more information this time.
@@ -56,13 +56,14 @@ Example using Safari:
 4. Depending on your installation, execute the program either by:
     - Double clicking the `main` unix executable file.
     - Running `python main.py` (located in the `src/` folder) in your terminal.  
-    (If you want the program to continue running even when the computer is in sleep, do either of the following:
-    - Double click the main_`no_sleep.command` file in the `src/` folder
-    - Run `caffeinate python main.py` inside the `src/` folder.)
+
+- If you want the program to continue to run even when the computer is in sleep, do either of the following instead:
+    - Double click the `main_no_sleep.command` file in the `src/` folder
+    - Run `caffeinate python main.py` inside the `src/` folder.
 
 5. Follow the instructions, and copy-paste your cookies & user agent from Step 3. when prompted.
 
-6. The program will automatically create a `Downloaded/` folder for the downloaded galleries.
+6. The program will automatically create a `Downloaded/` folder for the downloaded galleries and begin download.
 
 7. To end the program, simply press `Ctrl-c`.
 
