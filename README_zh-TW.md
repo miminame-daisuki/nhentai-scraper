@@ -3,11 +3,12 @@
 
 一個nhentai的爬蟲
 
-
 ## To-do
 - artists w/ special characters (ex:'upanishi.')
 - Use async?
 - Rewrite logs for more readibility?
 - Automatically delete old logs
-- Add blank after :
+- Add blank after : in tags
 - Check why error when saving pdf
+- Add favorites tag to already downloaded favorite gallery
+- Automatically load blacklist tags from nhentai user page
