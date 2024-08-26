@@ -5,11 +5,9 @@
 
 
 ## To-do
-- artists w/ '.'
-- write failed downloads after ctrl-c
-- start downloading from last unfinished, start from top every seven days (by reading from log?)
+- artists w/ special characters (ex:'upanishi.')
 - Use async?
 - Rewrite logs for more readibility?
-- Add -- line after failed loads
 - Automatically delete old logs
 - Add blank after :
+- Check why error when saving pdf
