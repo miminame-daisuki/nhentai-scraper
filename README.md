@@ -52,12 +52,13 @@ tag:males only
 3. Find your cookies and headers with your browser of choice for bypassing CloudFlare.  
 Example using Safari:
     1. Go to [nhentai](https://nhentai.net).
-    2. Clear the CloudFlare captcha.
-    3. From the `Develop` menu, click on `Show Web Inspector`. (Follow [these steps](https://developer.apple.com/documentation/safari-developer-tools/enabling-developer-features) if you haven't enabled it.)
-    4. Select `nhentai.net` in the `Name` column. It should be displaying almost nothing (except for the `https://nhentai.net/` url in the `URL` line under the `Summary` section).
-    5. Reload the page.
-    6. Repeat Step 3-iv., except that it should be displaying a lot more information this time.
-    7. Locate `Cookie` and `User-Agent` under the `Request` section.
+    1. (Optional) Log in with your account (only necessary if you with to download your favorites).
+    1. Clear the CloudFlare captcha.
+    1. From the `Develop` menu, click on `Show Web Inspector`. (Follow [these steps](https://developer.apple.com/documentation/safari-developer-tools/enabling-developer-features) if you haven't enabled it.)
+    1. Select `nhentai.net` in the `Name` column. It should be displaying almost nothing (except for the `https://nhentai.net/` url in the `URL` line under the `Summary` section).
+    1. Reload the page.
+    1. Repeat Step 3-iv., except that it should be displaying a lot more information this time.
+    1. Locate `Cookie` and `User-Agent` under the `Request` section.
 
 4. Depending on your installation, execute the program either by:
     - Double clicking the `main` unix executable file.
