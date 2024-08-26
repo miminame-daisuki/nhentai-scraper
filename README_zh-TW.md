@@ -12,3 +12,4 @@
 - Rewrite logs for more readibility?
 - Add -- line after failed loads
 - Automatically delete old logs
+- Add blank after :
