@@ -22,32 +22,26 @@ Scraper/Downloader for [nhentai](https://nhentai.net), specifically designed for
 -
 
 ## Installation
-### Unix executable (only requires the CLI dependencies)
+### Unix executable (only requires the [CLI dependencies](#cli-dependencies))
 - Download the unix executable from [Releases](https://github.com/miminame-daisuki/nhentai-scraper/releases).
-### Source code (requires both the CLI and the python dependencies)
+### Source code (requires both the [CLI](#cli-dependencies) and the [python dependencies](#python-dependencies))
 - Run `git clone https://github.com/miminame-daisuki/nhentai-scraper` in your terminal.
 
 ## Basic Usage
-1. Create a file called `download_id.txt` inside the folder `inputs/`, and place the gallery id/ tag name/ artist name ... you wish to download in the file, separated by line breaks.
-
-Example:
+1. Create a file called `download_id.txt` inside the folder `inputs/`, and place the gallery id/ tag name/ artist name ... you wish to download in the file, separated by line breaks.  Example:
 ```
 artist/
 tag/
 group/
 ```
 
-2. (Optional) Create another file called `blacklist.txt` inside the `inputs/` folder, and place the list of tags you want to avoid downloading, separated by line breaks.
-
-Example:
+2. (Optional) Create another file called `blacklist.txt` inside the `inputs/` folder, and place the list of tags you want to avoid downloading, separated by line breaks.  Example:
 ```
 tag:yaoi
 tag:males only
 ```
 
-3. Find your cookies and headers with your browser of choice for bypassing CloudFlare.
-
-Example using Safari:
+3. Find your cookies and headers with your browser of choice for bypassing CloudFlare.  Example using Safari:
     1. Go to [nhentai](https://nhentai.net).
     2. Clear the CloudFlare captcha.
     3. From the `Develop` menu, click on `Show Web Inspector`. (Follow https://developer.apple.com/documentation/safari-developer-tools/enabling-developer-features if you haven't enabled it.)
