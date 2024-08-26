@@ -41,7 +41,8 @@ def main():
     }
 
     signal.signal(
-        signal.SIGINT, partial(misc.exit_gracefully, gallery_results)
+        signal.SIGINT,
+        partial(download_galleries.exit_gracefully, gallery_results)
     )
 
     for entry in download_list:
@@ -90,7 +91,7 @@ def main():
 
         print(f"{'-'*os.get_terminal_size().columns}")
 
-    misc.write_final_results(gallery_results)
+    download_galleries.write_final_results(gallery_results)
 
 
 if __name__ == '__main__':
