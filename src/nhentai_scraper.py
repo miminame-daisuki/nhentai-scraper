@@ -237,6 +237,7 @@ class Gallery:
         self.tags = [
             f"{tag['type']}:{tag['name']}" for tag in self.metadata['tags']
         ]
+
         self.thumb_extension = self.get_img_extension(
             self.metadata['images']['thumbnail']
         )
@@ -316,6 +317,7 @@ class Gallery:
             return
 
         # download and set thumbnail if thumbnail file doesn't exist
+        self.thumb_filename = f'{self.folder_dir}/thumb.{self.thumb_extension}'
         if f'thumb.{self.thumb_extension}' not in os.listdir(self.folder_dir):
             self.download_thumb()
             self.resize_thumb()
@@ -346,7 +348,6 @@ class Gallery:
 
                 return
 
-        self.thumb_filename = f'{self.folder_dir}/thumb.{self.thumb_extension}'
         with open(self.thumb_filename, 'wb') as f:
             f.write(thumb_response.content)
 
@@ -377,7 +378,7 @@ class Gallery:
             'fileicon',
             'set',
             f"{self.folder_dir}",
-            f'{self.thumb_filename}'
+            f"{self.thumb_filename}"
         ]
         result = run(set_thumb_command, capture_output=True)
         logger.info(result.stdout.decode('utf-8').split('\n')[0])
