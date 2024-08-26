@@ -8,3 +8,5 @@
 - artists w/ '.'
 - write failed downloads after ctrl-c
 - start downloading from last unfinished, start from top every seven days (by reading from log?)
+- Use async?
+- Rewrite logs for more readibility?
