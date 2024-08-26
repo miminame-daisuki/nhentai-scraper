@@ -9,6 +9,8 @@ import logging
 import logging.config
 from typing import Union, Optional
 
+import download_galleries
+
 
 logger = logging.getLogger('__main__.' + __name__)
 
@@ -71,11 +73,33 @@ def set_logging_config(
     logging.config.dictConfig(logging_config)
 
 
-def exit_gracefully(signum: signal.Signals, frame) -> None:
+def write_final_results(gallery_results: dict):
+    if gallery_results['retry_fails']:
+        download_galleries.write_gallery_results(
+            gallery_results['retry_fails'],
+            'failed_download_id.txt'
+        )
+        print('\n\nFailed downloads written to failed_download_id.txt\n\n')
+        logger.info(
+            '\n\nFailed downloads written to failed_download_id.txt\n\n'
+        )
+
+    else:
+        print('\n\nFinished all downloads!!!\n\n')
+        logger.info(f"\n{'-'*os.get_terminal_size().columns}")
+        logger.info('Finished all downloads')
+
+
+def exit_gracefully(
+    gallery_results: dict,
+    signum: signal.Signals,
+    frame
+) -> None:
 
     logger.info(f"\n{'-'*os.get_terminal_size().columns}")
     logger.info('Program terminated with Ctrl-C')
     print(f"\n{'-'*os.get_terminal_size().columns}")
     print('\nProgram terminated with Ctrl-C')
+    write_final_results(gallery_results)
 
     sys.exit(0)

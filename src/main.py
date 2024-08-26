@@ -1,6 +1,7 @@
 import os
 import logging
 import signal
+from functools import partial
 
 import nhentai_scraper
 import download_galleries
@@ -38,6 +39,10 @@ def main():
         'initial_fails': [],
         'retry_fails': [],
     }
+
+    signal.signal(
+        signal.SIGINT, partial(misc.exit_gracefully, gallery_results)
+    )
 
     for entry in download_list:
 
@@ -85,22 +90,8 @@ def main():
 
         print(f"{'-'*os.get_terminal_size().columns}")
 
-    if gallery_results['retry_fails']:
-        download_galleries.write_gallery_results(
-            gallery_results['retry_fails'],
-            'failed_download_id.txt'
-        )
-        print('\n\nFailed downloads written to failed_download_id.txt\n\n')
-        logger.info(
-            '\n\nFailed downloads written to failed_download_id.txt\n\n'
-        )
-
-    else:
-        print('\n\nFinished all downloads!!!\n\n')
-        logger.info(f"\n{'-'*os.get_terminal_size().columns}")
-        logger.info('Finished all downloads')
+    misc.write_final_results(gallery_results)
 
 
 if __name__ == '__main__':
-    signal.signal(signal.SIGINT, misc.exit_gracefully)
     main()
