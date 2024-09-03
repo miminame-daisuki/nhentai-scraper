@@ -68,7 +68,7 @@ Example using Safari:
     - Running `python main.py` (located in the `src/` folder) in your terminal.
 
     - (If you want the program to continue to run even when the computer is in sleep, do either of the following instead:
-        - Double click the `main_no_sleep.command` file in the `src/` folder
+        - Double click the `main_no_sleep.command` file. 
         - Run `caffeinate python main.py` inside the `src/` folder.)
 
 1. Follow the instructions, and copy-paste your cookies & user agent from Step 3. when prompted.
