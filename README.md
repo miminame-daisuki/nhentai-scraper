@@ -1,7 +1,8 @@
 # NHentai Scraper
 English | [繁體中文](https://github.com/miminame-daisuki/nhentai-scraper/blob/main/README_zh-TW.md)
 
-Scraper/Downloader for [nhentai](https://nhentai.net), specifically designed for MacOS. Feel free to ask about any difficulties you are facing [here](https://github.com/miminame-daisuki/nhentai-scraper/issues)!
+Scraper/Downloader for [nhentai](https://nhentai.net), specifically designed for MacOS.\
+Feel free to ask about any difficulties you are facing [here](https://github.com/miminame-daisuki/nhentai-scraper/issues)!
 
 ## Features
 - Automatically sets thumbnail and tags to folder for each gallery.
