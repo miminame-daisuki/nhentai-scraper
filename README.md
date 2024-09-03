@@ -28,7 +28,7 @@ Feel free to ask about any difficulties you are facing [here](https://github.com
 
 ## Installation
 ### Unix executable (only requires the [CLI dependencies](#cli-dependencies))
-- Download the unix executable from [Releases](https://github.com/miminame-daisuki/nhentai-scraper/releases).
+- Download the unix executable from [Releases](https://github.com/miminame-daisuki/nhentai-scraper/releases). (Tested on MacOS Monterey 12.6.6)
 ### Source code (requires both the [CLI](#cli-dependencies) and the [Python dependencies](#python-dependencies))
 - Run `git clone https://github.com/miminame-daisuki/nhentai-scraper` in your terminal.
 
