@@ -1,7 +1,7 @@
 # NHentai Scraper
 English | [繁體中文](https://github.com/miminame-daisuki/nhentai-scraper/blob/main/README_zh-TW.md)
 
-Scraper/Downloader for [nhentai](https://nhentai.net), specifically designed for MacOS.
+Scraper/Downloader for [nhentai](https://nhentai.net), specifically designed for MacOS. Feel free to ask about any difficulties you are facing [here](https://github.com/miminame-daisuki/nhentai-scraper/issues)!
 
 ## Features
 - Automatically sets thumbnail and tags to folder for each gallery.
@@ -32,7 +32,7 @@ Scraper/Downloader for [nhentai](https://nhentai.net), specifically designed for
 - Run `git clone https://github.com/miminame-daisuki/nhentai-scraper` in your terminal.
 
 ## Basic Usage
-1. (For people downloading from [Releases](https://github.com/miminame-daisuki/nhentai-scraper/releases)): Create a folder with the name `inputs` at the location of the `main` program.
+1. (For people downloading from [Releases](https://github.com/miminame-daisuki/nhentai-scraper/releases)) Create a folder with the name `inputs` at the location of the `main` program.
 
 1. Create a file called `download_list.txt` inside the folder `inputs/`, and place the gallery id/tag name/artist name ... you wish to download in the file, separated b line breaks.\
 Example:
