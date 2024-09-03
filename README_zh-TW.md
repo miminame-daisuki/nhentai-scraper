@@ -1,7 +1,7 @@
 # NHentai Scraper
 [English](https://github.com/miminame-daisuki/nhentai-scraper/blob/main/README.md) | 繁體中文
 
-一個nhentai的爬蟲
+一個nhentai的爬蟲。啊啊啊我還沒把這部分翻譯成中文，如果有人急了.jpg的話可以在issues那邊留言，我盡快幫你～
 
 ## To-do
 - artists w/ special characters (ex:'upanishi.')
