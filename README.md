@@ -32,7 +32,8 @@ Scraper/Downloader for [nhentai](https://nhentai.net), specifically designed for
 - Run `git clone https://github.com/miminame-daisuki/nhentai-scraper` in your terminal.
 
 ## Basic Usage
-1. Create a file called `download_id.txt` inside the folder `inputs/`, and place the gallery id/ tag name/ artist name ... you wish to download in the file, separated by line breaks.  
+1. Create a file called `download_list.txt` inside the folder `inputs/`, and place the gallery id/ tag name/ artist name ... you wish to download in the file, separated b line breaks.
+
 Example:
 ```
 artist:
@@ -42,14 +43,14 @@ search:
 #
 ```
 
-2. (Optional) Create another file called `blacklist.txt` inside the `inputs/` folder, and place the list of tags you want to avoid downloading, separated by line breaks.  
+1. (Optional) Create another file called `blacklist.txt` inside the `inputs/` folder, and place the list of tags you want to avoid downloading, separated by line breaks.
 Example:
 ```
 tag:yaoi
 tag:males only
 ```
 
-3. Find your cookies and headers with your browser of choice for bypassing CloudFlare.  
+1. Find your cookies and headers with your browser of choice for bypassing CloudFlare.
 Example using Safari:
     1. Go to [nhentai](https://nhentai.net).
     1. (Optional) Log in to your account (only necessary if you wish to download your favorites).
@@ -60,21 +61,28 @@ Example using Safari:
     1. Repeat Step 3-iv., except that it should be displaying a lot more information this time.
     1. Locate `Cookie` and `User-Agent` under the `Request` section.
 
-4. Depending on your installation, execute the program either by:
+1. Depending on your installation, execute the program either by:
     - Double clicking the `main` unix executable file.
-    - Running `python main.py` (located in the `src/` folder) in your terminal.  
+    - Running `python main.py` (located in the `src/` folder) in your terminal.
 
 - If you want the program to continue to run even when the computer is in sleep, do either of the following instead:
     - Double click the `main_no_sleep.command` file in the `src/` folder
     - Run `caffeinate python main.py` inside the `src/` folder.
 
-5. Follow the instructions, and copy-paste your cookies & user agent from Step 3. when prompted.
+1. Follow the instructions, and copy-paste your cookies & user agent from Step 3. when prompted.
 
-6. The program will automatically create a `Downloaded/` folder for the downloaded galleries and begin download.
+1. The program will automatically create a `Downloaded/` folder for the downloaded galleries and begin download.
 
-7. To end the program, simply press `Ctrl-c`.
+1. Confirm the download folder location when asked `Download to /your/download/folder/location?(y/n)` by either typing `y` or `n` then `enter`.
 
-8. The next time you start the program, it will continue to download any unfinished galleries.
+1. To end the program, simply press `Ctrl-c`. (Recommended: save the terminal window)
+
+1. The next time you start the program, it will prompt the folloing questions:
+    1. `Download to /your/download/folder/location?(y/n)`
+    1. `Update cookies?(y/n)`: Go to [nhentai](https://nhentai.net) and see if you need to update your cookies for bypassing CloudFlare.
+    1. `Skip downloaded galleries?(y/n)`: If `y`, the program will skip over an entry in the `download_list.txt` if every gallery belonging to the entry is already downloaded.
+    1. `Skip to tag?(Press Enter for no skip)`: If you wish to start downloading from where your last session ended, enter the name of the last unfinished entry from your last session (ex: if you stopped the program while it was downloading 'tag:aaa', then type 'tag:aaa' then `Enter`.
+    The program should resume the download process.
 
 ## Some Tips when Using the Program
 - [Reindex spotlight](https://support.apple.com/en-us/102321) if it is not skipping a praticular tag, even though all galleries from the tag have already been downloaded. 

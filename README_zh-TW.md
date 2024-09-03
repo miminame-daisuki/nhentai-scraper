@@ -12,3 +12,4 @@
 - Check why error when saving pdf
 - Add favorites tag to already downloaded favorite gallery
 - Automatically load blacklist tags from nhentai user page
+- Print number of downloaded galleries in this session
