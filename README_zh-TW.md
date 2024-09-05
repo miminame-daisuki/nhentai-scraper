@@ -14,3 +14,5 @@
 - Automatically load blacklist tags from nhentai user page
 - Print number of downloaded galleries in this session
 - Regenerate `requirements.txt` and `environment.yml`
+- Download from mirror sites (i# for pages, t# for thumbnails)
+- Add helper functions (ex: export id of favorites, tags, ...)
