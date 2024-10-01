@@ -162,13 +162,13 @@ def search_finished_downloads(
 ) -> list[str]:
 
     # search for finished download galleries in download_dir
-    download_dir = str(misc.set_download_dir(download_dir))
+    if download_dir is None:
+        download_dir = str(misc.set_download_dir(download_dir))
 
     find_tag_command = [
         'tag',
         '--find',
         tag.replace('-', ' '),
-        rf'{download_dir}'
     ]
     result = run(find_tag_command, capture_output=True, check=True)
 
@@ -179,7 +179,6 @@ def search_finished_downloads(
             'tag',
             '--find',
             tag,
-            rf'{download_dir}'
         ]
         result = run(find_tag_command, capture_output=True, check=True)
 
@@ -187,6 +186,11 @@ def search_finished_downloads(
 
     # remove last one (blank stirng)
     matched_galleries = matched_galleries.split('\n')[:-1]
+
+    matched_galleries = [
+        gallery for gallery in matched_galleries
+        if gallery.startswith(download_dir)
+    ]
 
     matched_galleries_id = []
     for gallery in matched_galleries:
