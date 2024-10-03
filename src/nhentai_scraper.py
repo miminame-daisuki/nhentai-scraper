@@ -523,7 +523,7 @@ class Gallery:
 
             if tries == 0:
                 t.set_description(f"Downloading #{self.id}")
-                img_base_url = IMG_BASE_URL_i3
+                img_base_url = IMG_BASE_URL_i5
 
             else:
                 t.set_description(
