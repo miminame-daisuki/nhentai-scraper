@@ -23,7 +23,17 @@ from typing import Union, Optional
 
 import load_inputs
 import misc
-from nhentai_urls import API_GALLERY_URL, THUMB_BASE_URL, IMG_BASE_URL
+from nhentai_urls import (
+    API_GALLERY_URL,
+    THUMB_BASE_URL_t2,
+    THUMB_BASE_URL_t3,
+    THUMB_BASE_URL_t5,
+    THUMB_BASE_URL_t7,
+    IMG_BASE_URL_i2,
+    IMG_BASE_URL_i3,
+    IMG_BASE_URL_i5,
+    IMG_BASE_URL_i7
+)
 
 
 logger = logging.getLogger('__main__.' + __name__)
@@ -71,7 +81,7 @@ class Session(requests.Session):
 
         # sleep for sleep_time after each get_response
         if sleep_time is None:
-            sleep_time = 3*random.random()+1.5
+            sleep_time = 1*random.random()
         logger.info(f'Sleeping for {sleep_time:.3f} seconds...')
         time.sleep(sleep_time)
 
@@ -120,7 +130,7 @@ def get_response(
 
     # sleep for sleep_time after each get_response
     if sleep_time is None:
-        sleep_time = 3*random.random()+1.5
+        sleep_time = 0.
     logger.info(f'Sleeping for {sleep_time:.3f} seconds...')
     time.sleep(sleep_time)
 
@@ -319,7 +329,10 @@ class Gallery:
         # download and set thumbnail if thumbnail file doesn't exist
         self.thumb_filename = f'{self.folder_dir}/thumb.{self.thumb_extension}'
         if f'thumb.{self.thumb_extension}' not in os.listdir(self.folder_dir):
-            self.download_thumb()
+            response_code = self.download_thumb()
+            if response_code != 200:
+                self.status_code = -6
+                return
             self.resize_thumb()
 
         self.set_thumb()
@@ -327,8 +340,9 @@ class Gallery:
     def download_thumb(self) -> None:
 
         logger.info('Retrieving thumbnail...')
+        thumb_base_url = THUMB_BASE_URL_t3
         thumb_url = (
-            f'{THUMB_BASE_URL}/{self.media_id}/thumb.{self.thumb_extension}'
+            f'{thumb_base_url}/{self.media_id}/thumb.{self.thumb_extension}'
         )
 
         thumb_response = get_response(thumb_url, self.session)
@@ -340,16 +354,27 @@ class Gallery:
                 'Something went wrong when retrieving thumbnail:'
                 f'{thumb_response.status_code}, retrying...'
             )
+            thumb_base_urls = [
+                THUMB_BASE_URL_t2,
+                THUMB_BASE_URL_t3,
+                THUMB_BASE_URL_t5,
+                THUMB_BASE_URL_t7
+            ]
+            thumb_base_url = random.choice(thumb_base_urls)
+            thumb_url = (
+                f'{thumb_base_url}/{self.media_id}/thumb.{self.thumb_extension}'
+            )
             thumb_response = get_response(thumb_url, self.session)
             tries += 1
 
-            if tries >= 3 and thumb_response != 200:
-                self.status_code = -6
+            if tries >= 3 and thumb_response.status_code != 200:
 
-                return
+                return thumb_response.status_code
 
         with open(self.thumb_filename, 'wb') as f:
             f.write(thumb_response.content)
+
+        return thumb_response.status_code
 
     def resize_thumb(self) -> None:
         # resizing thumbnail to be square
@@ -421,14 +446,17 @@ class Gallery:
             self.status_code = -7
             logger.error(f"{result.stderr.decode('utf-8')}")
 
-    def download_page(self, page: Union[str, int]) -> None:
+    def download_page(
+        self, page: Union[str, int],
+        img_base_url: Optional[str] = IMG_BASE_URL_i3
+    ) -> None:
 
         logger.info(f'Retrieving Page {page}/{self.num_pages} url...')
 
         extension = self.get_img_extension(
             self.metadata['images']['pages'][int(page)-1]
         )
-        img_url = f'{IMG_BASE_URL}/{self.media_id}/{int(page)}.{extension}'
+        img_url = f'{img_base_url}/{self.media_id}/{int(page)}.{extension}'
         img_response = get_response(
             img_url, self.session
         )
@@ -492,13 +520,25 @@ class Gallery:
 
         t = tqdm(self.missing_pages, leave=leave_tqdm)
         for page in t:
+
             if tries == 0:
                 t.set_description(f"Downloading #{self.id}")
+                img_base_url = IMG_BASE_URL_i3
+
             else:
                 t.set_description(
                     f'Retrying failed pages for the {tries}(th) time'
                 )
-            self.download_page(page)
+
+                img_base_urls = [
+                    IMG_BASE_URL_i2,
+                    IMG_BASE_URL_i3,
+                    IMG_BASE_URL_i5,
+                    IMG_BASE_URL_i7
+                ]
+                img_base_url = random.choice(img_base_urls)
+
+            self.download_page(page, img_base_url=img_base_url)
 
     def load_missing_pages(self) -> list[str]:
 
@@ -681,8 +721,6 @@ class Gallery:
 
 
 if __name__ == '__main__':
-    signal.signal(signal.SIGINT, misc.exit_gracefully)
-
     misc.set_logging_config()
     logger.info(f"\n{'-'*os.get_terminal_size().columns}")
     logger.info('Program started')
