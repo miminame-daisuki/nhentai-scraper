@@ -1,4 +1,3 @@
-
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
@@ -7,13 +6,15 @@ Created on Sat Feb 11 22:22:59 2024
 @author: ball
 """
 from tqdm import tqdm
+from pathlib import Path
+from typing import Optional
 
 import nhentai_scraper
 import download_tags
-import load_inputs
 import misc
 
-def get_favorite_id_artist(save_filename):
+
+def get_favorite_id_artist(save_filename: Optional[Path] = None):
     # automatically generates download_list.txt from artists/ids of favorited galleries
     download_list = []
 
@@ -36,11 +37,12 @@ def get_favorite_id_artist(save_filename):
         if not tag_list:
             download_list.append(gallery_id)
 
+    if save_filename is None:
+        save_filename = download_dir.parent / 'inputs/download_list.txt'
     with open(save_filename, 'w') as f:
         for line in download_list:
             f.write(f'{line}\n')
 
 
 if __name__ == '__main__':
-    save_filename = '/Volumes/Transcend/nhentai-scraper/inputs/download_list.txt'
-    get_favorite_id_artist(save_filename)
+    get_favorite_id_artist()
