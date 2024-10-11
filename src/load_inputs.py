@@ -77,9 +77,6 @@ def confirm_settings() -> dict:
 
     # confirm download location
     application_folder_path = misc.get_application_folder_dir()
-    download_dir = os.path.abspath(
-        f'{application_folder_path}/Downloaded/'
-    )
     download_dir = str(misc.set_download_dir())
     while True:
         confirm_download_dir = input((f'Download to {download_dir}?(y/n)'))

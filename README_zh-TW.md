@@ -4,6 +4,7 @@
 一個nhentai的爬蟲。啊啊啊我還沒把這部分翻譯成中文，如果有人急了.jpg的話可以在issues那邊留言，我盡快幫你～
 
 ## To-do
+- Fix tqdm when retrying failed pages
 - artists w/ special characters (ex:'upanishi.')
 - Use async?
 - Rewrite logs for more readibility?
@@ -14,5 +15,4 @@
 - Automatically load blacklist tags from nhentai user page
 - Print number of downloaded galleries in this session
 - Regenerate `requirements.txt` and `environment.yml`
-- Download from mirror sites (i# for pages, t# for thumbnails)
 - Add helper functions (ex: export id of favorites, tags, ...)
