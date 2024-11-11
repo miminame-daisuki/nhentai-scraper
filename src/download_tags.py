@@ -111,6 +111,13 @@ def search_tag(
         page_count = search_api(search, session)[1]
     elif ':' in tag:
         tag_type, tag_name = tag.split(':')
+
+        # replace special characters in tag_name
+        tag_name = ''.join([c if c.isalnum() else '-' for c in tag_name])
+        # drop final non-alphanumerical character in tag_name
+        if not tag_name[-1].isalnum():
+            tag_name = tag_name[:-1]
+
         url = f"{NHENTAI_URL}/{tag_type}/{tag_name}/"
         page_count = search_url(url, session)[1]
     elif tag == 'favorites':
