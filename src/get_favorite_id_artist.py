@@ -11,13 +11,16 @@ from typing import Optional
 
 import nhentai_scraper
 import download_tags
+import load_inputs
 import misc
 
 
 def get_favorite_id_artist(save_filename: Optional[Path] = None):
-    # automatically generates download_list.txt from artists/ids of favorited galleries
+    # automatically generates download_list.txt
+    # from artists/ids of favorited galleries
     download_list = []
 
+    settings = load_inputs.confirm_settings()
     download_dir = misc.set_download_dir()
     session = nhentai_scraper.create_session()
 
@@ -32,10 +35,12 @@ def get_favorite_id_artist(save_filename: Optional[Path] = None):
             if (tag['type'] == 'artist' or tag['type'] == 'group')
         ]
         download_list.extend(
-            [tag['url'][1:-1].replace('/', ':') for tag in tag_list]
+            [f"{tag['type']}:{tag['name']}" for tag in tag_list]
         )
         if not tag_list:
             download_list.append(gallery_id)
+
+    download_list = list(set(download_list))
 
     if save_filename is None:
         save_filename = download_dir.parent / 'inputs/download_list.txt'

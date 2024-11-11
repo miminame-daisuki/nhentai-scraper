@@ -4,13 +4,14 @@
 一個nhentai的爬蟲。啊啊啊我還沒把這部分翻譯成中文，如果有人急了.jpg的話可以在issues那邊留言，我盡快幫你～
 
 ## To-do
-- Fix tqdm when retrying failed pages
-- artists w/ special characters (ex:'upanishi.')
+- Add error for not logging in
+- Continue download pages when error in downloading thumbnail?
+- Fix tqdm (progress bar disappearing) when retrying failed pages
 - Use async?
 - Rewrite logs for more readibility?
 - Automatically delete old logs
 - Add blank after : in tags
-- Check why error when saving pdf
+- Check why error when saving pdf and downloading thumbnail
 - Add favorites tag to already downloaded favorite gallery
 - Automatically load blacklist tags from nhentai user page
 - Print number of downloaded galleries in this session
