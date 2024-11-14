@@ -275,6 +275,8 @@ class Gallery:
             return 'png'
         elif img_metadata['t'] == 'g':
             return 'gif'
+        elif img_metadata['t'] == 'w':
+            return 'webp'
 
     def check_folder(self) -> None:
 
