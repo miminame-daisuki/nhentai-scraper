@@ -10,6 +10,7 @@ import os
 from pathlib import Path
 import json
 import requests
+import re
 from subprocess import run
 from tqdm import tqdm
 import logging
@@ -49,6 +50,11 @@ def search_url(
         return None, None
 
     soup = BeautifulSoup(response.content, features='html.parser')
+
+    if soup.title.string.split(' ')[0] == 'Login':
+        raise Exception(
+            'Please login to nhentai.net and update the cookies again.'
+        )
 
     gallery_count = soup.find('span', {'class': 'count'}).string
     gallery_count = gallery_count.replace('(', '').replace(')', '')
@@ -113,7 +119,7 @@ def search_tag(
         tag_type, tag_name = tag.split(':')
 
         # replace special characters in tag_name
-        tag_name = ''.join([c if c.isalnum() else '-' for c in tag_name])
+        tag_name = re.sub('[^0-9a-zA-Z]+', '-', tag_name)
         # drop final non-alphanumerical character in tag_name
         if not tag_name[-1].isalnum():
             tag_name = tag_name[:-1]
