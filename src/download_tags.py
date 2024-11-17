@@ -42,12 +42,8 @@ def search_url(
         url, session, params=params
     )
 
-    if response.status_code == 403:
-        return None, 'Error 403'
-    elif response.status_code == 404:
-        return None, 'Error 404'
-    elif response.status_code != 200:
-        return None, None
+    if response.status_code != 200:
+        return None, f'Error {response.status_code}'
 
     soup = BeautifulSoup(response.content, features='html.parser')
 
@@ -88,12 +84,8 @@ def search_api(
         url, session, params=params
     )
 
-    if response.status_code == 403:
-        return None, 'Error 403'
-    elif response.status_code == 404:
-        return None, 'Error 404'
-    elif response.status_code != 200:
-        return None, None
+    if response.status_code != 200:
+        return None, f'Error {response.status_code}'
 
     api_metadata = response.json()
     page_count = int(api_metadata['num_pages'])
@@ -132,23 +124,22 @@ def search_tag(
 
     id_list = []
 
-    if page_count == 'Error 403':
-        print('Error 403 - Forbidden (try updating `cf_clearance`)')
-        logger.error('Error 403 - Forbidden (try updating `cf_clearance`)')
-        print(f"\n{'-'*os.get_terminal_size().columns}")
+    if type(page_count) is not int:
+        if page_count == 'Error 403':
+            error_message = (
+                'Error 403 - Forbidden (try updating `cf_clearance`)'
+            )
+        elif page_count == 'Error 404':
+            error_message = f'Error 404 - Not Found for {tag}'
+        elif page_count == 'Error 500':
+            error_message = 'Error 500 - Server error'
+        else:
+            error_message = (
+                f'Failed to retrieve {tag} due to Error {page_count}'
+            )
 
-        return None
-
-    elif page_count == 'Error 404':
-        print(f'Error 404 - Not Found for {tag}')
-        logger.error(f'Error 404 - Not Found for {tag}')
-        print(f"\n{'-'*os.get_terminal_size().columns}")
-
-        return None
-
-    elif page_count is None:
-        logger.error(f'Failed to retrieve {tag}')
-        print(f'Failed to retrieve {tag}')
+        logger.error(error_message)
+        print(error_message)
         print(f"\n{'-'*os.get_terminal_size().columns}")
 
         return None
