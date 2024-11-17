@@ -17,7 +17,6 @@ import unicodedata
 from tqdm import tqdm
 from pypdf import PdfReader
 from pathlib import Path
-import signal
 import logging
 from typing import Union, Optional
 
@@ -34,6 +33,12 @@ from nhentai_urls import (
     IMG_BASE_URL_i5,
     IMG_BASE_URL_i7
 )
+
+# Fix for 'IOError: image file is truncated (nn bytes not processed).'
+# See https://stackoverflow.com/questions/12984426/
+# pil-ioerror-image-file-truncated-with-big-images
+from PIL import ImageFile
+ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 
 logger = logging.getLogger('__main__.' + __name__)
@@ -629,6 +634,9 @@ class Gallery:
                 image_path = os.path.join(self.folder_dir, img_filename)
                 with Image.open(image_path) as img:
                     img_copy = img.copy()
+                # fix for 'ValueError: cannot save mode I'
+                if img_copy.mode == 'I':
+                    img_copy = img_copy.convert('RGB')
                 images.append(img_copy)
             images[0].save(
                 pdf_path, "PDF", resolution=100.0,
