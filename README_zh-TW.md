@@ -4,16 +4,20 @@
 一個nhentai的爬蟲。啊啊啊我還沒把這部分翻譯成中文，如果有人急了.jpg的話可以在issues那邊留言，我盡快幫你～
 
 ## To-do
-- Add error for not logging in
+- Check why error when downloading thumbnail (happens when title contains '"'?)
+- Print download failed tags
+
+- Update README
 - Continue download pages when error in downloading thumbnail?
 - Fix tqdm (progress bar disappearing) when retrying failed pages
+- Automatically load blacklist tags from nhentai user page
+- Add helper functions (ex: export id of favorites, tags, ...)
+
+- Replace os with Path
+- Add blank after : in tags
 - Use async?
 - Rewrite logs for more readibility?
 - Automatically delete old logs
-- Add blank after : in tags
-- Check why error when saving pdf and downloading thumbnail
-- Add favorites tag to already downloaded favorite gallery
-- Automatically load blacklist tags from nhentai user page
-- Print number of downloaded galleries in this session
 - Regenerate `requirements.txt` and `environment.yml`
-- Add helper functions (ex: export id of favorites, tags, ...)
+
+- Add favorites tag to already downloaded favorite gallery
