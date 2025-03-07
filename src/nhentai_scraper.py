@@ -249,6 +249,11 @@ class Gallery:
         else:
             self.title = self.metadata['title']['english']
         self.title = self.title.replace('/', '_')
+
+        # trim filenames that are too long (max length = 255 for MacOS)
+        if len(self.title) > 240:
+            self.title = (self.title[:240] + '...')
+
         self.num_pages = self.metadata['num_pages']
         self.tags = [
             f"{tag['type']}:{tag['name']}" for tag in self.metadata['tags']
@@ -458,7 +463,7 @@ class Gallery:
 
     def download_page(
         self, page: Union[str, int],
-        img_base_url: Optional[str] = IMG_BASE_URL_i3
+        img_base_url: Optional[str] = IMG_BASE_URL_i2
     ) -> None:
 
         logger.info(f'Retrieving Page {page}/{self.num_pages} url...')
@@ -533,7 +538,7 @@ class Gallery:
 
             if tries == 0:
                 t.set_description(f"Downloading #{self.id}")
-                img_base_url = IMG_BASE_URL_i5
+                img_base_url = IMG_BASE_URL_i2
 
             else:
                 t.set_description(
