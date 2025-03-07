@@ -4,6 +4,8 @@
 一個nhentai的爬蟲。啊啊啊我還沒把這部分翻譯成中文，如果有人急了.jpg的話可以在issues那邊留言，我盡快幫你～
 
 ## To-do
+- Trim filenames that are too long, and also check the algorithm for checking whether the gallery has been downloaded
+- Remove #559950 from blacklist after fixing above bug
 - Check why error when downloading thumbnail (happens when title contains '"'?)
 - Print download failed tags
 
