@@ -17,6 +17,7 @@ import unicodedata
 from tqdm import tqdm
 from pypdf import PdfReader
 from pathlib import Path
+import Cocoa
 import logging
 from typing import Union, Optional
 
@@ -322,13 +323,7 @@ class Gallery:
     def check_thumb(self) -> None:
 
         logger.info('Checking thumbnail...')
-        check_thumb_command = [
-            'fileicon',
-            'test',
-            f"{self.folder_dir}"
-        ]
-        result = run(check_thumb_command, capture_output=True)
-        if result.returncode == 0:
+        if os.path.exists(f'{self.folder_dir}/Icon\r'):
             logger.info('Thumbnail already set')
 
             return
@@ -369,7 +364,8 @@ class Gallery:
             ]
             thumb_base_url = random.choice(thumb_base_urls)
             thumb_url = (
-                f'{thumb_base_url}/{self.media_id}/thumb.{self.thumb_extension}'
+                f'{thumb_base_url}/{self.media_id}/'
+                f'thumb.{self.thumb_extension}'
             )
             thumb_response = get_response(thumb_url, self.session)
             tries += 1
@@ -406,17 +402,24 @@ class Gallery:
     def set_thumb(self) -> None:
 
         logger.info('Setting thumbnail...')
-        set_thumb_command = [
-            'fileicon',
-            'set',
-            f"{self.folder_dir}",
-            f"{self.thumb_filename}"
-        ]
-        result = run(set_thumb_command, capture_output=True)
-        logger.info(result.stdout.decode('utf-8').split('\n')[0])
-        if result.returncode != 0:
+
+        try:
+            thumb_image = Cocoa.NSImage.alloc().initWithContentsOfFile_(
+                self.thumb_filename
+            )
+            workspace = Cocoa.NSWorkspace.sharedWorkspace()
+            workspace.setIcon_forFile_options_(
+                thumb_image,
+                self.folder_dir,
+                0
+            )
+            logger.info('Thumbnail set')
+
+        except Exception as error:
             self.status_code = -8
-            logger.error(f"{result.stderr.decode('utf-8')}")
+            logger.error(
+                f'Something went wrong when setting thumbnail: {error}'
+            )
 
     def check_tags(self) -> None:
 
