@@ -455,7 +455,7 @@ class Gallery:
 
     def download_page(
         self, page: Union[str, int],
-        img_base_url: Optional[str] = IMG_BASE_URL_i3
+        img_base_url: Optional[str] = IMG_BASE_URL_i2
     ) -> None:
 
         logger.info(f'Retrieving Page {page}/{self.num_pages} url...')
@@ -530,7 +530,7 @@ class Gallery:
 
             if tries == 0:
                 t.set_description(f"Downloading #{self.id}")
-                img_base_url = IMG_BASE_URL_i5
+                img_base_url = IMG_BASE_URL_i2
 
             else:
                 t.set_description(
