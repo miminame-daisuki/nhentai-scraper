@@ -248,6 +248,11 @@ class Gallery:
         else:
             self.title = self.metadata['title']['english']
         self.title = self.title.replace('/', '_')
+
+        # trim filenames that are too long (max length = 255 for MacOS)
+        if len(self.title) > 240:
+            self.title = (self.title[:240] + '...')
+
         self.num_pages = self.metadata['num_pages']
         self.tags = [
             f"{tag['type']}:{tag['name']}" for tag in self.metadata['tags']
