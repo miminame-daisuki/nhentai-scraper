@@ -4,13 +4,13 @@
 一個nhentai的爬蟲。啊啊啊我還沒把這部分翻譯成中文，如果有人急了.jpg的話可以在issues那邊留言，我盡快幫你～
 
 ## To-do
-- Remove #559950 from blacklist after fixing above bug
 - Check why error when downloading thumbnail (happens when title contains '"'?)
 - Print download failed tags
 - Replace 'tags' and 'fileicon' with pure python code
 - Download repeated galleries
 - Retry Error 500
 
+- Package python scripts instead of using pyinstaller
 - Update README
 - Use async to send requests to all mirrors (i1, i2, i3, ...) to download with the one that has the fastest response
 - Add colors to terminal output
