@@ -98,7 +98,7 @@ def search_api(
 def search_tag(
     tag: str,
     session: requests.sessions.Session
-) -> Optional[list[str]]:
+) -> Optional[Union[list[str], str]]:
 
     logger.info(f"\n{'-'*os.get_terminal_size().columns}")
     logger.info(f"Searching galleries from {tag}")
@@ -125,24 +125,26 @@ def search_tag(
     id_list = []
 
     if type(page_count) is not int:
-        if page_count == 'Error 403':
+        error = page_count
+        if error == 'Error 403':
             error_message = (
-                'Error 403 - Forbidden (try updating `cf_clearance`)'
+                f'Error 403 - Forbidden for {tag} '
+                '(try updating cookies)'
             )
-        elif page_count == 'Error 404':
+        elif error == 'Error 404':
             error_message = f'Error 404 - Not Found for {tag}'
-        elif page_count == 'Error 500':
-            error_message = 'Error 500 - Server error'
+        elif error == 'Error 500':
+            error_message = f'Error 500 - Server error for {tag}'
         else:
             error_message = (
-                f'Failed to retrieve {tag} due to Error {page_count}'
+                f'Failed to retrieve {tag} due to Error {error}'
             )
 
         logger.error(error_message)
         print(error_message)
         print(f"\n{'-'*os.get_terminal_size().columns}")
 
-        return None
+        return error_message
 
     for page in tqdm(range(1, page_count+1), leave=False):
         logger.info(f"Searching page {page} from {tag}")
@@ -211,13 +213,14 @@ def download_tag(
     download_dir: Union[str, Path],
     session: requests.sessions.Session,
     skip_downloaded_ids: Optional[bool] = False
-) -> dict[str, list[str]]:
+) -> Optional[Union[dict[str, list[str]], str]]:
 
     id_list = search_tag(tag, session)
 
     # Failed to retrieve id_list
-    if id_list is None:
-        return None
+    if type(id_list) is str:
+        error_message = id_list
+        return error_message
 
     # only keep not yet finished downloaded ids in id_list
     if skip_downloaded_ids:
@@ -229,14 +232,14 @@ def download_tag(
         blacklist = load_inputs.load_input_list('blacklist.txt')
         blacklist_ids = [id for id in blacklist if '#' in id]
 
-        id_list = list(
+        id_list_to_download = list(
             set(id_list)
             - set(matched_galleries_id)
             - set(repeat_ids)
             - set(blacklist_ids)
         )
 
-    if not id_list:
+    if not id_list_to_download:
         print(
             f'All galleries from {tag} have already been downloaded.'
         )
@@ -254,8 +257,11 @@ def download_tag(
 
     logger.info(f'Start downloading for {tag}')
     gallery_results = download_galleries.download_id_list(
-        id_list, download_dir, session,
-        additional_tags=additional_tags, id_list_name=tag
+        id_list_to_download,
+        download_dir,
+        session,
+        additional_tags=additional_tags,
+        id_list_name=tag
     )
 
     return gallery_results

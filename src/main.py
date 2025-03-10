@@ -49,16 +49,26 @@ def main():
 
         # entry is `favorites` or a tag
         if entry == 'favorites' or ':' in entry:
-            gallery_results_extend = download_tags.download_tag(
-                entry, download_dir,
-                session,
-                skip_downloaded_ids=skip_downloaded_ids
-            )
 
-            if gallery_results_extend is None:
-                continue
+            retry_count = 0
+            while retry_count < 3:
+                retry_count += 1
+                gallery_results_extend = download_tags.download_tag(
+                    entry, download_dir,
+                    session,
+                    skip_downloaded_ids=skip_downloaded_ids
+                )
+                if (
+                    type(gallery_results_extend) is dict
+                    or gallery_results_extend is None
+                ):
+                    break
 
-            for key in gallery_results:
+            else:
+                error_message = gallery_results_extend
+                gallery_results_extend = {'retry_fails': [error_message]}
+
+            for key in gallery_results_extend:
                 gallery_results[key].extend(gallery_results_extend[key])
 
         # entry is a gallery id
@@ -78,7 +88,6 @@ def main():
             logger.info(f"\n{'-'*os.get_terminal_size().columns}")
             logger.error(f'{entry} is neither a tag nor a gallery id')
             print(f'{entry} is neither a tag nor a gallery id')
-            print(f"\n{'-'*os.get_terminal_size().columns}")
 
         if gallery_results['repeats']:
             download_galleries.write_gallery_results(
