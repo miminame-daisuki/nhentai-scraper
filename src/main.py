@@ -64,6 +64,7 @@ def main():
                 ):
                     break
 
+            # error when downloading tag
             else:
                 error_message = gallery_results_extend
                 gallery_results_extend = {'retry_fails': [error_message]}

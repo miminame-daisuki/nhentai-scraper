@@ -243,7 +243,6 @@ def download_tag(
         print(
             f'All galleries from {tag} have already been downloaded.'
         )
-        print(f"\n{'-'*os.get_terminal_size().columns}")
         logger.info(
             f'All galleries from {tag} has already been downloaded.'
         )
