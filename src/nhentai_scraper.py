@@ -335,15 +335,21 @@ class Gallery:
 
             return
 
-        # download and set thumbnail if thumbnail file doesn't exist
+        # set thumbnail if thumbnail file exists
         self.thumb_filename = f'{self.folder_dir}/thumb.{self.thumb_extension}'
-        if f'thumb.{self.thumb_extension}' not in os.listdir(self.folder_dir):
-            response_code = self.download_thumb()
-            if response_code != 200:
-                self.status_code = -6
-                return
-            self.resize_thumb()
+        if f'thumb.{self.thumb_extension}' in os.listdir(self.folder_dir):
+            self.set_thumb()
 
+            return
+
+        # download and set thumbnail if thumbnail file doesn't exist
+        response_code = self.download_thumb()
+        if response_code != 200:
+            self.status_code = -6
+
+            return
+
+        self.resize_thumb()
         self.set_thumb()
 
     def download_thumb(self) -> None:
@@ -369,10 +375,16 @@ class Gallery:
                 THUMB_BASE_URL_t5,
                 THUMB_BASE_URL_t7
             ]
+            thumb_extensions = [
+                'jpg',
+                'webp'
+            ]
             thumb_base_url = random.choice(thumb_base_urls)
+            thumb_random_extension = random.choice(thumb_extensions)
+            # Sometimes the thumbnail webpage on nhentai has two extensions
             thumb_url = (
                 f'{thumb_base_url}/{self.media_id}/'
-                f'thumb.{self.thumb_extension}'
+                f'thumb.{thumb_random_extension}.{self.thumb_extension}'
             )
             thumb_response = get_response(thumb_url, self.session)
             tries += 1
@@ -667,7 +679,7 @@ class Gallery:
             -4: ('Error when downloading metadata '
                  f"(failed retry 3 times) for #{self.id}"),
             -5: f"BLACKLISTED #{self.id}",
-            -6: f'Error when downloading thmbnail for {str(self)}',
+            -6: f'Error when downloading thumbnail for {str(self)}',
             -7: f'Error when setting tags for {str(self)}',
             -8: f'Error when setting thumbnail for {str(self)}',
             -9: ('Error when downloading missing pages (failed retry 3 times) '
