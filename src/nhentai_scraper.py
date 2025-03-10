@@ -17,7 +17,9 @@ import unicodedata
 from tqdm import tqdm
 from pypdf import PdfReader
 from pathlib import Path
+import xattr
 import Cocoa
+import plistlib
 import logging
 from typing import Union, Optional
 
@@ -430,36 +432,32 @@ class Gallery:
 
         logger.info('Checking tags...')
 
-        show_tags_command = [
-            'tag',
-            '--list',
-            '--no-name',
-            self.folder_dir
-        ]
+        attr_name = 'com.apple.metadata:_kMDItemUserTags'
+        try:
+            raw_current_tags = xattr.getxattr(self.folder_dir, attr_name)
+            current_tags = plistlib.loads(raw_current_tags)
+            # Remove the trailing "\n0" that appears
+            # when using 'tag save tags
+            current_tags = [tag.split('\n')[0] for tag in current_tags]
 
-        result = run(show_tags_command, capture_output=True)
+            if set(self.tags) == set(current_tags):
+                self.status_code = 1
 
-        if result.stdout:
-            self.status_code = 1
+                return
 
-            return
+        except OSError:
+            pass
 
         logger.info('Setting tags...')
 
-        tags_string = ''.join(f'{tag},' for tag in self.tags)
-        tags_string = tags_string[:-1]  # to exclude the final ','
-
-        # set tags with tag
-        set_tags_command = [
-            'tag',
-            '--set',
-            f'{tags_string}',
-            f"{self.folder_dir}"
-        ]
-        result = run(set_tags_command, capture_output=True)
-        if result.returncode != 0:
+        tags_data = plistlib.dumps(self.tags, fmt=plistlib.FMT_BINARY)
+        try:
+            xattr.setxattr(self.folder_dir, attr_name, tags_data)
+        except Exception as error:
             self.status_code = -7
-            logger.error(f"{result.stderr.decode('utf-8')}")
+            logger.error(
+                f'Something went wrong when setting tags: {error}'
+            )
 
     def download_page(
         self, page: Union[str, int],
