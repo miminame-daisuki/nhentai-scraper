@@ -68,8 +68,9 @@ def main():
                 error_message = gallery_results_extend
                 gallery_results_extend = {'retry_fails': [error_message]}
 
-            for key in gallery_results_extend:
-                gallery_results[key].extend(gallery_results_extend[key])
+            if gallery_results_extend is not None:
+                for key in gallery_results_extend:
+                    gallery_results[key].extend(gallery_results_extend[key])
 
         # entry is a gallery id
         elif '#' in entry:
