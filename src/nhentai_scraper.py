@@ -153,6 +153,7 @@ class Gallery:
         session: Optional[requests.sessions.Session] = None,
         download_dir: Optional[Union[str, Path]] = None,
         additional_tags: Optional[list[str]] = None,
+        download_repeats: Optional[bool] = False,
     ):
 
         self.id = id_
@@ -161,6 +162,7 @@ class Gallery:
         self.session = session
         self.download_dir = download_dir
         self.additional_tags = additional_tags
+        self.download_repeats = download_repeats
 
         self.status_code = -1
 
@@ -295,7 +297,10 @@ class Gallery:
 
         logger.info('Checking folder...')
         # replace '/' with '_' for folder directory
-        self.folder_dir = os.path.join(self.download_dir, self.title)
+        if self.download_repeats:
+            self.folder_dir = os.path.join(self.download_dir, str(self))
+        else:
+            self.folder_dir = os.path.join(self.download_dir, self.title)
 
         # check whether there exists a downloaded gallery with the same name
         if os.path.isdir(self.folder_dir):
