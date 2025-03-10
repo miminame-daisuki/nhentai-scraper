@@ -10,6 +10,7 @@
 - Download repeated galleries
 - Retry Error 500
 
+- Package python scripts instead of using pyinstaller
 - Update README
 - Use async to send requests to all mirrors (i1, i2, i3, ...) to download with the one that has the fastest response
 - Add colors to terminal output
