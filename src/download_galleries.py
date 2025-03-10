@@ -129,8 +129,9 @@ def print_gallery_results(gallery_results: dict[str, list[str]]) -> None:
     if len(gallery_results['retry_fails']) > 0:
         print(
             (f"{len(gallery_results['retry_fails'])} "
-             'failed retry galleries\n')
+             'failed retry galleries')
         )
+    print('\n')
 
 
 def write_gallery_results(

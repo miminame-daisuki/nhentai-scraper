@@ -241,7 +241,7 @@ def download_tag(
 
     if not id_list_to_download:
         print(
-            f'All galleries from {tag} have already been downloaded.'
+            f'All galleries from {tag} have already been downloaded.\n'
         )
         logger.info(
             f'All galleries from {tag} has already been downloaded.'
