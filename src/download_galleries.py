@@ -158,13 +158,23 @@ def write_final_results(gallery_results: dict):
             gallery_results['retry_fails'],
             'failed_downloads.txt'
         )
-        print('\n\nFailed downloads written to failed_downloads.txt\n\n')
+        print(
+            f"\n\nFinished {len(gallery_results['finished'])} "
+            'downloads'
+        )
+        print(
+            f"{len(gallery_results['retry_fails'])} failed downloads "
+            'written to failed_downloads.txt\n\n'
+        )
         logger.info(
             '\n\nFailed downloads written to failed_downloads.txt\n\n'
         )
 
     else:
-        print('\n\nFinished all downloads!!!\n\n')
+        print(
+            f"\n\nFinished all {len(gallery_results['finished'])} "
+            'downloads!!!\n\n'
+        )
         logger.info(f"\n{'-'*os.get_terminal_size().columns}")
         logger.info('Finished all downloads')
 
