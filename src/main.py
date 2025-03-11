@@ -56,7 +56,10 @@ def main():
                 skip_downloaded_ids=skip_downloaded_ids
             )
 
-            if gallery_results_extend is not None:
+            if gallery_results_extend is None:
+                continue
+
+            else:
                 for key in gallery_results_extend:
                     gallery_results[key].extend(gallery_results_extend[key])
 
