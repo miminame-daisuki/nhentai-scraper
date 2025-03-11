@@ -52,7 +52,7 @@ def set_logging_config(
 
     if logging_config_filename is None:
         application_folder_path = get_application_folder_dir()
-        logging_dir = os.path.abspath(f'{application_folder_path}/log/')
+        logging_dir = os.path.abspath(f'{application_folder_path}/logs/')
         logging_config_filename = os.path.join(
             logging_dir, 'logging_config.yaml'
         )
