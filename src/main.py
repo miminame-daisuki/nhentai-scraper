@@ -50,24 +50,11 @@ def main():
         # entry is `favorites` or a tag
         if entry == 'favorites' or ':' in entry:
 
-            retry_count = 0
-            while retry_count < 3:
-                retry_count += 1
-                gallery_results_extend = download_tags.download_tag(
-                    entry, download_dir,
-                    session,
-                    skip_downloaded_ids=skip_downloaded_ids
-                )
-                if (
-                    type(gallery_results_extend) is dict
-                    or gallery_results_extend is None
-                ):
-                    break
-
-            # error when downloading tag
-            else:
-                error_message = gallery_results_extend
-                gallery_results_extend = {'retry_fails': [error_message]}
+            gallery_results_extend = download_tags.download_tag(
+                entry, download_dir,
+                session,
+                skip_downloaded_ids=skip_downloaded_ids
+            )
 
             if gallery_results_extend is not None:
                 for key in gallery_results_extend:
