@@ -115,10 +115,11 @@ def print_gallery_results(gallery_results: dict[str, list[str]]) -> None:
     for key in keys:
         total_download_counts += len(gallery_results[key])
 
-    print(
-        (f"\nFinished {len(gallery_results['finished'])} "
-         f'out of {total_download_counts} gallery downloads in total')
-    )
+    if len(gallery_results['finished']) > 0:
+        print(
+            (f"\nFinished {len(gallery_results['finished'])} "
+             f'out of {total_download_counts} gallery downloads in total')
+        )
     if len(gallery_results['repeats']) > 0:
         print(
             (f"{len(gallery_results['repeats'])} "
