@@ -160,7 +160,10 @@ class Gallery:
             session = create_session()
         self.session = session
         self.download_dir = download_dir
-        self.additional_tags = additional_tags
+        if additional_tags:
+            self.additional_tags = additional_tags
+        else:
+            self.additional_tags = []
 
         self.status_code = -1
 
@@ -265,7 +268,7 @@ class Gallery:
             self.metadata['images']['thumbnail']
         )
 
-        if self.additional_tags is not None:
+        if self.additional_tags:
             self.tags.extend(self.additional_tags)
 
     def check_blacklist(self, blacklist: Optional[list[str]] = None) -> None:
