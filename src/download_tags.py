@@ -225,7 +225,8 @@ def download_tag(
     tag: str,
     download_dir: Union[str, Path],
     session: requests.sessions.Session,
-    skip_downloaded_ids: Optional[bool] = False
+    skip_downloaded_ids: Optional[bool] = False,
+    additional_tags: Optional[list[str]] = None
 ) -> Optional[dict[str, list[str]]]:
 
     id_list = search_tag(tag, session)
@@ -263,13 +264,6 @@ def download_tag(
         )
 
         return None
-
-    if tag == 'favorites':
-        additional_tags = ['favorites']
-    if tag == 'repeats':
-        additional_tags = ['repeats']
-    else:
-        additional_tags = None
 
     logger.info(f'Start downloading for {tag}')
     gallery_results = download_galleries.download_id_list(

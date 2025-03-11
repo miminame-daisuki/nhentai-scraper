@@ -47,13 +47,21 @@ def main():
 
     for entry in download_list:
 
-        # entry is `favorites` or a tag
-        if entry == 'favorites' or ':' in entry:
+        additional_tags = []
+        if 'repeats' in download_list:
+            additional_tags.append('repeats')
+
+        # entry is `favorites`, `repeats`, or a tag
+        if entry == 'favorites' or entry == 'repeats' or ':' in entry:
+
+            if entry == 'favorites':
+                additional_tags.append('favorites')
 
             gallery_results_extend = download_tags.download_tag(
                 entry, download_dir,
                 session,
-                skip_downloaded_ids=skip_downloaded_ids
+                skip_downloaded_ids=skip_downloaded_ids,
+                additional_tags=additional_tags,
             )
 
             if gallery_results_extend is None:
@@ -68,7 +76,8 @@ def main():
             logger.info(f"\n{'-'*os.get_terminal_size().columns}")
 
             gallery = nhentai_scraper.Gallery(
-                entry, session=session, download_dir=download_dir
+                entry, session=session, download_dir=download_dir,
+                additional_tags=additional_tags,
             )
             gallery.download()
 
