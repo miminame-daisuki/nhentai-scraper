@@ -49,6 +49,7 @@ def main():
 
         # entry is `favorites` or a tag
         if entry == 'favorites' or ':' in entry:
+
             gallery_results_extend = download_tags.download_tag(
                 entry, download_dir,
                 session,
@@ -56,9 +57,10 @@ def main():
             )
 
             if gallery_results_extend is None:
+                print(f"{'-'*os.get_terminal_size().columns}")
                 continue
 
-            for key in gallery_results:
+            for key in gallery_results_extend:
                 gallery_results[key].extend(gallery_results_extend[key])
 
         # entry is a gallery id
@@ -78,7 +80,6 @@ def main():
             logger.info(f"\n{'-'*os.get_terminal_size().columns}")
             logger.error(f'{entry} is neither a tag nor a gallery id')
             print(f'{entry} is neither a tag nor a gallery id')
-            print(f"\n{'-'*os.get_terminal_size().columns}")
 
         if gallery_results['repeats']:
             download_galleries.write_gallery_results(

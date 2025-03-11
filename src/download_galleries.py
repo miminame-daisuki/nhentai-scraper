@@ -115,19 +115,24 @@ def print_gallery_results(gallery_results: dict[str, list[str]]) -> None:
     for key in keys:
         total_download_counts += len(gallery_results[key])
 
-    print(
-        (f"\nFinished {len(gallery_results['finished'])} "
-         f'out of {total_download_counts} gallery downloads in total')
-    )
-    print(
-        (f"{len(gallery_results['repeats'])} "
-         'repeated galleries not downloaded')
-    )
-    print(f"{len(gallery_results['blacklists'])} BLACKLISTED")
-    print(
-        (f"{len(gallery_results['retry_fails'])} "
-         'failed retry galleries\n')
-    )
+    if len(gallery_results['finished']) > 0:
+        print(
+            (f"\nFinished {len(gallery_results['finished'])} "
+             f'out of {total_download_counts} gallery downloads in total')
+        )
+    if len(gallery_results['repeats']) > 0:
+        print(
+            (f"{len(gallery_results['repeats'])} "
+             'repeated galleries not downloaded')
+        )
+    if len(gallery_results['blacklists']) > 0:
+        print(f"{len(gallery_results['blacklists'])} BLACKLISTED")
+    if len(gallery_results['retry_fails']) > 0:
+        print(
+            (f"{len(gallery_results['retry_fails'])} "
+             'failed retry galleries')
+        )
+    print()
 
 
 def write_gallery_results(
@@ -135,7 +140,7 @@ def write_gallery_results(
     filename: Union[str, Path]
 ) -> None:
 
-    # write the failed retry galleries to failed_download_id.txt
+    # write the failed retry galleries to failed_downloads.txt
     application_folder_path = misc.get_application_folder_dir()
     inputs_folder_dir = os.path.abspath(
         f'{application_folder_path}/inputs/'
@@ -152,15 +157,25 @@ def write_final_results(gallery_results: dict):
     if gallery_results['retry_fails']:
         write_gallery_results(
             gallery_results['retry_fails'],
-            'failed_download_id.txt'
+            'failed_downloads.txt'
         )
-        print('\n\nFailed downloads written to failed_download_id.txt\n\n')
+        print(
+            f"\n\nFinished {len(gallery_results['finished'])} "
+            'downloads'
+        )
+        print(
+            f"{len(gallery_results['retry_fails'])} failed downloads "
+            'written to failed_downloads.txt\n\n'
+        )
         logger.info(
-            '\n\nFailed downloads written to failed_download_id.txt\n\n'
+            '\n\nFailed downloads written to failed_downloads.txt\n\n'
         )
 
     else:
-        print('\n\nFinished all downloads!!!\n\n')
+        print(
+            f"\n\nFinished all {len(gallery_results['finished'])} "
+            'downloads!!!\n\n'
+        )
         logger.info(f"\n{'-'*os.get_terminal_size().columns}")
         logger.info('Finished all downloads')
 

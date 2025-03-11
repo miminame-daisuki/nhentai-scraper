@@ -98,55 +98,66 @@ def search_api(
 def search_tag(
     tag: str,
     session: requests.sessions.Session
-) -> Optional[list[str]]:
+) -> Optional[Union[list[str], str]]:
 
     logger.info(f"\n{'-'*os.get_terminal_size().columns}")
     logger.info(f"Searching galleries from {tag}")
     print(f"\nSearching galleries from {tag}...\n")
 
-    if tag.startswith('search: '):
-        search = tag.split('search: ')[1]
-        page_count = search_api(search, session)[1]
-    elif ':' in tag:
-        tag_type, tag_name = tag.split(':')
-
-        # replace special characters in tag_name
-        tag_name = re.sub('[^0-9a-zA-Z]+', '-', tag_name)
-        # drop final non-alphanumerical character in tag_name
-        if not tag_name[-1].isalnum():
-            tag_name = tag_name[:-1]
-
-        url = f"{NHENTAI_URL}/{tag_type}/{tag_name}/"
-        page_count = search_url(url, session)[1]
-    elif tag == 'favorites':
-        url = FAVORITES_URL
-        page_count = search_url(url, session)[1]
-    elif tag == 'repeats':
-        id_list = load_inputs.load_input_list('repeated_galleries.txt')
-
-        return id_list
-
     id_list = []
 
-    if type(page_count) is not int:
-        if page_count == 'Error 403':
+    retry_count = 0
+    while retry_count < 3:
+        retry_count += 1
+
+        if tag.startswith('search: '):
+            search = tag.split('search: ')[1]
+            page_count = search_api(search, session)[1]
+        elif ':' in tag:
+            tag_type, tag_name = tag.split(':')
+
+            # replace special characters in tag_name
+            tag_name = re.sub('[^0-9a-zA-Z]+', '-', tag_name)
+            # drop final non-alphanumerical character in tag_name
+            if not tag_name[-1].isalnum():
+                tag_name = tag_name[:-1]
+
+            url = f"{NHENTAI_URL}/{tag_type}/{tag_name}/"
+            page_count = search_url(url, session)[1]
+        elif tag == 'favorites':
+            url = FAVORITES_URL
+            page_count = search_url(url, session)[1]
+        elif tag == 'repeats':
+            id_list = load_inputs.load_input_list('repeated_galleries.txt')
+
+            return id_list
+
+        # successfully retrieved page_count for tag
+        if type(page_count) is int:
+            break
+        else:
+            logger.error('Retrying...')
+
+    else:
+        error = page_count
+        if error == 'Error 403':
             error_message = (
-                'Error 403 - Forbidden (try updating `cf_clearance`)'
+                f'Error 403 - Forbidden for {tag} '
+                '(try updating cookies)\n'
             )
-        elif page_count == 'Error 404':
+        elif error == 'Error 404':
             error_message = f'Error 404 - Not Found for {tag}'
-        elif page_count == 'Error 500':
-            error_message = 'Error 500 - Server error'
+        elif error == 'Error 500':
+            error_message = f'Error 500 - Server error for {tag}'
         else:
             error_message = (
-                f'Failed to retrieve {tag} due to Error {page_count}'
+                f'Failed to retrieve {tag} due to Error {error}'
             )
 
         logger.error(error_message)
-        print(error_message)
-        print(f"\n{'-'*os.get_terminal_size().columns}")
+        print(error_message + '\n')
 
-        return None
+        return error_message
 
     for page in tqdm(range(1, page_count+1), leave=False):
         logger.info(f"Searching page {page} from {tag}")
@@ -215,13 +226,16 @@ def download_tag(
     download_dir: Union[str, Path],
     session: requests.sessions.Session,
     skip_downloaded_ids: Optional[bool] = False
-) -> dict[str, list[str]]:
+) -> Optional[dict[str, list[str]]]:
 
     id_list = search_tag(tag, session)
 
-    # Failed to retrieve id_list
-    if id_list is None:
-        return None
+    # Failed to retrieve id_list for tag
+    if type(id_list) is str:
+        error_message = id_list
+        gallery_results = {'retry_fails': [error_message]}
+
+        return gallery_results
 
     # only keep not yet finished downloaded ids in id_list
     if skip_downloaded_ids:
@@ -233,18 +247,17 @@ def download_tag(
         blacklist = load_inputs.load_input_list('blacklist.txt')
         blacklist_ids = [id for id in blacklist if '#' in id]
 
-        id_list = list(
+        id_list_to_download = list(
             set(id_list)
             - set(matched_galleries_id)
             - set(repeat_ids)
             - set(blacklist_ids)
         )
 
-    if not id_list:
+    if not id_list_to_download:
         print(
-            f'All galleries from {tag} have already been downloaded.'
+            f'All galleries from {tag} have already been downloaded.\n'
         )
-        print(f"\n{'-'*os.get_terminal_size().columns}")
         logger.info(
             f'All galleries from {tag} has already been downloaded.'
         )
@@ -260,8 +273,11 @@ def download_tag(
 
     logger.info(f'Start downloading for {tag}')
     gallery_results = download_galleries.download_id_list(
-        id_list, download_dir, session,
-        additional_tags=additional_tags, id_list_name=tag
+        id_list_to_download,
+        download_dir,
+        session,
+        additional_tags=additional_tags,
+        id_list_name=tag
     )
 
     return gallery_results
