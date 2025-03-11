@@ -255,6 +255,9 @@ def download_tag(
             - set(blacklist_ids)
         )
 
+    else:
+        id_list_to_download = id_list
+
     if not id_list_to_download:
         print(
             f'All galleries from {tag} have already been downloaded.\n'
