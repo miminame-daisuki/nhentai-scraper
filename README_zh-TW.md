@@ -4,13 +4,10 @@
 一個nhentai的爬蟲。啊啊啊我還沒把這部分翻譯成中文，如果有人急了.jpg的話可以在issues那邊留言，我盡快幫你～
 
 ## To-do
-- Check why error when downloading thumbnail (happens when title contains '"'?)
-- Print download failed tags
 - Replace 'tags' and 'fileicon' with pure python code
 - Download repeated galleries
-- Retry Error 500
 
-- Package python scripts instead of using pyinstaller
+- Package python scripts (into command line scripts?) instead of using pyinstaller
 - Update README
 - Use async to send requests to all mirrors (i1, i2, i3, ...) to download with the one that has the fastest response
 - Add colors to terminal output
@@ -20,11 +17,11 @@
 - Automatically load blacklist tags from nhentai user page
 - Output ids of successfully downloaded galleries to log?
 - Add helper functions (export id of favorites, print id of downloaded galleries, compare difference between favorites (or any tag) on nhentai.com and local downloads, ...)
-- Update list of downloaded galleries to txt file?
-- Separate internal settings (ex: download wait time) to another .py file
+- Separate settings (ex: download wait time) to another .txt file
 - Print 'N repeadted galleries not downloaded', 'N blacklisted', 'N failed retry galleries' only when N > 0
 - Make thumbnails and tags optional
 - Automatically add tags to 'already downloaded' galleries
+- Update list of downloaded galleries to txt file
 
 - Print name of program when starting?
 - Replace os with Path
