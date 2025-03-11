@@ -59,9 +59,8 @@ def main():
             if gallery_results_extend is None:
                 continue
 
-            else:
-                for key in gallery_results_extend:
-                    gallery_results[key].extend(gallery_results_extend[key])
+            for key in gallery_results_extend:
+                gallery_results[key].extend(gallery_results_extend[key])
 
         # entry is a gallery id
         elif '#' in entry:
