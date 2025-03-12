@@ -63,13 +63,11 @@ def main():
                 session,
                 skip_downloaded_ids=skip_downloaded_ids,
                 additional_tags=additional_tags,
+                gallery_results=gallery_results,
             )
 
             if gallery_results_extend is None:
                 continue
-
-            for key in gallery_results_extend:
-                gallery_results[key].extend(gallery_results_extend[key])
 
         # entry is a gallery id
         elif '#' in entry:

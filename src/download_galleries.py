@@ -27,10 +27,11 @@ def download_id_list(
     download_dir: Union[str, Path],
     session: requests.sessions.Session,
     additional_tags: Optional[list[str]] = None,
-    id_list_name: Optional[str] = None
+    id_list_name: Optional[str] = None,
+    gallery_results: Optional[dict[str, list[str]]] = None,
 ) -> dict[str, list[str]]:
 
-    gallery_results = {
+    gallery_results_extend = {
         'finished': [],
         'already_downloaded': [],
         'repeats': [],
@@ -57,15 +58,26 @@ def download_id_list(
         )
         gallery.download()
 
-        record_gallery_results(gallery_results, gallery, initial_try=True)
+        record_gallery_results(
+            gallery_results_extend,
+            gallery,
+            initial_try=True
+        )
+
+        if gallery_results:
+            record_gallery_results(
+                gallery_results,
+                gallery,
+                initial_try=True
+            )
 
     # retry failed galleries
-    if gallery_results['initial_fails']:
+    if gallery_results_extend['initial_fails']:
         print('\nRetrying failed galleries...\n')
 
         progress_bar = tqdm(
-                enumerate(gallery_results['initial_fails'], start=1),
-                total=len(gallery_results['initial_fails'])
+                enumerate(gallery_results_extend['initial_fails'], start=1),
+                total=len(gallery_results_extend['initial_fails'])
             )
         for count, gallery_id in progress_bar:
             logger.info(f"\n{'-'*os.get_terminal_size().columns}")
@@ -80,11 +92,22 @@ def download_id_list(
             )
             gallery.download()
 
-            record_gallery_results(gallery_results, gallery, initial_try=False)
+            record_gallery_results(
+                gallery_results_extend,
+                gallery,
+                initial_try=False
+            )
 
-    print_gallery_results(gallery_results)
+            if gallery_results:
+                record_gallery_results(
+                    gallery_results,
+                    gallery,
+                    initial_try=False
+                )
 
-    return gallery_results
+    print_gallery_results(gallery_results_extend)
+
+    return gallery_results_extend
 
 
 def record_gallery_results(

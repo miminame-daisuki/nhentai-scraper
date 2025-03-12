@@ -226,17 +226,27 @@ def download_tag(
     download_dir: Union[str, Path],
     session: requests.sessions.Session,
     skip_downloaded_ids: Optional[bool] = False,
-    additional_tags: Optional[list[str]] = None
+    additional_tags: Optional[list[str]] = None,
+    gallery_results: Optional[dict[str, list[str]]] = None,
 ) -> Optional[dict[str, list[str]]]:
+
+    gallery_results_extend = {
+        'finished': [],
+        'already_downloaded': [],
+        'repeats': [],
+        'blacklists': [],
+        'initial_fails': [],
+        'retry_fails': [],
+    }
 
     id_list = search_tag(tag, session)
 
     # Failed to retrieve id_list for tag
     if type(id_list) is str:
         error_message = id_list
-        gallery_results = {'retry_fails': [error_message]}
+        gallery_results_extend['retry_fails'].append(error_message)
 
-        return gallery_results
+        return gallery_results_extend
 
     # only keep not yet finished downloaded ids in id_list
     if skip_downloaded_ids:
@@ -270,12 +280,13 @@ def download_tag(
         return None
 
     logger.info(f'Start downloading for {tag}')
-    gallery_results = download_galleries.download_id_list(
+    gallery_results_extend = download_galleries.download_id_list(
         id_list_to_download,
         download_dir,
         session,
         additional_tags=additional_tags,
-        id_list_name=tag
+        id_list_name=tag,
+        gallery_results=gallery_results,
     )
 
-    return gallery_results
+    return gallery_results_extend
