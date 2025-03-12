@@ -45,6 +45,8 @@ search:
 #000000
 ```
 
+1. (Optional) Add `repeats` to `download_list.txt` if you wish to download all galleries with the same title (but with different ids)
+
 1. (Optional) Create another file called `blacklist.txt` inside the `inputs/` folder, and place the list of tags you want to avoid downloading, separated by line breaks.\
 Example:
 ```
