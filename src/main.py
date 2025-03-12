@@ -66,7 +66,6 @@ def main():
             )
 
             if gallery_results_extend is None:
-                print(f"{'-'*os.get_terminal_size().columns}")
                 continue
 
             for key in gallery_results_extend:
