@@ -15,6 +15,7 @@ from subprocess import run
 from tqdm import tqdm
 import logging
 from typing import Union, Optional
+import sys
 
 import nhentai_scraper
 import download_galleries
@@ -48,9 +49,10 @@ def search_url(
     soup = BeautifulSoup(response.content, features='html.parser')
 
     if soup.title.string.split(' ')[0] == 'Login':
-        raise Exception(
+        print(
             'Please login to nhentai.net and update the cookies again.'
         )
+        sys.exit()
 
     gallery_count = soup.find('span', {'class': 'count'}).string
     gallery_count = gallery_count.replace('(', '').replace(')', '')
