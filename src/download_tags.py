@@ -256,16 +256,22 @@ def download_tag(
         matched_galleries_id = search_finished_downloads(
             tag, download_dir=download_dir
         )
-        repeat_ids = load_inputs.load_input_list('repeated_galleries.txt')
         blacklist = load_inputs.load_input_list('blacklist.txt')
         blacklist_ids = [id for id in blacklist if '#' in id]
 
         id_list_to_download = list(
             set(id_list)
             - set(matched_galleries_id)
-            - set(repeat_ids)
             - set(blacklist_ids)
         )
+
+        # don't download repeats
+        if 'repeats' not in additional_tags:
+            repeat_ids = load_inputs.load_input_list('repeated_galleries.txt')
+            id_list_to_download = list(
+                set(id_list_to_download)
+                - set(repeat_ids)
+            )
 
     else:
         id_list_to_download = id_list
