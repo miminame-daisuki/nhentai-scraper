@@ -34,6 +34,7 @@ def main():
 
     gallery_results = {
         'finished': [],
+        'already_downloaded': [],
         'repeats': repeat_ids,
         'blacklists': blacklist,
         'initial_fails': [],

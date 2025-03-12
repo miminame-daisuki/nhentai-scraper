@@ -32,6 +32,7 @@ def download_id_list(
 
     gallery_results = {
         'finished': [],
+        'already_downloaded': [],
         'repeats': [],
         'blacklists': [],
         'initial_fails': [],
@@ -92,8 +93,10 @@ def record_gallery_results(
     initial_try: Optional[bool] = True
 ) -> dict[str, list[str]]:
 
-    if gallery.status_code == 0 or gallery.status_code == 1:
+    if gallery.status_code == 0:
         gallery_results['finished'].append(f'#{gallery.id}')
+    elif gallery.status_code == 1:
+        gallery_results['already_downloaded'].append(f'#{gallery.id}')
     elif gallery.status_code == 2:
         gallery_results['repeats'].append(f'#{gallery.id}')
     elif gallery.status_code == -5:
@@ -115,9 +118,10 @@ def print_gallery_results(gallery_results: dict[str, list[str]]) -> None:
     for key in keys:
         total_download_counts += len(gallery_results[key])
 
+    print()
     if len(gallery_results['finished']) > 0:
         print(
-            (f"\nFinished {len(gallery_results['finished'])} "
+            (f"Finished {len(gallery_results['finished'])} "
              f'out of {total_download_counts} gallery downloads in total')
         )
     if len(gallery_results['repeats']) > 0:
@@ -130,7 +134,7 @@ def print_gallery_results(gallery_results: dict[str, list[str]]) -> None:
     if len(gallery_results['retry_fails']) > 0:
         print(
             (f"{len(gallery_results['retry_fails'])} "
-             'failed retry galleries not downloaded')
+             'failed downloads written to failed_downloads.txt')
         )
     print()
 
@@ -159,14 +163,10 @@ def write_final_results(gallery_results: dict):
             gallery_results['retry_fails'],
             'failed_downloads.txt'
         )
-        print(
-            f"\n\nFinished {len(gallery_results['finished'])} "
-            'downloads'
-        )
-        print(
-            f"{len(gallery_results['retry_fails'])} failed downloads "
-            'written to failed_downloads.txt\n\n'
-        )
+        print()
+        print_gallery_results(gallery_results)
+        print()
+        print(f"{'-'*os.get_terminal_size().columns}")
         logger.info(
             '\n\nFailed downloads written to failed_downloads.txt\n\n'
         )
