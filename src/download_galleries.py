@@ -27,6 +27,7 @@ def download_id_list(
     download_dir: Union[str, Path],
     session: requests.sessions.Session,
     additional_tags: Optional[list[str]] = None,
+    download_repeats: Optional[bool] = False,
     id_list_name: Optional[str] = None,
     gallery_results: Optional[dict[str, list[str]]] = None,
 ) -> dict[str, list[str]]:
@@ -54,7 +55,8 @@ def download_id_list(
         )
         gallery = nhentai_scraper.Gallery(
             gallery_id, session=session, download_dir=download_dir,
-            additional_tags=additional_tags
+            additional_tags=additional_tags,
+            download_repeats=download_repeats,
         )
         gallery.download()
 
@@ -88,7 +90,8 @@ def download_id_list(
 
             gallery = nhentai_scraper.Gallery(
                 gallery_id, session=session, download_dir=download_dir,
-                additional_tags=additional_tags
+                additional_tags=additional_tags,
+                download_repeats=download_repeats,
             )
             gallery.download()
 

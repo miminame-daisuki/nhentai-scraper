@@ -49,8 +49,6 @@ def main():
     for entry in download_list:
 
         additional_tags = []
-        if 'repeats' in download_list:
-            additional_tags.append('repeats')
 
         # entry is `favorites`, `repeats`, or a tag
         if entry == 'favorites' or entry == 'repeats' or ':' in entry:

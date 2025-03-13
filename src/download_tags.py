@@ -265,8 +265,12 @@ def download_tag(
             - set(blacklist_ids)
         )
 
-        # don't download repeats
-        if 'repeats' not in additional_tags:
+        # download repeats
+        if tag == 'repeats':
+            download_repeats = True
+        else:
+            download_repeats = False
+
             repeat_ids = load_inputs.load_input_list('repeated_galleries.txt')
             id_list_to_download = list(
                 set(id_list_to_download)
@@ -293,6 +297,7 @@ def download_tag(
         download_dir,
         session,
         additional_tags=additional_tags,
+        download_repeats=download_repeats,
         id_list_name=tag,
         gallery_results=gallery_results,
     )

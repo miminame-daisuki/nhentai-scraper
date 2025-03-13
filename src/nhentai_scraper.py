@@ -153,6 +153,7 @@ class Gallery:
         session: Optional[requests.sessions.Session] = None,
         download_dir: Optional[Union[str, Path]] = None,
         additional_tags: Optional[list[str]] = None,
+        download_repeats: Optional[bool] = False,
     ):
 
         self.id = id_
@@ -164,6 +165,7 @@ class Gallery:
             self.additional_tags = additional_tags
         else:
             self.additional_tags = []
+        self.download_repeats = download_repeats
 
         self.status_code = -1
 
@@ -298,8 +300,9 @@ class Gallery:
 
         logger.info('Checking folder...')
         # replace '/' with '_' for folder directory
-        if 'repeats' in self.additional_tags:
+        if self.download_repeats:
             self.folder_dir = os.path.join(self.download_dir, str(self))
+            self.additional_tags.append('repeats')
         else:
             self.folder_dir = os.path.join(self.download_dir, self.title)
 
