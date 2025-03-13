@@ -125,14 +125,17 @@ def record_gallery_results(
         gallery_results['already_downloaded'].append(f'#{gallery.id}')
     elif gallery.status_code == 2:
         gallery_results['repeats'].append(f'#{gallery.id}')
-    elif gallery.status_code == -5:
+    elif gallery.status_code == 3:
         gallery_results['blacklists'].append(f'#{gallery.id}')
-    else:
-        if initial_try:
-            gallery_results['initial_fails'].append(f'#{gallery.id}')
-        else:
-            gallery_results['retry_fails'].append(gallery.status())
-        logger.error(gallery.status())
+
+    if initial_try and gallery.status_code < -1:
+        gallery_results['initial_fails'].append(f'#{gallery.id}')
+        gallery_results['retry_fails'].append(gallery.status())
+    elif not initial_try and gallery.status_code >= -1:
+        # remove from retry_fails if download successful during retry
+        for result in gallery_results['retry_fails']:
+            if f'#{gallery.id}' in result:
+                gallery_results['retry_fails'].remove(result)
 
     return gallery_results
 

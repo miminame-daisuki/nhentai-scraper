@@ -281,7 +281,7 @@ class Gallery:
             blacklist_tags = [tag for tag in blacklist if ':' in tag]
 
         if any(tag in self.tags for tag in blacklist_tags):
-            self.status_code = -5
+            self.status_code = 3
         else:
             logger.info('Clear')
 
@@ -354,7 +354,7 @@ class Gallery:
         # download and set thumbnail if thumbnail file doesn't exist
         response_code = self.download_thumb()
         if response_code != 200:
-            self.status_code = -6
+            self.status_code = -5
 
             return
 
@@ -444,7 +444,7 @@ class Gallery:
             logger.info('Thumbnail set')
 
         except Exception as error:
-            self.status_code = -8
+            self.status_code = -7
             logger.error(
                 f'Something went wrong when setting thumbnail: {error}'
             )
@@ -475,7 +475,7 @@ class Gallery:
         try:
             xattr.setxattr(self.folder_dir, attr_name, tags_data)
         except Exception as error:
-            self.status_code = -7
+            self.status_code = -6
             logger.error(
                 f'Something went wrong when setting tags: {error}'
             )
@@ -541,7 +541,7 @@ class Gallery:
             tries += 1
             if tries > 3 and len(self.missing_pages) != 0:
                 logger.error(f'Failed pages: {self.missing_pages}')
-                self.status_code = -9
+                self.status_code = -8
 
                 return
 
@@ -617,7 +617,7 @@ class Gallery:
                 extra_pages.append(downloaded_page)
 
         if len(extra_pages) != 0:
-            self.status_code = -10
+            self.status_code = -9
 
         return extra_pages
 
@@ -671,7 +671,7 @@ class Gallery:
             )
         except Exception as error:
             logger.error(f"{error}")
-            self.status_code = -11
+            self.status_code = -10
 
     def status(self) -> str:
         # status_code >= -1: Normal
@@ -682,20 +682,21 @@ class Gallery:
             1: f"{str(self)} already downloaded",
             2: (f"{str(self)} has the same title as "
                 f"the already downloaded #{self.downloaded_metadata['id']}"),
+            3: f"BLACKLISTED {str(self)}",
             -1: 'Download not finished...',
-            -2: 'Error 403 - Forbidden (try updating `cf_clearance`)',
+            -2: (f"Error 403 - Forbidden for #{self.id} "
+                 '(try updating `cf_clearance`)'),
             -3: f'Error 404 - Not Found for #{self.id}',
             -4: ('Error when downloading metadata '
                  f"(failed retry 3 times) for #{self.id}"),
-            -5: f"BLACKLISTED #{self.id}",
-            -6: f'Error when downloading thumbnail for {str(self)}',
-            -7: f'Error when setting tags for {str(self)}',
-            -8: f'Error when setting thumbnail for {str(self)}',
-            -9: ('Error when downloading missing pages (failed retry 3 times) '
+            -5: f'Error when downloading thumbnail for {str(self)}',
+            -6: f'Error when setting tags for {str(self)}',
+            -7: f'Error when setting thumbnail for {str(self)}',
+            -8: ('Error when downloading missing pages (failed retry 3 times) '
                  f"for {str(self)}"),
-            -10: ('There are more pages downloaded than self.num_pages '
+            -9: ('There are more pages downloaded than self.num_pages '
                   f"for {str(self)}"),
-            -11: f'Error when saving PDF for {str(self)}',
+            -10: f'Error when saving PDF for {str(self)}',
         }
 
         return status_dict[self.status_code]
