@@ -166,6 +166,8 @@ class Gallery:
         else:
             self.additional_tags = []
         self.download_repeats = download_repeats
+        if download_repeats:
+            self.additional_tags.append('repeats')
 
         self.status_code = -1
 
@@ -302,7 +304,6 @@ class Gallery:
         # replace '/' with '_' for folder directory
         if self.download_repeats:
             self.folder_dir = os.path.join(self.download_dir, str(self))
-            self.additional_tags.append('repeats')
         else:
             self.folder_dir = os.path.join(self.download_dir, self.title)
 

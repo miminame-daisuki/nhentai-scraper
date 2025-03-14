@@ -208,7 +208,7 @@ def write_final_results(gallery_results: dict):
     else:
         print(
             f"\n\nFinished all {len(gallery_results['finished'])} "
-            'downloads!!!\n\n'
+            'gallery downloads!!!\n\n'
         )
         print(f"{'-'*os.get_terminal_size().columns}")
         logger.info(f"\n{'-'*os.get_terminal_size().columns}")
