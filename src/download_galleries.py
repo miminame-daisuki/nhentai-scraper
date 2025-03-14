@@ -151,7 +151,7 @@ def print_gallery_results(gallery_results: dict[str, list[str]]) -> None:
     if len(gallery_results['finished']) > 0:
         print(
             (f"Finished {len(gallery_results['finished'])} "
-             f'out of {total_download_counts} gallery downloads in total')
+             f'out of {total_download_counts} gallery downloads')
         )
     if len(gallery_results['repeats']) > 0:
         print(
@@ -159,11 +159,11 @@ def print_gallery_results(gallery_results: dict[str, list[str]]) -> None:
              'repeated galleries not downloaded')
         )
     if len(gallery_results['blacklists']) > 0:
-        print(f"{len(gallery_results['blacklists'])} BLACKLISTED")
+        print(f"{len(gallery_results['blacklists'])} galleries BLACKLISTED")
     if len(gallery_results['retry_fails']) > 0:
         print(
             (f"{len(gallery_results['retry_fails'])} "
-             'failed downloads written to failed_downloads.txt')
+             'failed retry galleries not downloaded')
         )
     print()
 
@@ -192,9 +192,14 @@ def write_final_results(gallery_results: dict):
             gallery_results['retry_fails'],
             'failed_downloads.txt'
         )
-        print()
-        print_gallery_results(gallery_results)
-        print()
+        print(
+            f"\n\nFinished {len(gallery_results['finished'])} "
+            'gallery downloads in total'
+        )
+        print(
+            f"{len(gallery_results['retry_fails'])} failed downloads "
+            'written to failed_downloads.txt\n\n'
+        )
         print(f"{'-'*os.get_terminal_size().columns}")
         logger.info(
             '\n\nFailed downloads written to failed_downloads.txt\n\n'

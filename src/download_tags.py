@@ -247,6 +247,8 @@ def download_tag(
     if type(id_list) is str:
         error_message = id_list
         gallery_results_extend['retry_fails'].append(error_message)
+        if gallery_results:
+            gallery_results['retry_fails'].append(error_message)
 
         return gallery_results_extend
 
