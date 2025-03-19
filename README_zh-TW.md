@@ -22,6 +22,7 @@
 - Update list of downloaded galleries to txt file
 - Print # of new repeats and blacklists not downloaded during this session in write_final_results()?
 - Add whether to put gallery id in folder name to settings?
+- Release memory after each gallery download?
 
 - Print name of program when starting?
 - Replace os with Path
