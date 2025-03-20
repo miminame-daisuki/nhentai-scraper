@@ -12,7 +12,6 @@ import time
 import json
 import os
 from PIL import Image
-from subprocess import run
 import unicodedata
 from tqdm import tqdm
 from pypdf import PdfReader
@@ -27,10 +26,10 @@ import load_inputs
 import misc
 from nhentai_urls import (
     API_GALLERY_URL,
+    THUMB_BASE_URL_t1,
     THUMB_BASE_URL_t2,
     THUMB_BASE_URL_t3,
-    THUMB_BASE_URL_t5,
-    THUMB_BASE_URL_t7,
+    THUMB_BASE_URL_t4,
     IMG_BASE_URL_i2,
     IMG_BASE_URL_i3,
     IMG_BASE_URL_i5,
@@ -380,10 +379,10 @@ class Gallery:
                 f'{thumb_response.status_code}, retrying...'
             )
             thumb_base_urls = [
+                THUMB_BASE_URL_t1,
                 THUMB_BASE_URL_t2,
                 THUMB_BASE_URL_t3,
-                THUMB_BASE_URL_t5,
-                THUMB_BASE_URL_t7
+                THUMB_BASE_URL_t4,
             ]
             thumb_extensions = [
                 'jpg',
@@ -696,7 +695,7 @@ class Gallery:
             -8: ('Error when downloading missing pages (failed retry 3 times) '
                  f"for {str(self)}"),
             -9: ('There are more pages downloaded than self.num_pages '
-                  f"for {str(self)}"),
+                 f"for {str(self)}"),
             -10: f'Error when saving PDF for {str(self)}',
         }
 
