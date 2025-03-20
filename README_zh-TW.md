@@ -6,7 +6,7 @@
 ## To-do
 - Update README
 - Output and print initial_fails when initial_try = False?
-- How to download repeats for favorites?
+- How to download repeats for favorites (with additional_tags = ['favorites', 'repeats'])?
 - Replace 'tags' and 'fileicon' with pure python code
 - EOF error?
 
