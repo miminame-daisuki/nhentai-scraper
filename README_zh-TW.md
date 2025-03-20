@@ -24,6 +24,7 @@
 - Print # of new repeats and blacklists not downloaded during this session in write_final_results()?
 - Add whether to put gallery id in folder name to settings?
 - Add periods and () around plural s
+- Align tqdm progress bar?
 
 - Print name of program when starting?
 - Replace os with Path
