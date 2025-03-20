@@ -10,6 +10,7 @@
 - Replace 'tags' and 'fileicon' with pure python code
 - EOF error?
 
+- Release memory after each gallery download?
 - Package python scripts (into command line scripts?) instead of using pyinstaller
 - Use async to send requests to all mirrors (i1, i2, i3, ...) to download with the one that has the fastest response
 - Add colors to terminal output
@@ -22,7 +23,7 @@
 - Update list of downloaded galleries to txt file
 - Print # of new repeats and blacklists not downloaded during this session in write_final_results()?
 - Add whether to put gallery id in folder name to settings?
-- Release memory after each gallery download?
+- Add periods and () around plural s
 
 - Print name of program when starting?
 - Replace os with Path
