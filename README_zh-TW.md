@@ -10,6 +10,7 @@
 - Replace 'tags' and 'fileicon' with pure python code
 - EOF error?
 
+- Add tqdm for total progress?
 - Release memory after each gallery download?
 - Package python scripts (into command line scripts?) instead of using pyinstaller
 - Use async to send requests to all mirrors (i1, i2, i3, ...) to download with the one that has the fastest response
