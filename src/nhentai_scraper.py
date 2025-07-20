@@ -624,7 +624,7 @@ class Gallery:
     def check_pdf(self) -> None:
 
         logger.info('Checking PDF...')
-        pdf_path = f"{self.folder_dir}/{self.title}.pdf"
+        self.pdf_path = f"{self.folder_dir}/{self.title}.pdf"
         # load all image files and remove unwanted ones
         image_filenames = os.listdir(self.folder_dir)
         exclude_list = [
@@ -634,39 +634,43 @@ class Gallery:
             '.DS_Store',
             f'thumb.{self.thumb_extension}',
         ]
-        image_filenames = [
+        self.image_filenames = [
             unicodedata.normalize('NFC', file) for file in image_filenames
             if file not in exclude_list
         ]
 
         # check whether pdf already exists
-        if f"{self.title}.pdf" in image_filenames:
-            reader = PdfReader(pdf_path)
+        if f"{self.title}.pdf" in self.image_filenames:
+            reader = PdfReader(self.pdf_path)
             if len(reader.pages) == self.num_pages:
                 logger.info('PDF file already exists with matching page count')
 
                 return
 
+        self.save2pdf()
+
+    def save2pdf(self) -> None:
+
         logger.info('Converting images to PDF file...')
         # sort according to page number
-        sort = [int(Path(page).stem) for page in image_filenames]
-        image_filenames = [
-            file for _, file in sorted(zip(sort, image_filenames))
+        sort = [int(Path(page).stem) for page in self.image_filenames]
+        self.image_filenames = [
+            file for _, file in sorted(zip(sort, self.image_filenames))
         ]
 
         # open all image files and save to pdf
         images = []
         try:
-            for img_filename in image_filenames:
+            for img_filename in self.image_filenames:
                 image_path = os.path.join(self.folder_dir, img_filename)
                 with Image.open(image_path) as img:
                     img_copy = img.copy()
                 # fix for 'ValueError: cannot save mode I'
-                if img_copy.mode == 'I':
+                if img_copy.mode == 'I' or img_copy.mode == 'RGBA':
                     img_copy = img_copy.convert('RGB')
                 images.append(img_copy)
             images[0].save(
-                pdf_path, "PDF", resolution=100.0,
+                self.pdf_path, "PDF", resolution=100.0,
                 save_all=True, append_images=images[1:]
             )
         except Exception as error:
