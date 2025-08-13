@@ -7,9 +7,10 @@
 - Update README
 - Output and print initial_fails when initial_try = False?
 - How to download repeats for favorites (with additional_tags = ['favorites', 'repeats'])?
-- Replace 'tags' and 'fileicon' with pure python code
-- EOF error?
+- 'EOFError' happening at the end of terminal output?
 
+- Remove tags in blacklist right after loading download_list 
+- How to detect individual corrupted images in a gallery and automatically redownload them?
 - Add tqdm for total progress?
 - Release memory after each gallery download?
 - Package python scripts (into command line scripts?) instead of using pyinstaller
