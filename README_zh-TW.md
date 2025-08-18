@@ -19,7 +19,7 @@
 - Continue download pages when error in downloading thumbnail?
 - Fix tqdm (progress bar disappearing) when retrying failed pages
 - Automatically load blacklist tags from nhentai user page
-- Add helper functions (export id of favorites, print id of downloaded galleries, compare difference between favorites (or any tag) on nhentai.com and local downloads, ...)
+- Add helper functions (export id of favorites, print id of downloaded galleries, compare difference between favorites (or any tag) on nhentai.com and local downloads, tags statistics for downloaded galleries, ...)
 - Separate settings (ex: download wait time) to another .txt file
 - Make thumbnails and tags optional
 - Update list of downloaded galleries to txt file
@@ -30,7 +30,7 @@
 
 - Print name of program when starting?
 - Replace os with Path
-- Add blank after : in tags
+- Add blankspace after : in tags
 - Use async?
 - Rewrite logs for more readibility?
 - Automatically delete old logs?

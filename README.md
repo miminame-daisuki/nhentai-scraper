@@ -14,23 +14,10 @@ Feel free to ask about any difficulties you are facing [here](https://github.com
 - Can also skip over galleries with the same title.
 - Supports running while computer is in sleep.
 
-## Dependencies
-### CLI Dependencies
-- [fileicon](https://github.com/mklement0/fileicon)
-- [tag](https://github.com/jdberry/tag)
-
-### Python Dependencies
-- [Requests](https://pypi.org/project/requests/)
-- [Beautiful Soup 4](https://pypi.org/project/beautifulsoup4/)
-- [Pillow](https://pypi.org/project/pillow/)
-- [pypdf](https://pypi.org/project/pypdf/)
-- [tqdm](https://github.com/tqdm/tqdm)
--
-
 ## Installation
-### Unix executable (only requires the [CLI dependencies](#cli-dependencies))
+### Unix executable
 - Download the unix executable from [Releases](https://github.com/miminame-daisuki/nhentai-scraper/releases).
-### Source code (requires both the [CLI](#cli-dependencies) and the [Python dependencies](#python-dependencies))
+### Source code
 - Run `git clone https://github.com/miminame-daisuki/nhentai-scraper` in your terminal.
 
 ## Basic Usage
@@ -57,7 +44,7 @@ Example `blacklist.txt`:
 
 1. Find your cookies and headers with your browser of choice for bypassing CloudFlare.
 Example using Safari:
-    1. Go to [nhentai](https://nhentai.net).
+    1. Visit to [nhentai.net](https://nhentai.net).
     1. (Optional) Log in to your account (only necessary if you wish to download your favorites).
     1. Clear the CloudFlare captcha.
     1. From the `Develop` menu, click on `Show Web Inspector`. (Follow [these steps](https://developer.apple.com/documentation/safari-developer-tools/enabling-developer-features) if you haven't enabled it.)
