@@ -22,19 +22,19 @@ def get_favorite_id_artist(save_filename: Optional[Path] = None):
     # from artists/ids of favorited galleries
     download_list = []
 
-    settings = load_inputs.confirm_settings()
     download_dir = misc.set_download_dir()
     session = nhentai_scraper.create_session()
 
-    id_list = download_tags.search_tag('favorites', session)
+    id_list = download_tags.search_tag("favorites", session)
 
     for gallery_id in tqdm(id_list):
         gallery = nhentai_scraper.Gallery(
             gallery_id, session=session, download_dir=download_dir
         )
         tag_list = [
-            tag for tag in gallery.metadata['tags']
-            if (tag['type'] == 'artist' or tag['type'] == 'group')
+            tag
+            for tag in gallery.metadata["tags"]
+            if (tag["type"] == "artist" or tag["type"] == "group")
         ]
         download_list.extend(
             [f"{tag['type']}:{tag['name']}" for tag in tag_list]
@@ -45,11 +45,12 @@ def get_favorite_id_artist(save_filename: Optional[Path] = None):
     download_list = list(set(download_list))
 
     if save_filename is None:
-        save_filename = download_dir.parent / 'inputs/download_list.txt'
-    with open(save_filename, 'w') as f:
+        save_filename = download_dir.parent / "inputs/download_list.txt"
+    with open(save_filename, "w") as f:
         for line in download_list:
-            f.write(f'{line}\n')
+            f.write(f"{line}\n")
 
+    return download_list
 
 
 def get_blacklist_tags(save_filename: Optional[Path] = None):
