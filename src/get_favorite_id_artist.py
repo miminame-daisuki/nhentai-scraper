@@ -8,10 +8,12 @@ Created on Sat Feb 11 22:22:59 2024
 from tqdm import tqdm
 from pathlib import Path
 from typing import Optional
+from bs4 import BeautifulSoup
+import json
 
 import nhentai_scraper
+import nhentai_urls
 import download_tags
-import load_inputs
 import misc
 
 
@@ -49,5 +51,43 @@ def get_favorite_id_artist(save_filename: Optional[Path] = None):
             f.write(f'{line}\n')
 
 
-if __name__ == '__main__':
+
+def get_blacklist_tags(save_filename: Optional[Path] = None):
+
+    blacklist = []
+
+    download_dir = misc.set_download_dir()
+    session = nhentai_scraper.create_session()
+
+    response = nhentai_scraper.get_response(nhentai_urls.NHENTAI_URL, session)
+    soup = BeautifulSoup(response.text, "html.parser")
+
+    menu_right = soup.find("ul", {"class": "menu right"})
+    user_url = (
+        menu_right.find_all("li")[1].find("a").get("href")  # type:ignore
+    )
+
+    blacklist_url = nhentai_urls.NHENTAI_URL + user_url + "/blacklist"
+    response = nhentai_scraper.get_response(blacklist_url, session)
+    soup = BeautifulSoup(response.text, "html.parser")
+
+    blacklist_script = soup.find_all("script")[2].contents[0]
+    blacklist_json = blacklist_script.split('"')[1]
+    blacklist_dict = json.loads(
+        blacklist_json.encode("utf-8").decode("unicode-escape")
+    )
+
+    for tag in blacklist_dict:
+        blacklist.append(f"{tag['type']}:{tag['name']}")
+
+    if save_filename is None:
+        save_filename = download_dir.parent / "inputs/blacklist.txt"
+    with open(save_filename, "w") as f:
+        for line in blacklist:
+            f.write(f"{line}\n")
+
+    return blacklist
+
+
+if __name__ == "__main__":
     get_favorite_id_artist()
