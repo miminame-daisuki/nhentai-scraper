@@ -17,7 +17,10 @@ import download_tags
 import misc
 
 
-def get_favorite_id_artist(save_filename: Optional[Path] = None):
+def get_favorites_tags(
+    type: Optional[list] = ["artist", "group"],
+    save_filename: Optional[Path] = None,
+):
     # automatically generates download_list.txt
     # from artists/ids of favorited galleries
     download_list = []
@@ -34,7 +37,7 @@ def get_favorite_id_artist(save_filename: Optional[Path] = None):
         tag_list = [
             tag
             for tag in gallery.metadata["tags"]
-            if (tag["type"] == "artist" or tag["type"] == "group")
+            if (tag["type"] in type)
         ]
         download_list.extend(
             [f"{tag['type']}:{tag['name']}" for tag in tag_list]
@@ -91,4 +94,4 @@ def get_blacklist_tags(save_filename: Optional[Path] = None):
 
 
 if __name__ == "__main__":
-    get_favorite_id_artist()
+    get_favorites_tags()
