@@ -2,13 +2,17 @@
 
 [English](README.md) | 繁體中文
 
-一個nhentai的爬蟲。啊啊啊我還沒把這部分翻譯成中文，如果有人急了.jpg的話可以在issues那邊留言，我盡快幫你～
+一個nhentai的爬蟲。
+啊啊啊我還沒把這部分翻譯成中文，
+如果有人急了.jpg的話可以在issues那邊留言，
+我盡快幫你～
 
 ## To-do
 
 - Update README
 - Output and print initial_fails when initial_try = False?
-- How to download repeats for favorites (with additional_tags = ['favorites', 'repeats'])?
+- How to download repeats for favorites
+(with additional_tags = ['favorites', 'repeats'])?
 - 'EOFError' happening at the end of terminal output?
 
 - Update 'metadata.json' for galleries that have updated their tags?
@@ -24,13 +28,16 @@ to download with the one that has the fastest response
 - Continue download pages when error in downloading thumbnail?
 - Fix tqdm (progress bar disappearing) when retrying failed pages
 - Automatically load blacklist tags from nhentai user page
-- Add helper functions (export id of favorites, print id of downloaded galleries,
+- Add helper functions
+(export id of favorites,
+print id of downloaded galleries,
 compare difference between favorites (or any tag) on nhentai.com and local downloads,
 tags statistics for downloaded galleries, ...)
 - Separate settings (ex: download wait time) to another .txt file
 - Make thumbnails and tags optional
 - Update list of downloaded galleries to txt file
-- Print # of new repeats and blacklists not downloaded during this session in write_final_results()?
+- Print # of new repeats and blacklists not downloaded during this session
+in write_final_results()?
 - Add whether to put gallery id in folder name to settings?
 - Add periods and () around plural s
 - Align tqdm progress bar?
