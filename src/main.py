@@ -48,6 +48,10 @@ def main():
         # entry is `favorites`, `repeats`, or a tag
         if entry == 'favorites' or entry == 'repeats' or ':' in entry:
 
+            if entry in blacklist:
+                print(f'BLACKLISTED {entry}')
+                continue
+
             if entry == 'favorites':
                 additional_tags.append('favorites')
 
