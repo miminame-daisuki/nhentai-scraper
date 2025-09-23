@@ -27,10 +27,7 @@ def cli_parser():
 
     parser.add_argument(
         "--redownload-downloaded",
-        help=(
-            "Start download at the specified tag, "
-            "skipping all previous tags in 'download_list.txt'"
-        ),
+        help="Recheck all downloaded galleries",
         action="store_true",
     )
 
