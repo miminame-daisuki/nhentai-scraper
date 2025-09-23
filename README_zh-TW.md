@@ -15,6 +15,7 @@
 (with additional_tags = ['favorites', 'repeats'])?
 - 'EOFError' happening at the end of terminal output?
 
+- Check errors
 - Update 'metadata.json' for galleries that have updated their tags?
 - Remove tags in blacklist right after loading download_list
 - How to detect individual corrupted images in a gallery
