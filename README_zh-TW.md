@@ -44,7 +44,6 @@ in write_final_results()?
 - Align tqdm progress bar?
 - Add line number to logs
 
-- Print name of program when starting?
 - Replace os with Path
 - Add blankspace after : in tags
 - Use async?
