@@ -552,7 +552,16 @@ class Gallery:
         leave_tqdm: Optional[bool] = True
     ) -> None:
 
-        t = tqdm(self.missing_pages, leave=leave_tqdm)
+        bar_format = (
+            '{desc}: {percentage:3.0f}%|'
+            '{bar}'
+            "| {n_fmt:>3}/{total_fmt:<3} [{elapsed}<{remaining}, {rate_fmt}{postfix}]"
+        )
+        t = tqdm(
+            self.missing_pages,
+            bar_format=bar_format,
+            leave=leave_tqdm
+        )
         for page in t:
 
             if tries == 0:
