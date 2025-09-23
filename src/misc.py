@@ -12,6 +12,25 @@ from typing import Union, Optional
 logger = logging.getLogger('__main__.' + __name__)
 
 
+def create_gallery_results_dict(repeat_ids: list, blacklist: list) -> dict:
+
+    gallery_results = {
+        'finished': [],
+        'already_downloaded': [],
+        'repeats': repeat_ids,
+        'blacklists': blacklist,
+        'initial_fails': [],
+        'retry_fails': [],
+    }
+    return gallery_results
+
+
+def print_start_message(download_dir) -> None:
+
+    print(f'Downloading to: {download_dir}')
+    print('-'*os.get_terminal_size().columns)
+
+
 def get_application_folder_dir() -> str:
 
     application_folder_dir = ''

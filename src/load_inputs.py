@@ -104,6 +104,4 @@ def confirm_settings() -> dict:
 
     settings['skip_to_tag'] = args.skip_to_tag
 
-    print('-'*os.get_terminal_size().columns)
-
     return settings
