@@ -26,6 +26,15 @@ def cli_parser():
     )
 
     parser.add_argument(
+        "--redownload-downloaded",
+        help=(
+            "Start download at the specified tag, "
+            "skipping all previous tags in 'download_list.txt'"
+        ),
+        action="store_true",
+    )
+
+    parser.add_argument(
         "--thumbnail",
         help="Set thumbnails to each downloaded gallery.",
         action="store_true",

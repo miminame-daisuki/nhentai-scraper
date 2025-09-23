@@ -93,26 +93,18 @@ def confirm_settings() -> dict:
     settings['download_dir'] = download_dir
 
     # create `cookies.json` and `headers.json` if not present in `inputs/`
-    if args.confirm_settings:
-        inputs_path = Path(f'{application_folder_path}/inputs').absolute()
-        if 'cookies.json' not in [file.name for file in inputs_path.iterdir()]:
-            write_cookies(inputs_path)
-        else:
-            x = input('Update cookies? (y/n)')
-            if x != 'n':
-                write_cookies(inputs_path)
-        if 'headers.json' not in [file.name for file in inputs_path.iterdir()]:
-            write_headers(inputs_path)
+    inputs_path = Path(f'{application_folder_path}/inputs').absolute()
+    if 'cookies.json' not in [file.name for file in inputs_path.iterdir()]:
+        write_cookies(inputs_path)
+    if 'headers.json' not in [file.name for file in inputs_path.iterdir()]:
+        write_headers(inputs_path)
 
-    if args.confirm_settings:
-        skip_downloaded_ids = input('Skip downloaded galleries?(y/n)')
-        if skip_downloaded_ids == 'y':
-            skip_downloaded_ids = True
-        else:
-            skip_downloaded_ids = False
-        settings['skip_downloaded_ids'] = skip_downloaded_ids
+    if args.update_cookies:
+        write_cookies(inputs_path)
 
-        settings['skip_to_tag'] = input('Skip to tag?(Press Enter for no skip)')
+    settings['redownload_downloaded'] = args.redownload_downloaded
+
+    settings['skip_to_tag'] = args.skip_to_tag
 
     print('-'*os.get_terminal_size().columns)
 

@@ -21,7 +21,7 @@ def main():
 
     settings = load_inputs.confirm_settings()
     download_dir = settings['download_dir']
-    skip_downloaded_ids = settings['skip_downloaded_ids']
+    redownload_downloaded = settings['redownload_downloaded']
     skip_to_tag = settings['skip_to_tag']
 
     download_list = load_inputs.load_input_list(
@@ -59,7 +59,7 @@ def main():
             gallery_results_extend = download_tags.download_tag(
                 entry, download_dir,
                 session,
-                skip_downloaded_ids=skip_downloaded_ids,
+                redownload_downloaded=redownload_downloaded,
                 additional_tags=additional_tags,
                 gallery_results=gallery_results,
             )
