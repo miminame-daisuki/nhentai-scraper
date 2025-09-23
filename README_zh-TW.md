@@ -42,6 +42,7 @@ in write_final_results()?
 - Add whether to put gallery id in folder name to settings?
 - Add periods and () around plural s
 - Align tqdm progress bar?
+- Add line number to logs
 
 - Print name of program when starting?
 - Replace os with Path
