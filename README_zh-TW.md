@@ -1,16 +1,18 @@
 # NHentai Scraper
+
 [English](https://github.com/miminame-daisuki/nhentai-scraper/blob/main/README.md) | 繁體中文
 
 一個nhentai的爬蟲。啊啊啊我還沒把這部分翻譯成中文，如果有人急了.jpg的話可以在issues那邊留言，我盡快幫你～
 
 ## To-do
+
 - Update README
 - Output and print initial_fails when initial_try = False?
 - How to download repeats for favorites (with additional_tags = ['favorites', 'repeats'])?
 - 'EOFError' happening at the end of terminal output?
 
 - Update 'metadata.json' for galleries that have updated their tags?
-- Remove tags in blacklist right after loading download_list 
+- Remove tags in blacklist right after loading download_list
 - How to detect individual corrupted images in a gallery and automatically redownload them?
 - Add tqdm for total progress?
 - Release memory after each gallery download?
@@ -38,3 +40,4 @@
 - Regenerate `requirements.txt` and `environment.yml`
 - Add tests
 - Add documentation
+
