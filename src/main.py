@@ -49,7 +49,8 @@ def main():
         if entry == 'favorites' or entry == 'repeats' or ':' in entry:
 
             if entry in blacklist:
-                print(f'BLACKLISTED {entry}')
+                print(f'\nBLACKLISTED {entry}\n')
+                print(f"{'-'*os.get_terminal_size().columns}")
                 continue
 
             if entry == 'favorites':
