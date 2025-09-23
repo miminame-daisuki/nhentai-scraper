@@ -30,16 +30,11 @@ def main():
     blacklist = load_inputs.load_input_list('blacklist.txt')
     repeat_ids = load_inputs.load_input_list('repeated_galleries.txt')
 
+    misc.print_start_message(download_dir)
+
     session = nhentai_scraper.create_session()
 
-    gallery_results = {
-        'finished': [],
-        'already_downloaded': [],
-        'repeats': repeat_ids,
-        'blacklists': blacklist,
-        'initial_fails': [],
-        'retry_fails': [],
-    }
+    gallery_results = misc.create_gallery_results_dict(repeat_ids, blacklist)
 
     signal.signal(
         signal.SIGINT,

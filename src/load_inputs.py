@@ -105,6 +105,4 @@ def confirm_settings() -> dict:
 
     settings['skip_to_tag'] = input('Skip to tag?(Press Enter for no skip)')
 
-    print('-'*os.get_terminal_size().columns)
-
     return settings
