@@ -98,8 +98,6 @@ def confirm_settings() -> dict:
     if 'headers.json' not in [file.name for file in inputs_path.iterdir()]:
         write_headers(inputs_path)
 
-    check_fileicon_tag_install()
-
     skip_downloaded_ids = input('Skip downloaded galleries?(y/n)')
     if skip_downloaded_ids == 'y':
         skip_downloaded_ids = True
@@ -112,23 +110,3 @@ def confirm_settings() -> dict:
     print('-'*os.get_terminal_size().columns)
 
     return settings
-
-
-def check_fileicon_tag_install() -> None:
-    check_fileicon_command = ['which', 'fileicon']
-    result = run(check_fileicon_command, capture_output=True)
-    if result.returncode != 0:
-        print(
-            "Please install 'fileicon' from "
-            "'https://github.com/mklement0/fileicon'"
-        )
-        sys.exit('fileicon not installed')
-
-    check_tag_command = ['which', 'tag']
-    result = run(check_tag_command, capture_output=True)
-    if result.returncode != 0:
-        print(
-            "Please install 'tag' from "
-            "'https://github.com/jdberry/tag'"
-        )
-        sys.exit('tag not installed')
