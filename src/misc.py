@@ -8,6 +8,7 @@ import logging
 import logging.config
 from typing import Union, Optional
 
+from print_colored_text import bcolors
 
 logger = logging.getLogger('__main__.' + __name__)
 
@@ -27,8 +28,14 @@ def create_gallery_results_dict(repeat_ids: list, blacklist: list) -> dict:
 
 def print_start_message(download_dir) -> None:
 
-    print(f'Downloading to: {download_dir}')
-    print('-'*os.get_terminal_size().columns)
+    message = (
+        f"{'-'*os.get_terminal_size().columns}\n\n"
+        f'{bcolors.HEADER}NHENTAI SCRAPER{bcolors.ENDC}\n\n'
+        f'Downloading to: {download_dir}\n\n'
+        f"{'-'*os.get_terminal_size().columns}"
+    )
+
+    print(message)
 
 
 def get_application_folder_dir() -> str:
