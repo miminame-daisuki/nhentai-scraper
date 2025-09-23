@@ -1,6 +1,4 @@
 import os
-import sys
-from subprocess import run
 from pathlib import Path
 import json
 from typing import Union, Optional
@@ -9,7 +7,7 @@ import misc
 
 
 def load_input_list(
-    filename: str, skip_to_tag: Optional[str] = ''
+    filename: Union[str, Path], skip_to_tag: Optional[str] = ''
 ) -> list[str]:
 
     application_folder_path = misc.get_application_folder_dir()
