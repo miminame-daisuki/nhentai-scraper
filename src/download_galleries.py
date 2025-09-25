@@ -44,7 +44,7 @@ def download_id_list(
     progress_bar = tqdm(
         enumerate(id_list, start=1),
         total=len(id_list),
-        desc=f"Downloading galleries from {id_list_name}"
+        desc=f"Downloading galleries from {id_list_name}",
         leave=False,
     )
     for count, gallery_id in progress_bar:
