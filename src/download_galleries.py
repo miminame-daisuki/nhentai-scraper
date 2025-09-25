@@ -24,11 +24,11 @@ logger = logging.getLogger('__main__.' + __name__)
 
 def download_id_list(
     id_list: list[str],
+    id_list_name: str,
     download_dir: Union[str, Path],
     session: requests.sessions.Session,
     additional_tags: Optional[list[str]] = None,
     download_repeats: Optional[bool] = False,
-    id_list_name: Optional[str] = None,
     gallery_results: Optional[dict[str, list[str]]] = None,
 ) -> dict[str, list[str]]:
 
@@ -41,12 +41,13 @@ def download_id_list(
         'retry_fails': [],
     }
 
-    progress_bar = tqdm(enumerate(id_list, start=1), total=len(id_list))
+    progress_bar = tqdm(
+        enumerate(id_list, start=1),
+        total=len(id_list),
+        desc=f"Downloading galleries from {id_list_name}"
+        leave=False,
+    )
     for count, gallery_id in progress_bar:
-        if id_list_name is not None:
-            progress_bar.set_description(
-                f"Downloading galleries from {id_list_name}"
-            )
 
         logger.info(f"\n{'-'*os.get_terminal_size().columns}")
         logger.info(
@@ -79,7 +80,8 @@ def download_id_list(
 
         progress_bar = tqdm(
                 enumerate(gallery_results_extend['initial_fails'], start=1),
-                total=len(gallery_results_extend['initial_fails'])
+                total=len(gallery_results_extend['initial_fails']),
+                leave=False
             )
         for count, gallery_id in progress_bar:
             logger.info(f"\n{'-'*os.get_terminal_size().columns}")
@@ -108,7 +110,14 @@ def download_id_list(
                     initial_try=False
                 )
 
-    print_gallery_results(gallery_results_extend)
+    elapsed = progress_bar.format_dict['elapsed']
+    elapsed_time = progress_bar.format_interval(elapsed)
+
+    print_gallery_results(
+        gallery_results_extend,
+        id_list_name,
+        elapsed_time,
+    )
 
     return gallery_results_extend
 
@@ -140,7 +149,11 @@ def record_gallery_results(
     return gallery_results
 
 
-def print_gallery_results(gallery_results: dict[str, list[str]]) -> None:
+def print_gallery_results(
+    gallery_results: dict[str, list[str]],
+    id_list_name: str,
+    elapsed_time: str,
+) -> None:
 
     total_download_counts = 0
     keys = ['finished', 'repeats', 'blacklists', 'retry_fails']
@@ -150,8 +163,9 @@ def print_gallery_results(gallery_results: dict[str, list[str]]) -> None:
     print()
     if len(gallery_results['finished']) > 0:
         print(
-            (f"Finished {len(gallery_results['finished'])} "
-             f'out of {total_download_counts} gallery downloads')
+            f"Finished downloading {len(gallery_results['finished'])} "
+            f'out of {total_download_counts} galleries from {id_list_name} '
+            f'in {elapsed_time}.'
         )
     if len(gallery_results['repeats']) > 0:
         print(

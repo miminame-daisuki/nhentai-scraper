@@ -104,7 +104,6 @@ def search_tag(
 
     logger.info(f"\n{'-'*os.get_terminal_size().columns}")
     logger.info(f"Searching galleries from {tag}")
-    print(f"\nSearching galleries from {tag}...\n")
 
     id_list = []
 
@@ -161,7 +160,11 @@ def search_tag(
 
         return error_message
 
-    for page in tqdm(range(1, page_count+1), leave=False):
+    for page in tqdm(
+        range(1, page_count+1),
+        desc=f"Searching galleries from {tag}",
+        leave=False
+    ):
         logger.info(f"Searching page {page} from {tag}")
         params = {'page': page}
         if tag.startswith('search: '):
@@ -296,11 +299,11 @@ def download_tag(
     logger.info(f'Start downloading for {tag}')
     gallery_results_extend = download_galleries.download_id_list(
         id_list_to_download,
+        tag,
         download_dir,
         session,
         additional_tags=additional_tags,
         download_repeats=download_repeats,
-        id_list_name=tag,
         gallery_results=gallery_results,
     )
 
