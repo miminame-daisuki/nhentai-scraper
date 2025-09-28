@@ -41,6 +41,7 @@ def download_id_list(
         'retry_fails': [],
     }
 
+    print()  # blank line between seapration and progress bar for each gallery
     progress_bar = tqdm(
         enumerate(id_list, start=1),
         total=len(id_list),
@@ -161,7 +162,7 @@ def print_gallery_results(
         total_download_counts += len(gallery_results[key])
 
     print()
-    if len(gallery_results['finished']) > 0:
+    if total_download_counts > 0:
         print(
             f"Finished downloading {len(gallery_results['finished'])} "
             f'out of {total_download_counts} galleries from {id_list_name} '
