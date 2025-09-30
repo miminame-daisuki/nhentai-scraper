@@ -35,6 +35,7 @@ from nhentai_urls import (
     IMG_BASE_URL_i5,
     IMG_BASE_URL_i7
 )
+from print_colored_text import bcolors
 
 # Fix for 'IOError: image file is truncated (nn bytes not processed).'
 # See https://stackoverflow.com/questions/12984426/
@@ -718,7 +719,7 @@ class Gallery:
 
         def skip_download():
             if self.status_code < -1:
-                tqdm.write(self.status())
+                tqdm.write(f'{bcolors.FAIL}{self.status()}{bcolors.ENDC}')
                 logger.error(self.status())
 
                 return True
