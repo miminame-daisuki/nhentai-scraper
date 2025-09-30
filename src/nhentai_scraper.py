@@ -691,25 +691,25 @@ class Gallery:
         # status_code < -1: Error
 
         status_dict = {
-            0: f"{str(self)} download finished",
-            1: f"{str(self)} already downloaded",
+            0: f"{str(self)} download finished.",
+            1: f"{str(self)} already downloaded.",
             2: (f"{str(self)} has the same title as "
-                f"the already downloaded #{self.downloaded_metadata['id']}"),
-            3: f"BLACKLISTED {str(self)}",
+                f"the already downloaded #{self.downloaded_metadata['id']}."),
+            3: f"BLACKLISTED {str(self)}.",
             -1: 'Download not finished...',
             -2: (f"Error 403 - Forbidden for #{self.id} "
-                 '(try updating `cf_clearance`)'),
-            -3: f'Error 404 - Not Found for #{self.id}',
+                 '(try updating `cf_clearance`).'),
+            -3: f'Error 404 - Not Found for #{self.id}.',
             -4: ('Error when downloading metadata '
-                 f"(failed retry 3 times) for #{self.id}"),
-            -5: f'Error when downloading thumbnail for {str(self)}',
-            -6: f'Error when setting tags for {str(self)}',
-            -7: f'Error when setting thumbnail for {str(self)}',
+                 f"(failed retry 3 times) for #{self.id}."),
+            -5: f'Error when downloading thumbnail for {str(self)}.',
+            -6: f'Error when setting tags for {str(self)}.',
+            -7: f'Error when setting thumbnail for {str(self)}.',
             -8: ('Error when downloading missing pages (failed retry 3 times) '
-                 f"for {str(self)}"),
+                 f"for {str(self)}."),
             -9: ('There are more pages downloaded than self.num_pages '
-                 f"for {str(self)}"),
-            -10: f'Error when saving PDF for {str(self)}',
+                 f"for {str(self)}."),
+            -10: f'Error when saving PDF for {str(self)}.',
         }
 
         return status_dict[self.status_code]
