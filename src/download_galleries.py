@@ -17,6 +17,7 @@ from typing import Union, Optional
 
 import nhentai_scraper
 import misc
+from print_colored_text import bcolors
 
 
 logger = logging.getLogger('__main__.' + __name__)
@@ -170,15 +171,17 @@ def print_gallery_results(
         )
     if len(gallery_results['repeats']) > 0:
         print(
-            (f"{len(gallery_results['repeats'])} "
-             'repeated galleries not downloaded')
+            'Skipped download of '
+            f"{len(gallery_results['repeats'])} repeated galleries."
         )
     if len(gallery_results['blacklists']) > 0:
         print(f"{len(gallery_results['blacklists'])} galleries BLACKLISTED")
     if len(gallery_results['retry_fails']) > 0:
         print(
-            (f"{len(gallery_results['retry_fails'])} "
-             'failed retry galleries not downloaded')
+            f'{bcolors.FAIL}'
+            "Failed to download "
+            f"{len(gallery_results['retry_fails'])} galleries."
+            f'{bcolors.ENDC}'
         )
     print()
 
@@ -209,11 +212,13 @@ def write_final_results(gallery_results: dict):
         )
         print(
             f"\n\nFinished {len(gallery_results['finished'])} "
-            'gallery downloads in total'
+            'gallery downloads in total.'
         )
         print(
+            f'{bcolors.FAIL}'
             f"{len(gallery_results['retry_fails'])} failed downloads "
-            'written to failed_downloads.txt\n\n'
+            "written to 'failed_downloads.txt'\n\n"
+            f'{bcolors.ENDC}'
         )
         print(f"{'-'*os.get_terminal_size().columns}")
         logger.info(
