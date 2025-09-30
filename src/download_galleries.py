@@ -138,6 +138,8 @@ def record_gallery_results(
         gallery_results['repeats'].append(f'#{gallery.id}')
     elif gallery.status_code == 3:
         gallery_results['blacklists'].append(f'#{gallery.id}')
+    elif gallery.status_code == 4:
+        gallery_results['updated_tags'].append(f'#{gallery.id}')
 
     if initial_try and gallery.status_code < -1:
         gallery_results['initial_fails'].append(f'#{gallery.id}')
@@ -158,7 +160,7 @@ def print_gallery_results(
 ) -> None:
 
     total_download_counts = 0
-    keys = ['finished', 'repeats', 'blacklists', 'retry_fails']
+    keys = ['finished', 'repeats', 'blacklists', 'updated_tags', 'retry_fails']
     for key in keys:
         total_download_counts += len(gallery_results[key])
 
@@ -176,6 +178,11 @@ def print_gallery_results(
         )
     if len(gallery_results['blacklists']) > 0:
         print(f"{len(gallery_results['blacklists'])} galleries BLACKLISTED.")
+    if len(gallery_results['updated_tags']) > 0:
+        print(
+            f"Updated tags for "
+            f"{len(gallery_results['updated_tags'])} galleries."
+        )
     if len(gallery_results['retry_fails']) > 0:
         print(
             f'{bcolors.FAIL}'

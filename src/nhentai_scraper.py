@@ -454,9 +454,9 @@ class Gallery:
 
         logger.info('Checking tags...')
 
-        attr_name = 'com.apple.metadata:_kMDItemUserTags'
-        try:
-            raw_current_tags = xattr.getxattr(self.folder_dir, attr_name)
+        tag_attribute = 'com.apple.metadata:_kMDItemUserTags'
+        if tag_attribute in xattr.xattr(self.folder_dir):
+            raw_current_tags = xattr.getxattr(self.folder_dir, tag_attribute)
             current_tags = plistlib.loads(raw_current_tags)
             # Remove the trailing "\n0" that appears
             # when using 'tag save tags
@@ -467,14 +467,20 @@ class Gallery:
 
                 return
 
-        except OSError:
-            pass
+            else:
+                self.set_tags()
+                self.status_code = 4
 
-        logger.info('Setting tags...')
+        logger.info('Tags not found, setting tags...')
+        self.set_tags()
 
+    def set_tags(self) -> None:
+
+        tag_attribute = 'com.apple.metadata:_kMDItemUserTags'
         tags_data = plistlib.dumps(self.tags, fmt=plistlib.FMT_BINARY)
         try:
-            xattr.setxattr(self.folder_dir, attr_name, tags_data)
+            xattr.setxattr(self.folder_dir, tag_attribute, tags_data)
+            logger.info('Tags set.')
         except Exception as error:
             self.status_code = -6
             logger.error(
@@ -688,7 +694,8 @@ class Gallery:
             self.status_code = -10
 
     def status(self) -> str:
-        # status_code >= -1: Normal
+        # status_code >= 0: Normal
+        # status_code = 0: Still downloading
         # status_code < -1: Error
 
         status_dict = {
@@ -697,6 +704,7 @@ class Gallery:
             2: (f"{str(self)} has the same title as "
                 f"the already downloaded #{self.downloaded_metadata['id']}."),
             3: f"BLACKLISTED {str(self)}.",
+            4: f"Updated tags for {str(self)}.",
             -1: 'Download not finished...',
             -2: (f"Error 403 - Forbidden for #{self.id} "
                  '(try updating `cf_clearance`).'),
