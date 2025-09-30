@@ -170,15 +170,15 @@ def print_gallery_results(
         )
     if len(gallery_results['repeats']) > 0:
         print(
-            (f"{len(gallery_results['repeats'])} "
-             'repeated galleries not downloaded')
+            f"{len(gallery_results['repeats'])} "
+            'repeated galleries not downloaded.'
         )
     if len(gallery_results['blacklists']) > 0:
-        print(f"{len(gallery_results['blacklists'])} galleries BLACKLISTED")
+        print(f"{len(gallery_results['blacklists'])} galleries BLACKLISTED.")
     if len(gallery_results['retry_fails']) > 0:
         print(
-            (f"{len(gallery_results['retry_fails'])} "
-             'failed retry galleries not downloaded')
+            f"{len(gallery_results['retry_fails'])} "
+            'failed retry galleries not downloaded.'
         )
     print()
 
@@ -239,7 +239,7 @@ def exit_gracefully(
     logger.info(f"\n{'-'*os.get_terminal_size().columns}")
     logger.info('Program terminated with Ctrl-C')
     print(f"\n{'-'*os.get_terminal_size().columns}")
-    print('\nProgram terminated with Ctrl-C')
+    print('\nProgram terminated with Ctrl-C.')
     write_final_results(gallery_results)
 
     sys.exit(0)
