@@ -318,6 +318,10 @@ class Gallery:
 
                 return
 
+            elif self.downloaded_metadata != self.metadata:
+                self.save_metadata()
+                logger.info('Metadata updated.')
+
         else:
             os.mkdir(self.folder_dir)
             self.save_metadata()
