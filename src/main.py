@@ -49,7 +49,7 @@ def main():
         if entry == 'favorites' or entry == 'repeats' or ':' in entry:
 
             if entry in blacklist:
-                print(f'\nBLACKLISTED {entry}\n')
+                print(f'\nBLACKLISTED {entry}.\n')
                 print(f"{'-'*os.get_terminal_size().columns}")
                 continue
 
@@ -84,7 +84,7 @@ def main():
         else:
             logger.info(f"\n{'-'*os.get_terminal_size().columns}")
             logger.error(f'{entry} is neither a tag nor a gallery id')
-            print(f'{entry} is neither a tag nor a gallery id')
+            print(f'{entry} is neither a tag nor a gallery id.')
 
         if gallery_results['repeats']:
             download_galleries.write_gallery_results(
