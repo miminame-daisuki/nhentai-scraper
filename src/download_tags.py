@@ -239,6 +239,7 @@ def download_tag(
         'finished': [],
         'already_downloaded': [],
         'repeats': [],
+        'updated_tags': [],
         'blacklists': [],
         'initial_fails': [],
         'retry_fails': [],

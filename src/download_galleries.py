@@ -37,6 +37,7 @@ def download_id_list(
         'finished': [],
         'already_downloaded': [],
         'repeats': [],
+        'updated_tags': [],
         'blacklists': [],
         'initial_fails': [],
         'retry_fails': [],
