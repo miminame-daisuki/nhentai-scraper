@@ -80,12 +80,12 @@ def download_id_list(
     if gallery_results_extend['initial_fails']:
         print('\nRetrying failed galleries...\n')
 
-        progress_bar = tqdm(
+        progress_bar_retry = tqdm(
                 enumerate(gallery_results_extend['initial_fails'], start=1),
                 total=len(gallery_results_extend['initial_fails']),
                 leave=False
             )
-        for count, gallery_id in progress_bar:
+        for count, gallery_id in progress_bar_retry:
             logger.info(f"\n{'-'*os.get_terminal_size().columns}")
             logger.info(
                 (f'Downloading number {count} '
@@ -175,7 +175,7 @@ def print_gallery_results(
             f"{len(gallery_results['repeats'])} repeated galleries."
         )
     if len(gallery_results['blacklists']) > 0:
-        print(f"{len(gallery_results['blacklists'])} galleries BLACKLISTED")
+        print(f"{len(gallery_results['blacklists'])} galleries BLACKLISTED.")
     if len(gallery_results['retry_fails']) > 0:
         print(
             f'{bcolors.FAIL}'
@@ -244,7 +244,7 @@ def exit_gracefully(
     logger.info(f"\n{'-'*os.get_terminal_size().columns}")
     logger.info('Program terminated with Ctrl-C')
     print(f"\n{'-'*os.get_terminal_size().columns}")
-    print('\nProgram terminated with Ctrl-C')
+    print('\nProgram terminated with Ctrl-C.')
     write_final_results(gallery_results)
 
     sys.exit(0)

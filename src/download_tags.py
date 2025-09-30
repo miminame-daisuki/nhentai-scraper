@@ -144,15 +144,15 @@ def search_tag(
         if error == 'Error 403':
             error_message = (
                 f'Error 403 - Forbidden for {tag} '
-                '(try updating cookies)\n'
+                '(try updating cookies).\n'
             )
         elif error == 'Error 404':
-            error_message = f'Error 404 - Not Found for {tag}'
+            error_message = f'Error 404 - Not Found for {tag}.'
         elif error == 'Error 500':
-            error_message = f'Error 500 - Server error for {tag}'
+            error_message = f'Error 500 - Server error for {tag}.'
         else:
             error_message = (
-                f'Failed to retrieve {tag} due to Error {error}'
+                f'Failed to retrieve {tag} due to Error {error}.'
             )
 
         logger.error(error_message)

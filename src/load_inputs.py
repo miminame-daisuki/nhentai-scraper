@@ -37,7 +37,7 @@ def load_json(
 ) -> dict:
 
     if filename.split('.')[-1] != 'json':
-        print('Not json file')
+        print('Not json file.')
         return {}
 
     if inputs_dir is None:
