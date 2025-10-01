@@ -475,6 +475,8 @@ class Gallery:
                 self.set_tags()
                 self.status_code = 4
 
+                return
+
         logger.info('Tags not found, setting tags...')
         self.set_tags()
 
