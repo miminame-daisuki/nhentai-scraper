@@ -15,7 +15,7 @@
 (with additional_tags = ['favorites', 'repeats'])?
 - 'EOFError' happening at the end of terminal output?
 
-- Check errors
+- Check pyright errors
 - Update 'metadata.json' for galleries that have updated their tags?
 - How to detect individual corrupted images in a gallery
 and automatically redownload them?
