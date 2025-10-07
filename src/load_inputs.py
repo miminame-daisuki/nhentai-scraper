@@ -12,13 +12,18 @@ def load_input_list(
 ) -> list[str]:
 
     application_folder_path = misc.get_application_folder_dir()
-    if filename[0] != '/':
+    filename = Path(filename)
+    if not filename.is_absolute():
         inputs_folder_dir = os.path.abspath(f'{application_folder_path}/inputs/')
         filename = Path(f'{inputs_folder_dir}/{filename}')
     else:
         filename = Path(filename)
 
-    filename.touch(exist_ok=True)
+    if not filename.exists():
+        raise Exception(
+            "'download_list.txt' doesn't exist in inputs/ folder!"
+        )
+
     with open(filename) as f:
         download_list = f.read().splitlines()
 
@@ -36,7 +41,8 @@ def load_json(
     inputs_dir: Optional[Union[str, Path]] = None
 ) -> dict:
 
-    if filename.split('.')[-1] != 'json':
+    filename = Path(filename)
+    if filename.suffix != '.json':
         print('Not json file.')
         return {}
 

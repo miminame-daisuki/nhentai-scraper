@@ -366,7 +366,7 @@ class Gallery:
         self.resize_thumb()
         self.set_thumb()
 
-    def download_thumb(self) -> None:
+    def download_thumb(self) -> int:
 
         logger.info('Retrieving thumbnail...')
         thumb_base_url = THUMB_BASE_URL_t3
@@ -571,7 +571,7 @@ class Gallery:
             "| {n_fmt:>3}/{total_fmt:<3} [{elapsed}<{remaining}, {rate_fmt}{postfix}]"
         )
         t = tqdm(
-            self.missing_pages,
+            pages,
             bar_format=bar_format,
             leave=leave_tqdm
         )

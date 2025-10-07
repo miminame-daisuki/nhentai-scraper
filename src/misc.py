@@ -77,17 +77,18 @@ def set_logging_config(
     logging_config_filename: Optional[Union[str, Path]] = None
 ) -> None:
 
+    application_folder_path = get_application_folder_dir()
+    logging_dir = os.path.abspath(f'{application_folder_path}/logs/')
     if logging_config_filename is None:
-        application_folder_path = get_application_folder_dir()
-        logging_dir = os.path.abspath(f'{application_folder_path}/logs/')
         logging_config_filename = os.path.join(
             logging_dir, 'logging_config.yaml'
         )
 
+    logging_config_filename = Path(logging_config_filename)
     with open(logging_config_filename) as f:
-        if 'yaml' in logging_config_filename:
+        if logging_config_filename.suffix == '.yaml':
             logging_config = yaml.full_load(f)
-        elif 'json' in logging_config_filename:
+        elif logging_config_filename.suffix == '.json':
             logging_config = json.load(f)
 
     logging_filename = os.path.join(
