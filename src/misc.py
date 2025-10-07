@@ -20,6 +20,7 @@ def create_gallery_results_dict(repeat_ids: list, blacklist: list) -> dict:
         'already_downloaded': [],
         'repeats': repeat_ids,
         'blacklists': blacklist,
+        'updated_tags': [],
         'initial_fails': [],
         'retry_fails': [],
     }
