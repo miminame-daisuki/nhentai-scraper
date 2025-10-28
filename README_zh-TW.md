@@ -16,7 +16,6 @@
 - 'EOFError' happening at the end of terminal output?
 
 - Check pyright errors
-- Update 'metadata.json' for galleries that have updated their tags?
 - How to detect individual corrupted images in a gallery
 and automatically redownload them?
 - Add tqdm for total progress?
@@ -40,14 +39,12 @@ tags statistics for downloaded galleries, ...)
 in write_final_results()?
 - Add whether to put gallery id in folder name to settings?
 - Add periods and () around plural s
-- Align tqdm progress bar?
 - Add line number to logs
 
 - Replace os with Path
 - Add blankspace after : in tags
 - Use async?
 - Rewrite logs for more readibility?
-- Automatically delete old logs?
 - Regenerate `requirements.txt` and `environment.yml`
 - Add tests
 - Add documentation
