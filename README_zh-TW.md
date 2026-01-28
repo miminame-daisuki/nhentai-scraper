@@ -14,6 +14,7 @@
 - How to download repeats for favorites
 (with additional_tags = ['favorites', 'repeats'])?
 - 'EOFError' happening at the end of terminal output?
+- Add print result when # of downloaded galleries = # of repeats = # blacklists = 0
 
 - Check pyright errors
 - How to detect individual corrupted images in a gallery
