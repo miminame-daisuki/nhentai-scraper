@@ -180,6 +180,22 @@ def search_tag(
     return id_list
 
 
+def search_finished_cbz(
+    download_dir: Optional[Union[str, Path]] = None,
+) -> list[str]:
+
+    # search for finished download galleries in download_dir
+    if download_dir is None:
+        download_dir = str(misc.set_download_dir(download_dir))
+
+    finished_cbz_ids = [
+        f'#{path.name.split("#")[-1].split(")")[0]}'
+        for path in Path(download_dir).glob("*.cbz")
+    ]
+
+    return finished_cbz_ids
+
+
 def search_finished_downloads(
     tag: str,
     download_dir: Optional[Union[str, Path]] = None
@@ -259,6 +275,7 @@ def download_tag(
     # only keep not yet finished downloaded ids in id_list
     if not redownload_downloaded:
 
+        finished_cbz_ids = search_finished_cbz(download_dir=download_dir)
         matched_galleries_id = search_finished_downloads(
             tag, download_dir=download_dir
         )
@@ -269,6 +286,7 @@ def download_tag(
             set(id_list)
             - set(matched_galleries_id)
             - set(blacklist_ids)
+            - set(finished_cbz_ids)
         )
 
         # download repeats
