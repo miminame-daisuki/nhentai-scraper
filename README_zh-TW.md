@@ -17,6 +17,8 @@
 - Add print result when # of downloaded galleries = # of repeats = # blacklists = 0
 - Don't add 'repeats' as an additional tag?
 - Add input for cookies and headers in nhentai_scraper.py
+- Add warning for empty download_list.txt
+- Add function to run indefinitely (with random sleep time in-between)
 
 - Check pyright errors
 - How to detect individual corrupted images in a gallery
