@@ -28,8 +28,8 @@ from nhentai_urls import (
     API_GALLERY_URL,
     THUMB_BASE_URL_t1,
     THUMB_BASE_URL_t2,
-    THUMB_BASE_URL_t3,
     THUMB_BASE_URL_t4,
+    THUMB_BASE_URL_t9,
     IMG_BASE_URL_i2,
     IMG_BASE_URL_i3,
     IMG_BASE_URL_i5,
@@ -132,7 +132,9 @@ def get_response(
             url, params=params, timeout=timeout_time
         )
     except Exception as error:
-        logger.error(f'An exception occured: {error}')
+        logger.error(
+            f'An exception occured for {url}: {error}'
+        )
         response = lambda: None
         response.status_code = 'No_response'
 
@@ -369,7 +371,13 @@ class Gallery:
     def download_thumb(self) -> int:
 
         logger.info('Retrieving thumbnail...')
-        thumb_base_url = THUMB_BASE_URL_t3
+        thumb_base_urls = [
+            THUMB_BASE_URL_t1,
+            THUMB_BASE_URL_t2,
+            THUMB_BASE_URL_t4,
+            THUMB_BASE_URL_t9,
+        ]
+        thumb_base_url = random.choice(thumb_base_urls)
         thumb_url = (
             f'{thumb_base_url}/{self.media_id}/thumb.{self.thumb_extension}'
         )
@@ -383,12 +391,6 @@ class Gallery:
                 'Something went wrong when retrieving thumbnail:'
                 f'{thumb_response.status_code}, retrying...'
             )
-            thumb_base_urls = [
-                THUMB_BASE_URL_t1,
-                THUMB_BASE_URL_t2,
-                THUMB_BASE_URL_t3,
-                THUMB_BASE_URL_t4,
-            ]
             thumb_extensions = [
                 'jpg',
                 'webp'
