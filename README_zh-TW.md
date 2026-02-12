@@ -16,6 +16,7 @@
 - 'EOFError' happening at the end of terminal output?
 - Add print result when # of downloaded galleries = # of repeats = # blacklists = 0
 - Don't add 'repeats' as an additional tag?
+- Add input for cookies and headers in nhentai_scraper.py
 
 - Check pyright errors
 - How to detect individual corrupted images in a gallery
