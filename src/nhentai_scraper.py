@@ -11,10 +11,13 @@ import random
 import time
 import json
 import os
+import xml.etree.ElementTree as ET
+from datetime import datetime
 from PIL import Image
 import unicodedata
 from tqdm import tqdm
 from pypdf import PdfReader
+import shutil
 from pathlib import Path
 import xattr
 import Cocoa
@@ -152,13 +155,20 @@ class Gallery:
     def __init__(
         self,
         id_: Union[int, str],
-        session: Optional[requests.sessions.Session] = None,
+        download_method: str = "cbz",
+        server: Optional[str] = None,
         download_dir: Optional[Union[str, Path]] = None,
         additional_tags: Optional[list[str]] = None,
         download_repeats: Optional[bool] = False,
     ):
 
         self.id = id_
+        self.download_dir = download_dir
+        self.download_method = download_method
+        self.server = server
+        if self.download_method == "cbz" and self.server is None:
+            self.server = "LANraragi"
+
         if session is None:
             session = create_session()
         self.session = session
@@ -169,7 +179,10 @@ class Gallery:
             self.additional_tags = []
         self.download_repeats = download_repeats
         if download_repeats:
-            self.additional_tags.append('repeats')
+            self.additional_tags.append("repeats")
+
+        if self.download_method != "folder":
+            self.download_repeats = True
 
         self.status_code = -1
 
@@ -246,6 +259,7 @@ class Gallery:
 
         self.metadata = api_response.json()
         self._parse_metadata()
+        self._parse_ComicInfo_xml()
 
         logger.info('Metadata retrieved')
         logger.info(f'Title: {self.title}')
@@ -310,6 +324,13 @@ class Gallery:
             self.folder_dir = os.path.join(self.download_dir, self.title)
 
         # check whether there exists a downloaded gallery with the same name
+        if self.download_method == 'cbz' and self.server == 'LANraragi':
+            cbz_path = self.download_dir / Path(str(self)).with_suffix('.cbz')
+            if cbz_path.exists():
+                self.status_code = 1
+
+                return
+
         if os.path.isdir(self.folder_dir):
             self.load_downloaded_metadata()
             logger.info('Folder exists with metadata loaded')
@@ -342,6 +363,167 @@ class Gallery:
         filename = f'{self.folder_dir}/metadata.json'
         with open(filename, 'w', encoding='utf-8') as f:
             json.dump(self.metadata, f, ensure_ascii=False, indent=4)
+
+        xml_filename = f"{self.folder_dir}/ComicInfo.xml"
+        self.ComicInfo_tree.write(
+            xml_filename, xml_declaration=True, encoding="utf-8"
+        )
+
+    def _parse_ComicInfo_xml(self) -> None:
+
+        self.ComicInfo_tree = ET.parse("ComicInfo_template.xml")
+
+        if self.server == "Kavita":
+            self.ComicInfo_tree.find("Series").text = self.title
+            self.ComicInfo_tree.find("LocalizedSeries").text = self.metadata[
+                "title"
+            ]["english"]
+            self.ComicInfo_tree.find("Number").text = str(self.id)
+
+            parodies_list = []
+            characters_list = []
+            tags_list = []
+            artists_list = []
+            languages_list = []
+            categories_list = []
+
+            for tag in self.metadata["tags"]:
+                if tag["type"] == "parody":
+                    parodies_list.append(tag["name"])
+                elif tag["type"] == "character":
+                    characters_list.append(tag["name"])
+                elif tag["type"] == "tag":
+                    tags_list.append(tag["name"])
+                elif tag["type"] == "artist" or tag["type"] == "group":
+                    artists_list.append(tag["name"])
+                elif tag["type"] == "language":
+                    languages_list.append(tag["name"])
+                elif tag["type"] == "category":
+                    categories_list.append(tag["name"])
+
+            self.ComicInfo_tree.find("SeriesGroup").text = ",".join(
+                parodies_list
+            )
+            self.ComicInfo_tree.find("Characters").text = ",".join(
+                characters_list
+            )
+            self.ComicInfo_tree.find("Tags").text = ",".join(tags_list)
+            self.ComicInfo_tree.find("Writer").text = ",".join(artists_list)
+            self.ComicInfo_tree.find("LanguageISO").text = ",".join(
+                languages_list
+            )
+            self.ComicInfo_tree.find("Genre").text = ",".join(categories_list)
+
+            for page in self.metadata["images"]["pages"]:
+                # convert image width & height from int to str
+                for key, value in page.items():
+                    page[key] = str(value)
+
+                ET.SubElement(
+                    self.ComicInfo_tree.find("Images"), "pages", page
+                )
+
+            ET.SubElement(
+                self.ComicInfo_tree.find("Images"),
+                "cover",
+                {
+                    key: str(value)
+                    for key, value in self.metadata["images"]["cover"].items()
+                },
+            )
+            ET.SubElement(
+                self.ComicInfo_tree.find("Images"),
+                "thumbnail",
+                {
+                    key: str(value)
+                    for key, value in self.metadata["images"][
+                        "thumbnail"
+                    ].items()
+                },
+            )
+
+            self.ComicInfo_tree.find("PageCount").text = str(
+                self.metadata["num_pages"]
+            )
+
+            dt = datetime.fromtimestamp(self.metadata["upload_date"])
+            self.ComicInfo_tree.find("Year").text = str(dt.year)
+            self.ComicInfo_tree.find("Month").text = str(dt.month)
+            self.ComicInfo_tree.find("Day").text = str(dt.day)
+
+            self.ComicInfo_tree.find("Translator").text = self.metadata[
+                "scanlator"
+            ]
+
+        elif self.server == "LANraragi":
+            self.ComicInfo_tree.find("Title").text = str(self)
+            self.ComicInfo_tree.find("Web").text = f"nhentai.net/g/{self.id}"
+
+            parodies_list = []
+            characters_list = []
+            tags_list = []
+            artists_list = []
+            groups_list = []
+            languages_list = []
+
+            for tag in self.metadata["tags"]:
+                if tag["type"] == "parody":
+                    parodies_list.append(tag["name"])
+                elif tag["type"] == "character":
+                    characters_list.append(tag["name"])
+                elif tag["type"] == "tag":
+                    tags_list.append(tag["name"])
+                elif tag["type"] == "artist":
+                    artists_list.append(tag["name"])
+                elif tag["type"] == "group":
+                    groups_list.append(tag["name"])
+                elif tag["type"] == "language":
+                    languages_list.append(tag["name"])
+
+            parodies_list.append(self.title)
+
+            ComicInfo_namespace_correspond = [
+                ("Series", parodies_list),
+                ("Characters", characters_list),
+                ("Tags", tags_list),
+                ("Penciller", artists_list),
+                ("Writer", groups_list),
+                ("LanguageISO", languages_list),
+            ]
+            for namespace, tag_list in ComicInfo_namespace_correspond:
+                self.ComicInfo_tree.find(namespace).text = ",".join(tag_list)
+
+            for page in self.metadata["images"]["pages"]:
+                # convert image width & height from int to str
+                for key, value in page.items():
+                    page[key] = str(value)
+
+                ET.SubElement(
+                    self.ComicInfo_tree.find("Images"), "pages", page
+                )
+
+            ET.SubElement(
+                self.ComicInfo_tree.find("Images"),
+                "cover",
+                {
+                    key: str(value)
+                    for key, value in self.metadata["images"]["cover"].items()
+                },
+            )
+            ET.SubElement(
+                self.ComicInfo_tree.find("Images"),
+                "thumbnail",
+                {
+                    key: str(value)
+                    for key, value in self.metadata["images"][
+                        "thumbnail"
+                    ].items()
+                },
+            )
+
+            self.ComicInfo_tree.find("PageCount").text = str(
+                self.metadata["num_pages"]
+            )
 
     def check_thumb(self) -> None:
 
@@ -620,12 +802,13 @@ class Gallery:
         downloaded_pages = os.listdir(self.folder_dir)
 
         non_page_files = [
-            '._Icon\r',
-            'Icon\r',
-            'metadata.json',
-            f'thumb.{self.thumb_extension}',
-            '.DS_Store',
-            f'{self.title}.pdf'
+            "._Icon\r",
+            "Icon\r",
+            "metadata.json",
+            "ComicInfo.xml",
+            f"thumb.{self.thumb_extension}",
+            ".DS_Store",
+            f"{self.title}.pdf",
         ]
 
         downloaded_pages = [
@@ -701,6 +884,23 @@ class Gallery:
             logger.error(f"{error}")
             self.status_code = -10
 
+    def zip(self) -> None:
+        shutil.make_archive(self.folder_dir, "zip", self.folder_dir)
+
+        for file in Path(self.folder_dir).iterdir():
+            file.unlink()
+        zip_path = Path(self.folder_dir).with_suffix(".zip")
+        cbz_filename = Path(str(self)).with_suffix(".cbz")
+        if self.server == "Kavita":
+            zip_path.rename(
+                self.folder_dir / cbz_filename
+            )
+        elif self.server == "LANraragi":
+            zip_path.rename(
+                self.download_dir / cbz_filename
+            )
+            Path(self.folder_dir).rmdir()
+
     def status(self) -> str:
         # status_code >= 0: Normal
         # status_code = 0: Still downloading
@@ -760,9 +960,10 @@ class Gallery:
         if skip_download():
             return self.status_code
 
-        self.check_thumb()
-        if skip_download():
-            return self.status_code
+        if self.download_method == "folder":
+            self.check_thumb()
+            if skip_download():
+                return self.status_code
 
         self.check_extra_pages()
         if skip_download():
@@ -772,14 +973,18 @@ class Gallery:
         if skip_download():
             return self.status_code
 
-        self.check_pdf()
-        if skip_download():
-            return self.status_code
+        if self.download_method == "folder":
+            self.check_pdf()
+            if skip_download():
+                return self.status_code
 
-        # set tags after finishing download
-        self.check_tags()
-        if skip_download():
-            return self.status_code
+            # set tags after finishing download
+            self.check_tags()
+            if skip_download():
+                return self.status_code
+
+        elif self.download_method == "cbz":
+            self.zip()
 
         self.status_code = 0
         logger.info(f'{self.status()}')
@@ -798,8 +1003,15 @@ if __name__ == '__main__':
 
     session = create_session()
 
-    id_list = input('Input gallery id: ').split(' ')
+    id_list = input("Input gallery id: ").split(" ")
+    download_method = input("Download as (cbz/folder): ")
+    if download_method not in ["cbz", "folder"]:
+        raise Exception("Please enter either 'cbz' or 'folder'.")
 
     for gallery_id in id_list:
-        gallery = Gallery(gallery_id, download_dir=download_dir)
+        gallery = Gallery(
+            gallery_id,
+            download_method=download_method,
+            download_dir=download_dir,
+        )
         gallery.download()
