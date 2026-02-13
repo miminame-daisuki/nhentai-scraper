@@ -1,0 +1,17 @@
+.*
+!.gitignore
+__*
+*.spec
+inputs/*
+!inputs/README.md
+Downloaded/*
+!Downloaded/README.md
+test/*
+!test/README.md
+logs/*
+!logs/README.md
+!logs/logging_config.yaml
+src/build
+src/dist
+main
+session.vim
