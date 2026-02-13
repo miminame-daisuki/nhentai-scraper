@@ -316,8 +316,8 @@ class Gallery:
             self.folder_dir = os.path.join(self.download_dir, self.title)
 
         # check whether there exists a downloaded gallery with the same name
-        if self.download_method == 'cbz' and self.server == 'LANraragi':
-            cbz_path = self.download_dir / Path(str(self)).with_suffix('.cbz')
+        if self.download_method == "cbz" and self.server == "LANraragi":
+            cbz_path = self.download_dir / Path(str(self)).with_suffix(".cbz")
             if cbz_path.exists():
                 self.status_code = 1
 
@@ -870,16 +870,19 @@ class Gallery:
 
         for file in Path(self.folder_dir).iterdir():
             file.unlink()
-        zip_path = Path(self.folder_dir).with_suffix(".zip")
-        cbz_filename = Path(str(self)).with_suffix(".cbz")
+
+        # ensure that filenames with '.' within don't have
+        # part of the names replaced with '.zip' and '.cbz'
+        folder_path = Path(self.folder_dir)
+        zip_path = folder_path.with_suffix(folder_path.suffix + ".zip")
+        cbz_filename = Path(str(self)).with_suffix(
+            Path(str(self)).suffix + ".cbz"
+        )
+
         if self.server == "Kavita":
-            zip_path.rename(
-                self.folder_dir / cbz_filename
-            )
+            zip_path.rename(self.folder_dir / cbz_filename)
         elif self.server == "LANraragi":
-            zip_path.rename(
-                self.download_dir / cbz_filename
-            )
+            zip_path.rename(self.download_dir / cbz_filename)
             Path(self.folder_dir).rmdir()
 
     def status(self) -> str:
