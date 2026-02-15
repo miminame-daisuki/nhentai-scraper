@@ -56,15 +56,17 @@ class Session(requests.Session):
         self, cookies: Optional[dict] = None, headers: Optional[dict] = None
     ):
 
+        config = load_inputs.load_config_yaml()
+
         if cookies is None:
-            cookies = load_inputs.load_json("cookies.json")
+            cookies = config['cookies']
+            cookiejar = requests.cookies.cookiejar_from_dict(cookies)
+            self.cookies = cookiejar
+
         if headers is None:
-            headers = load_inputs.load_json("headers.json")
-
-        cookiejar = requests.cookies.cookiejar_from_dict(cookies)
-
-        self.cookies = cookiejar
-        self.headers.update(headers)
+            headers = config['headers']
+            if type(headers) is dict:
+                self.headers.update(headers)
 
     def __repr__(self):
         return f"Session(cookies={self.cookies}, headers={self.headers})"
@@ -102,15 +104,17 @@ def create_session(
 
     session = requests.Session()
 
+    config = load_inputs.load_config_yaml()
+
     if cookies is None:
-        cookies = load_inputs.load_json("cookies.json")
+        cookies = config['cookies']
+        cookiejar = requests.cookies.cookiejar_from_dict(cookies)
+        session.cookies = cookiejar
+
     if headers is None:
-        headers = load_inputs.load_json("headers.json")
-
-    cookiejar = requests.cookies.cookiejar_from_dict(cookies)
-
-    session.cookies = cookiejar
-    session.headers.update(headers)
+        headers = config['headers']
+        if type(headers) is dict:
+            session.headers.update(headers)
 
     return session
 
@@ -147,7 +151,7 @@ class Gallery:
     def __init__(
         self,
         id_: Union[int, str],
-        download_method: str = "cbz",
+        filetype: str = "folder",
         server: Optional[str] = None,
         download_dir: Optional[Union[str, Path]] = None,
         session: Optional[requests.sessions.Session] = None,
@@ -157,9 +161,9 @@ class Gallery:
 
         self.id = id_
         self.download_dir = download_dir
-        self.download_method = download_method
+        self.filetype = filetype
         self.server = server
-        if self.download_method == "cbz" and self.server is None:
+        if self.filetype == "cbz" and self.server is None:
             self.server = "LANraragi"
 
         if session is None:
@@ -175,7 +179,7 @@ class Gallery:
         if download_repeats:
             self.additional_tags.append("repeats")
 
-        if self.download_method != "folder":
+        if self.filetype != "folder":
             self.download_repeats = True
 
         self.status_code = -1
@@ -316,7 +320,7 @@ class Gallery:
             self.folder_dir = os.path.join(self.download_dir, self.title)
 
         # check whether there exists a downloaded gallery with the same name
-        if self.download_method == "cbz" and self.server == "LANraragi":
+        if self.filetype == "cbz" and self.server == "LANraragi":
             cbz_path = self.download_dir / Path(str(self)).with_suffix(".cbz")
             if cbz_path.exists():
                 self.status_code = 1
@@ -954,7 +958,7 @@ class Gallery:
         if skip_download():
             return self.status_code
 
-        if self.download_method == "folder":
+        if self.filetype == "folder":
             self.check_thumb()
             if skip_download():
                 return self.status_code
@@ -967,7 +971,7 @@ class Gallery:
         if skip_download():
             return self.status_code
 
-        if self.download_method == "folder":
+        if self.filetype == "folder":
             self.check_pdf()
             if skip_download():
                 return self.status_code
@@ -977,7 +981,7 @@ class Gallery:
             if skip_download():
                 return self.status_code
 
-        elif self.download_method == "cbz":
+        elif self.filetype == "cbz":
             self.zip()
 
         self.status_code = 0
@@ -998,14 +1002,14 @@ if __name__ == "__main__":
     session = create_session()
 
     id_list = input("Input gallery id: ").split(" ")
-    download_method = input("Download as (cbz/folder): ")
-    if download_method not in ["cbz", "folder"]:
+    filetype = input("Download as (cbz/folder): ")
+    if filetype not in ["cbz", "folder"]:
         raise Exception("Please enter either 'cbz' or 'folder'.")
 
     for gallery_id in id_list:
         gallery = Gallery(
             gallery_id,
-            download_method=download_method,
+            filetype=filetype,
             download_dir=download_dir,
         )
         gallery.download()
