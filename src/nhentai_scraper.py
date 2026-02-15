@@ -371,7 +371,9 @@ class Gallery:
 
     def _parse_ComicInfo_xml(self) -> None:
 
-        self.ComicInfo_tree = ET.parse("ComicInfo_template.xml")
+        self.ComicInfo_tree = ET.parse(
+            f"{misc.get_application_folder_dir()}/src/ComicInfo_template.xml"
+        )
 
         if self.server == "Kavita":
             self.ComicInfo_tree.find("Series").text = self.title
