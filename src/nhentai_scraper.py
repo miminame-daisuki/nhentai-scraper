@@ -214,7 +214,7 @@ class Gallery:
         return self.__download_dir
 
     @download_dir.setter
-    def download_dir(self, dir: Union[str, Path]):
+    def download_dir(self, dir: Optional[Union[str, Path]]=None):
         if dir is None:
             dir = str(misc.set_download_dir())
         logger.info(f"Download directory set to: '{dir}'")
@@ -290,9 +290,9 @@ class Gallery:
     def check_blacklist(self, blacklist: Optional[list[str]] = None) -> None:
 
         logger.info("Checking blacklist...")
-        if not blacklist:
+        if blacklist is None:
             blacklist = load_inputs.load_input_list("blacklist.txt")
-            blacklist_tags = [tag for tag in blacklist if ":" in tag]
+        blacklist_tags = [tag for tag in blacklist if ":" in tag]
 
         if any(tag in self.tags for tag in blacklist_tags):
             self.status_code = 3
@@ -309,6 +309,8 @@ class Gallery:
             return "gif"
         elif img_metadata["t"] == "w":
             return "webp"
+        else:
+            return ""
 
     def check_folder(self) -> None:
 
@@ -729,7 +731,6 @@ class Gallery:
 
     def download_pages(
         self,
-        pages: list[str],
         tries: Optional[int] = 0,
         leave_tqdm: Optional[bool] = True,
     ) -> None:
