@@ -44,9 +44,10 @@ def search_url(
 
     soup = BeautifulSoup(response.content, features="html.parser")
 
-    if soup.title.string.split(" ")[0] == "Login":
-        print("Please login to nhentai.net and update the cookies again.")
-        sys.exit()
+    if soup.title is not None and type(soup.title.string) == str:
+        if soup.title.string.split(" ")[0] == "Login":
+            print("Please login to nhentai.net and update the cookies again.")
+            sys.exit()
 
     gallery_count = soup.find("span", {"class": "count"}).string
     gallery_count = gallery_count.replace("(", "").replace(")", "")
@@ -291,7 +292,7 @@ def download_tag(
             )
 
     else:
-        id_list_to_download = id_list
+        id_list_to_download = list(id_list)
 
     if not id_list_to_download:
         print(f"\nAll galleries from {tag} have already been downloaded.\n")

@@ -151,7 +151,7 @@ class Gallery:
     def __init__(
         self,
         id_: Union[int, str],
-        filetype: str = "folder",
+        filetype: Optional[str] = None,
         server: Optional[str] = None,
         download_dir: Optional[Union[str, Path]] = None,
         session: Optional[requests.sessions.Session] = None,
@@ -162,6 +162,8 @@ class Gallery:
         self.id = id_
         self.download_dir = download_dir
         self.filetype = filetype
+        if self.filetype is None:
+            self.filetype = "folder"
         self.server = server
         if self.filetype == "cbz" and self.server is None:
             self.server = "LANraragi"
