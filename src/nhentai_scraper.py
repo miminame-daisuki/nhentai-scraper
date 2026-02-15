@@ -59,12 +59,12 @@ class Session(requests.Session):
         config = load_inputs.load_config_yaml()
 
         if cookies is None:
-            cookies = config['cookies']
+            cookies = config["cookies"]
             cookiejar = requests.cookies.cookiejar_from_dict(cookies)
             self.cookies = cookiejar
 
         if headers is None:
-            headers = config['headers']
+            headers = config["headers"]
             if type(headers) is dict:
                 self.headers.update(headers)
 
@@ -107,12 +107,12 @@ def create_session(
     config = load_inputs.load_config_yaml()
 
     if cookies is None:
-        cookies = config['cookies']
+        cookies = config["cookies"]
         cookiejar = requests.cookies.cookiejar_from_dict(cookies)
         session.cookies = cookiejar
 
     if headers is None:
-        headers = config['headers']
+        headers = config["headers"]
         if type(headers) is dict:
             session.headers.update(headers)
 
@@ -216,7 +216,7 @@ class Gallery:
         return self.__download_dir
 
     @download_dir.setter
-    def download_dir(self, dir: Optional[Union[str, Path]]=None):
+    def download_dir(self, dir: Optional[Union[str, Path]] = None):
         if dir is None:
             dir = str(misc.set_download_dir())
         logger.info(f"Download directory set to: '{dir}'")

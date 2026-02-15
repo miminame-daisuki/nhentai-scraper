@@ -25,15 +25,13 @@ def cli_parser():
 
     parser.add_argument(
         "--filetype",
-        choices=['folder', 'cbz'],
-        help=(
-            "Set the filetype for the downloaded galleries "
-        ),
+        choices=["folder", "cbz"],
+        help=("Set the filetype for the downloaded galleries "),
     )
 
     parser.add_argument(
         "--server",
-        choices=['LANraragi', 'Kavita'],
+        choices=["LANraragi", "Kavita"],
         help=(
             "Set the server name for viewing the downloaded galleries, "
             "only valid with '--filetype cbz' "
@@ -86,4 +84,4 @@ def cli_parser():
 
 if __name__ == "__main__":
     args = cli_parser()
-    print(f'{args = }')
+    print(f"{args = }")
