@@ -20,6 +20,8 @@
 - Add input for cookies and headers in nhentai_scraper.py
 - Add warning for empty download_list.txt
 - Add function to run indefinitely (with random sleep time in-between) (or just use cronjob?)
+- Add Docker container
+- Add doc for nhentai api
 
 - Check pyright errors
 - Add ability to toggle thumbnail and tags
