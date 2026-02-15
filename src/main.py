@@ -52,7 +52,7 @@ def main():
 
             if entry in blacklist:
                 print(f"\nBLACKLISTED {entry}.\n")
-                print(f"{'-'*os.get_terminal_size().columns}")
+                print('\u2500'*os.get_terminal_size().columns)
                 continue
 
             if entry == "favorites":
@@ -104,7 +104,7 @@ def main():
                 gallery_results["blacklists"], "blacklist.txt"
             )
 
-        print(f"{'-'*os.get_terminal_size().columns}")
+        print('\u2500'*os.get_terminal_size().columns)
 
     download_galleries.write_final_results(gallery_results)
 

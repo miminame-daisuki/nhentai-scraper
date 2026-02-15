@@ -296,7 +296,7 @@ def download_tag(
 
     if not id_list_to_download:
         print(f"\nAll galleries from {tag} have already been downloaded.\n")
-        print(f"{'-'*os.get_terminal_size().columns}")
+        print('\u2500'*os.get_terminal_size().columns)
         logger.info(f"All galleries from {tag} has already been downloaded.")
 
         return None

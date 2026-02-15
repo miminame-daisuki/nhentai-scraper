@@ -30,13 +30,13 @@ def create_gallery_results_dict(repeat_ids: list, blacklist: list) -> dict:
 def print_start_message(download_dir) -> None:
 
     message = (
-        f"{'-'*os.get_terminal_size().columns}\n\n"
-        f"{bcolors.HEADER}NHENTAI SCRAPER{bcolors.ENDC}\n\n"
-        f"Downloading to: {download_dir}\n\n"
-        f"{'-'*os.get_terminal_size().columns}"
+        f"\n{bcolors.HEADER}NHENTAI SCRAPER{bcolors.ENDC}\n\n"
+        f"Downloading to: {download_dir}\n"
     )
 
+    print('\u2500'*os.get_terminal_size().columns)
     print(message)
+    print('\u2500'*os.get_terminal_size().columns)
 
 
 def get_application_folder_dir() -> str:

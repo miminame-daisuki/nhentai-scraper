@@ -143,16 +143,15 @@ def generate_runtime_settings(inputs_path: Optional[Path] = None) -> dict:
 
     # confirm settings
     if args.confirm_settings:
-        print(f"{'-'*os.get_terminal_size().columns}")
+        print('\u2500'*os.get_terminal_size().columns)
         print("Runtime settings:")
         print(json.dumps(settings, indent=4))
-        print(f"{'-'*os.get_terminal_size().columns}")
+        print('\u2500'*os.get_terminal_size().columns)
         if input("Are these settings correct?(y/n)") != "y":
             raise SystemExit(
                 "Please modify these settings in 'inputs/config.yaml'"
                 " or set the cli arguments."
             )
-        print(f"{'-'*os.get_terminal_size().columns}")
 
     return settings
 
