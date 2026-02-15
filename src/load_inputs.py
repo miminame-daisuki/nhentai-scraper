@@ -69,6 +69,10 @@ def load_config_yaml(
     with open(config_filename, "r") as f:
         config = yaml.load(f, Loader=yaml.SafeLoader)
 
+    config["downloads"]["download_dir"] = str(
+        misc.set_download_dir(config["downloads"]["download_dir"])
+    )
+
     # populate missing values with default settings
     if config["downloads"]["download_dir"] is None:
         config["downloads"]["download_dir"] = str(misc.set_download_dir())
@@ -121,7 +125,9 @@ def generate_runtime_settings(inputs_path: Optional[Path] = None) -> dict:
     settings = copy.deepcopy(config)
 
     if args.download_dir:
-        settings["downloads"]["download_dir"] = args.download_dir
+        settings["downloads"]["download_dir"] = str(
+            misc.set_download_dir(args.download_dir)
+        )
     if args.filetype:
         settings["downloads"]["filetype"] = args.filetype
     if args.server:
