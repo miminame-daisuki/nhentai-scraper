@@ -717,9 +717,7 @@ class Gallery:
                     f"Retrying failed pages for the {tries}(th) time..."
                 )
 
-            self.download_pages(
-                self.missing_pages, tries=tries, leave_tqdm=leave_tqdm
-            )
+            self.download_pages(tries=tries, leave_tqdm=leave_tqdm)
             self.load_missing_pages()
 
             # record missing pages for initial download try
