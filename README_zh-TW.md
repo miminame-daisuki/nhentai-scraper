@@ -22,6 +22,7 @@
 - Add function to run indefinitely (with random sleep time in-between) (or just use cronjob?)
 
 - Check pyright errors
+- Add ability to toggle thumbnail and tags
 - How to detect individual corrupted images in a gallery
 and automatically redownload them?
 - Add tqdm for total progress?
