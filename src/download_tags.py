@@ -230,7 +230,7 @@ def download_tag(
     tag: str,
     download_dir: Union[str, Path],
     session: requests.sessions.Session,
-    redownload_downloaded: Optional[bool] = False,
+    check_downloaded: Optional[bool] = False,
     additional_tags: Optional[list[str]] = None,
     gallery_results: Optional[dict[str, list[str]]] = None,
 ) -> Optional[dict[str, list[str]]]:
@@ -257,7 +257,7 @@ def download_tag(
         return gallery_results_extend
 
     # only keep not yet finished downloaded ids in id_list
-    if not redownload_downloaded:
+    if not check_downloaded:
 
         matched_galleries_id = search_finished_downloads(
             tag, download_dir=download_dir
