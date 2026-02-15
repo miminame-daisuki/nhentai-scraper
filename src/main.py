@@ -19,10 +19,10 @@ def main():
     logger.info(f"\n{'-'*os.get_terminal_size().columns}")
     logger.info('Program started')
 
-    settings = load_inputs.confirm_settings()
-    download_dir = settings['download_dir']
-    redownload_downloaded = settings['redownload_downloaded']
-    skip_to_tag = settings['skip_to_tag']
+    settings = load_inputs.generate_runtime_settings()
+    download_dir = settings['downloads']['download_dir']
+    check_downloaded = settings['runtime']['check-downloaded']
+    skip_to_tag = settings['runtime']['skip-to-tag']
 
     download_list = load_inputs.load_input_list(
         'download_list.txt', skip_to_tag=skip_to_tag
@@ -32,7 +32,7 @@ def main():
 
     misc.print_start_message(download_dir)
 
-    session = nhentai_scraper.create_session()
+    session = nhentai_scraper.create_session(cookies=settings['cookies'], headers=settings['headers'])
 
     gallery_results = misc.create_gallery_results_dict(repeat_ids, blacklist)
 
@@ -59,7 +59,9 @@ def main():
             gallery_results_extend = download_tags.download_tag(
                 entry, download_dir,
                 session,
-                redownload_downloaded=redownload_downloaded,
+                filetype=settings['downloads']['filetype'],
+                server=settings['downloads']['server'],
+                check_downloaded=check_downloaded,
                 additional_tags=additional_tags,
                 gallery_results=gallery_results,
             )
@@ -72,7 +74,7 @@ def main():
             logger.info(f"\n{'-'*os.get_terminal_size().columns}")
 
             gallery = nhentai_scraper.Gallery(
-                entry, session=session, download_dir=download_dir,
+                entry, filetype=settings['downloads']['filetype'], server=settings['downloads']['server'], session=session, download_dir=download_dir,
                 additional_tags=additional_tags,
             )
             gallery.download()
