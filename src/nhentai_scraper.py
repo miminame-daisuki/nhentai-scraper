@@ -999,20 +999,21 @@ if __name__ == "__main__":
     logger.info(f"\n{'-'*os.get_terminal_size().columns}")
     logger.info("Program started")
 
-    application_folder_path = misc.get_application_folder_dir()
-    download_dir = os.path.abspath(f"{application_folder_path}/test/")
+    settings = load_inputs.generate_runtime_settings()
+    download_dir = settings["downloads"]["download_dir"]
+
+    misc.print_start_message(download_dir)
 
     session = create_session()
 
     id_list = input("Input gallery id: ").split(" ")
-    filetype = input("Download as (cbz/folder): ")
-    if filetype not in ["cbz", "folder"]:
+    if settings["downloads"]["filetype"] not in ["cbz", "folder"]:
         raise Exception("Please enter either 'cbz' or 'folder'.")
 
     for gallery_id in id_list:
         gallery = Gallery(
             gallery_id,
-            filetype=filetype,
+            filetype=settings["downloads"]["filetype"],
             download_dir=download_dir,
         )
         gallery.download()
