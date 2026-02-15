@@ -1,6 +1,4 @@
 import os
-import sys
-import shutil
 import argparse
 import copy
 from pathlib import Path
@@ -113,7 +111,7 @@ def input_headers() -> dict:
 
 def generate_runtime_settings(inputs_path: Optional[Path] = None) -> dict:
 
-    # load command line arguments and config.yaml 
+    # load command line arguments and config.yaml
     args = cli.cli_parser()
     config = load_config_yaml(inputs_path=inputs_path, args=args)
 
