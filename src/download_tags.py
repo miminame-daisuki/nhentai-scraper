@@ -24,13 +24,11 @@ import misc
 from nhentai_urls import NHENTAI_URL, FAVORITES_URL, API_SEARCH_URL
 
 
-logger = logging.getLogger('__main__.' + __name__)
+logger = logging.getLogger("__main__." + __name__)
 
 
 def search_url(
-    url: str,
-    session: requests.sessions.Session,
-    params: Optional[dict] = None
+    url: str, session: requests.sessions.Session, params: Optional[dict] = None
 ) -> tuple[list[str], int]:
     # retrieves all <=25 gallery ids from a nhentai url
 
@@ -39,27 +37,23 @@ def search_url(
 
     gallery_id = []
 
-    response = nhentai_scraper.get_response(
-        url, session, params=params
-    )
+    response = nhentai_scraper.get_response(url, session, params=params)
 
     if response.status_code != 200:
-        return None, f'Error {response.status_code}'
+        return None, f"Error {response.status_code}"
 
-    soup = BeautifulSoup(response.content, features='html.parser')
+    soup = BeautifulSoup(response.content, features="html.parser")
 
-    if soup.title.string.split(' ')[0] == 'Login':
-        print(
-            'Please login to nhentai.net and update the cookies again.'
-        )
+    if soup.title.string.split(" ")[0] == "Login":
+        print("Please login to nhentai.net and update the cookies again.")
         sys.exit()
 
-    gallery_count = soup.find('span', {'class': 'count'}).string
-    gallery_count = gallery_count.replace('(', '').replace(')', '')
-    gallery_count = gallery_count.replace(',', '')
-    page_count = int(gallery_count)//25 + 1
+    gallery_count = soup.find("span", {"class": "count"}).string
+    gallery_count = gallery_count.replace("(", "").replace(")", "")
+    gallery_count = gallery_count.replace(",", "")
+    page_count = int(gallery_count) // 25 + 1
 
-    gallery_list = soup.find_all('div', {'class': 'gallery'})
+    gallery_list = soup.find_all("div", {"class": "gallery"})
     for gallery in gallery_list:
         gallery_id.append(f"#{gallery.find('a').get('href').split('/')[2]}")
 
@@ -69,7 +63,7 @@ def search_url(
 def search_api(
     search: str,
     session: requests.sessions.Session,
-    params: Optional[dict] = None
+    params: Optional[dict] = None,
 ) -> tuple[Optional[list[str]], Union[int, str]]:
 
     gallery_id = []
@@ -81,25 +75,22 @@ def search_api(
     #     API_SEARCH_URL, session, params=query
     # )
 
-    url = API_SEARCH_URL + '?query=' + search
-    response = nhentai_scraper.get_response(
-        url, session, params=params
-    )
+    url = API_SEARCH_URL + "?query=" + search
+    response = nhentai_scraper.get_response(url, session, params=params)
 
     if response.status_code != 200:
-        return None, f'Error {response.status_code}'
+        return None, f"Error {response.status_code}"
 
     api_metadata = response.json()
-    page_count = int(api_metadata['num_pages'])
-    gallery_id = [f"#{gallery['id']}" for gallery in api_metadata['result']]
+    page_count = int(api_metadata["num_pages"])
+    gallery_id = [f"#{gallery['id']}" for gallery in api_metadata["result"]]
 
     return gallery_id, page_count
 
 
 # retrieves all gallery ids from a tag or favorites
 def search_tag(
-    tag: str,
-    session: requests.sessions.Session
+    tag: str, session: requests.sessions.Session
 ) -> Optional[Union[list[str], str]]:
 
     logger.info(f"\n{'-'*os.get_terminal_size().columns}")
@@ -111,25 +102,25 @@ def search_tag(
     while retry_count < 3:
         retry_count += 1
 
-        if tag.startswith('search: '):
-            search = tag.split('search: ')[1]
+        if tag.startswith("search: "):
+            search = tag.split("search: ")[1]
             page_count = search_api(search, session)[1]
-        elif ':' in tag:
-            tag_type, tag_name = tag.split(':')
+        elif ":" in tag:
+            tag_type, tag_name = tag.split(":")
 
             # replace special characters in tag_name
-            tag_name = re.sub('[^0-9a-zA-Z]+', '-', tag_name)
+            tag_name = re.sub("[^0-9a-zA-Z]+", "-", tag_name)
             # drop final non-alphanumerical character in tag_name
             if not tag_name[-1].isalnum():
                 tag_name = tag_name[:-1]
 
             url = f"{NHENTAI_URL}/{tag_type}/{tag_name}/"
             page_count = search_url(url, session)[1]
-        elif tag == 'favorites':
+        elif tag == "favorites":
             url = FAVORITES_URL
             page_count = search_url(url, session)[1]
-        elif tag == 'repeats':
-            id_list = load_inputs.load_input_list('repeated_galleries.txt')
+        elif tag == "repeats":
+            id_list = load_inputs.load_input_list("repeated_galleries.txt")
 
             return id_list
 
@@ -137,52 +128,64 @@ def search_tag(
         if type(page_count) is int:
             break
         else:
-            logger.error('Retrying...')
+            logger.error("Retrying...")
 
     else:
         error = page_count
-        if error == 'Error 403':
+        if error == "Error 403":
             error_message = (
-                f'Error 403 - Forbidden for {tag} '
-                '(try updating cookies).\n'
+                f"Error 403 - Forbidden for {tag} " "(try updating cookies).\n"
             )
-        elif error == 'Error 404':
-            error_message = f'Error 404 - Not Found for {tag}.'
-        elif error == 'Error 500':
-            error_message = f'Error 500 - Server error for {tag}.'
+        elif error == "Error 404":
+            error_message = f"Error 404 - Not Found for {tag}."
+        elif error == "Error 500":
+            error_message = f"Error 500 - Server error for {tag}."
         else:
-            error_message = (
-                f'Failed to retrieve {tag} due to Error {error}.'
-            )
+            error_message = f"Failed to retrieve {tag} due to Error {error}."
 
         logger.error(error_message)
-        print(error_message + '\n')
+        print(error_message + "\n")
 
         return error_message
 
     for page in tqdm(
-        range(1, page_count+1),
+        range(1, page_count + 1),
         desc=f"Searching galleries from {tag}",
-        leave=False
+        leave=False,
     ):
         logger.info(f"Searching page {page} from {tag}")
-        params = {'page': page}
-        if tag.startswith('search: '):
+        params = {"page": page}
+        if tag.startswith("search: "):
             gallery_id = search_api(search, session, params=params)[0]
-        elif ':' in tag or tag == 'favorites':
+        elif ":" in tag or tag == "favorites":
             gallery_id = search_url(url, session, params=params)[0]
 
         if gallery_id is None:
-            logger.error(f'Failed to retrieve id_list for page {page}')
+            logger.error(f"Failed to retrieve id_list for page {page}")
             continue
         id_list.extend(gallery_id)
 
     return id_list
 
 
+def search_finished_cbz(
+    download_dir: Optional[Union[str, Path]] = None,
+) -> list[str]:
+
+    # search for finished download galleries in download_dir
+    if download_dir is None:
+        download_dir = str(misc.set_download_dir(download_dir))
+
+    finished_cbz_ids = [
+        f'#{path.name.split("#")[-1].split(")")[0]}'
+        for path in Path(download_dir).glob("*.cbz")
+    ]
+
+    return finished_cbz_ids
+
+
 def search_finished_downloads(
-    tag: str,
-    download_dir: Optional[Union[str, Path]] = None
+    tag: str, download_dir: Optional[Union[str, Path]] = None
 ) -> list[str]:
 
     # search for finished download galleries in download_dir
@@ -190,36 +193,37 @@ def search_finished_downloads(
         download_dir = str(misc.set_download_dir(download_dir))
 
     find_tag_command = [
-        'tag',
-        '--find',
-        tag.replace('-', ' '),
+        "tag",
+        "--find",
+        tag.replace("-", " "),
     ]
     result = run(find_tag_command, capture_output=True, check=True)
 
-    matched_galleries = result.stdout.decode('utf-8')
+    matched_galleries = result.stdout.decode("utf-8")
 
     if not matched_galleries:
         find_tag_command = [
-            'tag',
-            '--find',
+            "tag",
+            "--find",
             tag,
         ]
         result = run(find_tag_command, capture_output=True, check=True)
 
-        matched_galleries = result.stdout.decode('utf-8')
+        matched_galleries = result.stdout.decode("utf-8")
 
     # remove last one (blank stirng)
-    matched_galleries = matched_galleries.split('\n')[:-1]
+    matched_galleries = matched_galleries.split("\n")[:-1]
 
     matched_galleries = [
-        gallery for gallery in matched_galleries
+        gallery
+        for gallery in matched_galleries
         if gallery.startswith(download_dir)
     ]
 
     matched_galleries_id = []
     for gallery in matched_galleries:
-        metadata_filename = f'{gallery}/metadata.json'
-        with open(metadata_filename, 'r') as f:
+        metadata_filename = f"{gallery}/metadata.json"
+        with open(metadata_filename, "r") as f:
             matched_metadata = json.load(f)
         matched_galleries_id.append(f"#{matched_metadata['id']}")
 
@@ -236,13 +240,13 @@ def download_tag(
 ) -> Optional[dict[str, list[str]]]:
 
     gallery_results_extend = {
-        'finished': [],
-        'already_downloaded': [],
-        'repeats': [],
-        'updated_tags': [],
-        'blacklists': [],
-        'initial_fails': [],
-        'retry_fails': [],
+        "finished": [],
+        "already_downloaded": [],
+        "repeats": [],
+        "updated_tags": [],
+        "blacklists": [],
+        "initial_fails": [],
+        "retry_fails": [],
     }
 
     id_list = search_tag(tag, session)
@@ -250,54 +254,51 @@ def download_tag(
     # Failed to retrieve id_list for tag
     if type(id_list) is str:
         error_message = id_list
-        gallery_results_extend['retry_fails'].append(error_message)
+        gallery_results_extend["retry_fails"].append(error_message)
         if gallery_results:
-            gallery_results['retry_fails'].append(error_message)
+            gallery_results["retry_fails"].append(error_message)
 
         return gallery_results_extend
 
     # only keep not yet finished downloaded ids in id_list
     if not check_downloaded:
 
+        finished_cbz_ids = search_finished_cbz(download_dir=download_dir)
         matched_galleries_id = search_finished_downloads(
             tag, download_dir=download_dir
         )
-        blacklist = load_inputs.load_input_list('blacklist.txt')
-        blacklist_ids = [id for id in blacklist if '#' in id]
+        blacklist = load_inputs.load_input_list("blacklist.txt")
+        blacklist_ids = [id for id in blacklist if "#" in id]
 
         id_list_to_download = list(
             set(id_list)
             - set(matched_galleries_id)
             - set(blacklist_ids)
+            - set(finished_cbz_ids)
         )
 
         # download repeats
-        if tag == 'repeats':
+        if tag == "repeats":
             download_repeats = True
         else:
             download_repeats = False
 
-            repeat_ids = load_inputs.load_input_list('repeated_galleries.txt')
+            repeat_ids = load_inputs.load_input_list("repeated_galleries.txt")
             id_list_to_download = list(
-                set(id_list_to_download)
-                - set(repeat_ids)
+                set(id_list_to_download) - set(repeat_ids)
             )
 
     else:
         id_list_to_download = id_list
 
     if not id_list_to_download:
-        print(
-            f'\nAll galleries from {tag} have already been downloaded.\n'
-        )
+        print(f"\nAll galleries from {tag} have already been downloaded.\n")
         print(f"{'-'*os.get_terminal_size().columns}")
-        logger.info(
-            f'All galleries from {tag} has already been downloaded.'
-        )
+        logger.info(f"All galleries from {tag} has already been downloaded.")
 
         return None
 
-    logger.info(f'Start downloading for {tag}')
+    logger.info(f"Start downloading for {tag}")
     gallery_results_extend = download_galleries.download_id_list(
         id_list_to_download,
         tag,
