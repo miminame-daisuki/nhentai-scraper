@@ -19,6 +19,8 @@
 - Add input for cookies and headers in nhentai_scraper.py
 - Add warning for empty download_list.txt
 - Add function to run indefinitely (with random sleep time in-between)
+- Add Docker container
+- Add doc for nhentai api
 
 - Check pyright errors
 - How to detect individual corrupted images in a gallery
