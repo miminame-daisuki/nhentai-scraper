@@ -7,42 +7,76 @@ def cli_parser():
 
     parser.add_argument(
         "--update-cookies",
-        help="Update cookies used for bypassing Cloudflare protection.",
         action="store_true",
-    )
-
-    parser.add_argument(
-        "--confirm-settings",
-        help="Confirm various settings: download location, ...",
-        action="store_true",
-    )
-
-    parser.add_argument(
-        "--skip-to-tag",
         help=(
-            "Start download at the specified tag, "
-            "skipping all previous tags in 'download_list.txt'"
+            "Update headers and cookies used for "
+            "bypassing Cloudflare and Anubis protection."
         ),
     )
 
     parser.add_argument(
-        "--redownload-downloaded",
-        help="Recheck all downloaded galleries",
-        action="store_true",
+        "--download_dir",
+        type=str,
+        help=(
+            "Set the directory for the folder "
+            "containing all the downloaded galleries."
+        ),
     )
 
     parser.add_argument(
-        "--thumbnail",
-        help="Set thumbnails to each downloaded gallery.",
-        action="store_true",
-        default=True,
+        "--filetype",
+        choices=['folder', 'cbz'],
+        help=(
+            "Set the filetype for the downloaded galleries "
+        ),
     )
 
     parser.add_argument(
-        "--tags",
-        help="Set tags to each downloaded gallery.",
+        "--server",
+        choices=['LANraragi', 'Kavita'],
+        help=(
+            "Set the server name for viewing the downloaded galleries, "
+            "only valid with '--filetype cbz' "
+        ),
+    )
+
+    parser.add_argument(
+        "--set-thumbnail",
         action="store_true",
-        default=True,
+        help=(
+            "Set thumbnail to the folders of the downloaded galleries, "
+            "only valid with '--filetype folder'."
+        ),
+    )
+
+    parser.add_argument(
+        "--set-tags",
+        action="store_true",
+        help=(
+            "Set tags to the folders of the downloaded gallery, "
+            "only valid with '--filetype folder'."
+        ),
+    )
+
+    parser.add_argument(
+        "--check-downloaded",
+        action="store_true",
+        help="Recheck all downloaded galleries for missing pages.",
+    )
+
+    parser.add_argument(
+        "--skip-to-tag",
+        type=str,
+        help=(
+            "Start download at the specified tag, "
+            "skipping all previous tags in 'download_list.txt'."
+        ),
+    )
+
+    parser.add_argument(
+        "--confirm-settings",
+        action="store_true",
+        help="Prints all runtime settings for confirmation.",
     )
 
     args = parser.parse_args()
@@ -52,4 +86,4 @@ def cli_parser():
 
 if __name__ == "__main__":
     args = cli_parser()
-    print(args)
+    print(f'{args = }')
