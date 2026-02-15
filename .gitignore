@@ -4,6 +4,7 @@ __*
 *.spec
 inputs/*
 !inputs/README.md
+!inputs/config_template.yaml
 Downloaded/*
 !Downloaded/README.md
 test/*

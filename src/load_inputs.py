@@ -1,6 +1,11 @@
 import os
+import sys
+import shutil
+import argparse
+import copy
 from pathlib import Path
 import json
+import yaml
 from typing import Union, Optional
 
 import cli
@@ -36,78 +41,114 @@ def load_input_list(
     return download_list
 
 
-def load_json(
-    filename: Union[str, Path],
-    inputs_dir: Optional[Union[str, Path]] = None
-) -> dict:
+def create_config_yaml(inputs_path: Optional[Path] = None) -> None:
 
-    filename = Path(filename)
-    if filename.suffix != '.json':
-        print('Not json file.')
-        return {}
-
-    if inputs_dir is None:
+    if inputs_path is None:
         application_folder_path = misc.get_application_folder_dir()
-        inputs_dir = os.path.abspath(f'{application_folder_path}/inputs/')
+        inputs_path = Path(f'{application_folder_path}/inputs').absolute()
 
-    json_filename = f'{inputs_dir}/{filename}'
-    with open(json_filename) as f:
-        json_dict = json.load(f)
+    # create config.yaml from config_template.yaml
+    config_template_filename = inputs_path / 'config_template.yaml'
+    with open(config_template_filename, 'r') as f:
+        config = yaml.load(f, Loader=yaml.SafeLoader)
 
-    return json_dict
+    with open(inputs_path / 'config.yaml', 'w') as f:
+        yaml.dump(config, f)
 
 
-def write_cookies(inputs_path: Path) -> None:
-    # cookies = {}
-    # cookies['cf_clearance'] = input('cf_clearance: ')
-    # cookies['sessionid'] = input('sessionid :')
+def load_config_yaml(inputs_path: Optional[Path] = None, args: Optional[argparse.Namespace] = None) -> dict:
+
+    if inputs_path is None:
+        application_folder_path = misc.get_application_folder_dir()
+        inputs_path = Path(f'{application_folder_path}/inputs').absolute()
+
+    config_filename = inputs_path / 'config.yaml'
+    if not config_filename.exists():
+        create_config_yaml()
+    with open(config_filename, 'r') as f:
+        config = yaml.load(f, Loader=yaml.SafeLoader)
+
+    # populate missing values with default settings
+    if config['downloads']['download_dir'] is None:
+        config['downloads']['download_dir'] = str(misc.set_download_dir())
+    if config['downloads']['filetype'] is None:
+        config['downloads']['filetype'] = 'folder'
+    if config['downloads']['set-thumbnail'] is None:
+        config['downloads']['set-thumbnail'] = True
+    if config['downloads']['set-tags'] is None:
+        config['downloads']['set-tags'] = True
+    if config['headers']['User-Agent'] is None:
+        config['headers'] = input_headers()
+    if not any([value for value in config['cookies'].values()]):
+        config['cookies'] = input_cookies()
+
+    if args is not None:
+        if args.update_cookies:
+            config['headers'] = input_headers()
+            config['cookies'] = input_cookies()
+
+    with open(config_filename, 'w') as f:
+        yaml.dump(config, f)
+
+    return config
+
+
+def input_cookies() -> dict:
+
     cookies = input('Cookie: ')
     cookies = {
         line.split('=')[0]: line.split('=')[1] for line in cookies.split('; ')
     }
-    with open(inputs_path / 'cookies.json', 'w') as f:
-        json.dump(cookies, f, indent=4)
+
+    return cookies
 
 
-def write_headers(inputs_path: Path) -> None:
+def input_headers() -> dict:
+
     headers = {}
     headers['User-Agent'] = input('User-Agent: ')
-    with open(inputs_path / 'headers.json', 'w') as f:
-        json.dump(headers, f, indent=4)
+
+    return headers
 
 
-def confirm_settings() -> dict:
+def generate_runtime_settings(inputs_path: Optional[Path] = None) -> dict:
 
-    settings = {}
-
-    # load command line arguments
+    # load command line arguments and config.yaml 
     args = cli.cli_parser()
+    config = load_config_yaml(inputs_path=inputs_path, args=args)
 
-    # confirm download location
-    application_folder_path = misc.get_application_folder_dir()
-    download_dir = str(misc.set_download_dir())
+    settings = copy.deepcopy(config)
+
+    if args.download_dir:
+        settings['downloads']['download_dir'] = args.download_dir
+    if args.filetype:
+        settings['downloads']['filetype'] = args.filetype
+    if args.server:
+        settings['downloads']['server'] = args.server
+    if args.set_thumbnail:
+        settings['downloads']['set-thumbnail'] = args.set_thumbnail
+    if args.set_tags:
+        settings['downloads']['set-tags'] = args.set_tags
+
+    settings['runtime'] = {}
+    settings['runtime']['check-downloaded'] = args.check_downloaded
+    settings['runtime']['skip-to-tag'] = args.skip_to_tag
+
+    # confirm settings
     if args.confirm_settings:
-        while True:
-            confirm_download_dir = input((f'Download to {download_dir}?(y/n)'))
-            if confirm_download_dir != 'y':
-                download_dir = input('Download directory: ')
-                download_dir = misc.set_download_dir(download_dir)
-            else:
-                break
-    settings['download_dir'] = download_dir
-
-    # create `cookies.json` and `headers.json` if not present in `inputs/`
-    inputs_path = Path(f'{application_folder_path}/inputs').absolute()
-    if 'cookies.json' not in [file.name for file in inputs_path.iterdir()]:
-        write_cookies(inputs_path)
-    if 'headers.json' not in [file.name for file in inputs_path.iterdir()]:
-        write_headers(inputs_path)
-
-    if args.update_cookies:
-        write_cookies(inputs_path)
-
-    settings['redownload_downloaded'] = args.redownload_downloaded
-
-    settings['skip_to_tag'] = args.skip_to_tag
+        print(f"{'-'*os.get_terminal_size().columns}")
+        print('Runtime settings:')
+        print(json.dumps(settings, indent=4))
+        print(f"{'-'*os.get_terminal_size().columns}")
+        if input('Are these settings correct?(y/n)') != 'y':
+            raise SystemExit(
+                "Please modify these settings in 'inputs/config.yaml'"
+                " or set the cli arguments."
+            )
+        print(f"{'-'*os.get_terminal_size().columns}")
 
     return settings
+
+if __name__ == "__main__":
+    config = load_config_yaml()
+    settings = generate_runtime_settings()
