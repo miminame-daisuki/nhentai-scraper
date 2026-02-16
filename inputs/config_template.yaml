@@ -4,14 +4,3 @@ downloads:
   server:
   set-thumbnail: 
   set-tags: 
-
-headers:
-  User-Agent:
-
-cookies:
-  cf_clearance:
-  csrftoken:
-  session-affinity:
-  sessionid:
-  techaro.lol-anubis-auth-auth:
-  techaro.lol-anubis-cookie-verification:
