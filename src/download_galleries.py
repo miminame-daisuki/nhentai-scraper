@@ -247,7 +247,7 @@ def exit_gracefully(
 
     logger.info(f"\n{'-'*os.get_terminal_size().columns}")
     logger.info("Program terminated with Ctrl-C")
-    print('\n\u2500'*os.get_terminal_size().columns)
+    print('\n' + '\u2500'*os.get_terminal_size().columns)
     print("\nProgram terminated with Ctrl-C.")
     write_final_results(gallery_results)
 
