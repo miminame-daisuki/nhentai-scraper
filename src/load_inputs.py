@@ -85,12 +85,12 @@ def load_config_yaml(
     if config["headers"]["User-Agent"] is None:
         config["headers"] = input_headers()
     if not any([value for value in config["cookies"].values()]):
-        config["cookies"] = input_cookies()
+        config["cookies"] = load_nhentai_cookies()
 
     if args is not None:
         if args.update_cookies:
             config["headers"] = input_headers()
-            config["cookies"] = input_cookies()
+            config["cookies"] = load_nhentai_cookies()
 
     with open(config_filename, "w") as f:
         yaml.dump(config, f)
@@ -111,24 +111,21 @@ def load_nhentai_cookies(inputs_dir: Optional[Path] = None) -> dict:
     if nhentai_net_jar["log"]["pages"][0]["title"] != "https://nhentai.net/":
         raise Exception("Please export from 'https://nhentai.net'")
 
+    # search for 'https://nhentai.net' headers
     nhentai_headers = next(
         entry["request"]["headers"]
         for entry in nhentai_net_jar["log"]["entries"]
         if entry["request"]["url"] == "https://nhentai.net/"
     )
 
+    # search for 'Cookie'
     nhentai_Cookie = next(
         item['value'] for item in nhentai_headers if item['name'] == 'Cookie'
     )
 
-    return nhentai_Cookie
-
-
-def input_cookies() -> dict:
-
-    cookies = input("Cookie: ")
+    # parse cookies
     cookies = {
-        line.split("=")[0]: line.split("=")[1] for line in cookies.split("; ")
+        line.split("=")[0]: line.split("=")[1] for line in nhentai_Cookie.split("; ")
     }
 
     return cookies
