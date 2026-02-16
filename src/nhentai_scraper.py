@@ -7,6 +7,7 @@ Created on Sat Feb 10 22:54:33 2024
 """
 
 import requests
+import requests.cookies
 import random
 import time
 import json
