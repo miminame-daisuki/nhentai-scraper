@@ -83,14 +83,14 @@ def load_config_yaml(
     if config["downloads"]["set-tags"] is None:
         config["downloads"]["set-tags"] = True
     if config["headers"]["User-Agent"] is None:
-        config["headers"] = input_headers()
+        config["headers"] = load_nhentai_headers()
     if not any([value for value in config["cookies"].values()]):
-        config["cookies"] = load_nhentai_cookies()
+        config["cookies"] = load_nhentai_Cookie()
 
     if args is not None:
         if args.update_cookies:
-            config["headers"] = input_headers()
-            config["cookies"] = load_nhentai_cookies()
+            config["headers"] = load_nhentai_headers()
+            config["cookies"] = load_nhentai_Cookie()
 
     with open(config_filename, "w") as f:
         yaml.dump(config, f)
@@ -98,7 +98,7 @@ def load_config_yaml(
     return config
 
 
-def load_nhentai_cookies(inputs_dir: Optional[Path] = None) -> dict:
+def load_nhentai_cookies(inputs_dir: Optional[Path] = None) -> list[dict]:
 
     if inputs_dir is None:
         application_folder_path = misc.get_application_folder_dir()
@@ -118,6 +118,17 @@ def load_nhentai_cookies(inputs_dir: Optional[Path] = None) -> dict:
         if entry["request"]["url"] == "https://nhentai.net/"
     )
 
+    return nhentai_headers
+
+
+def load_nhentai_Cookie(inputs_dir: Optional[Path] = None) -> dict:
+
+    if inputs_dir is None:
+        application_folder_path = misc.get_application_folder_dir()
+        inputs_dir = Path(application_folder_path).absolute() / "inputs/"
+
+    nhentai_headers = load_nhentai_cookies(inputs_dir=inputs_dir)
+
     # search for 'Cookie'
     nhentai_Cookie = next(
         item['value'] for item in nhentai_headers if item['name'] == 'Cookie'
@@ -131,10 +142,21 @@ def load_nhentai_cookies(inputs_dir: Optional[Path] = None) -> dict:
     return cookies
 
 
-def input_headers() -> dict:
+def load_nhentai_headers(inputs_dir: Optional[Path] = None) -> dict:
 
-    headers = {}
-    headers["User-Agent"] = input("User-Agent: ")
+    if inputs_dir is None:
+        application_folder_path = misc.get_application_folder_dir()
+        inputs_dir = Path(application_folder_path).absolute() / "inputs/"
+
+    nhentai_headers = load_nhentai_cookies(inputs_dir=inputs_dir)
+
+    # search for 'Cookie'
+    nhentai_headers = next(
+        item['value'] for item in nhentai_headers if item['name'] == 'User-Agent'
+    )
+
+    # parse headers
+    headers = {"User-Agent": nhentai_headers['value']}
 
     return headers
 
