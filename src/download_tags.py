@@ -135,7 +135,8 @@ def search_tag(
         error = page_count
         if error == "Error 403":
             error_message = (
-                f"Error 403 - Forbidden for {tag} " "(try updating cookies)."
+                f"Error 403 - Forbidden for {tag} "
+                "(try exporting a new `nhentai.net.har`)."
             )
         elif error == "Error 404":
             error_message = f"Error 404 - Not Found for {tag}."

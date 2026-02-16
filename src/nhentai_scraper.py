@@ -909,7 +909,7 @@ class Gallery:
             -1: "Download not finished...",
             -2: (
                 f"Error 403 - Forbidden for #{self.id} "
-                "(try updating `cf_clearance`)."
+                "(try exporting a new `nhentai.net.har`)."
             ),
             -3: f"Error 404 - Not Found for #{self.id}.",
             -4: (
