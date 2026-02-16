@@ -98,6 +98,32 @@ def load_config_yaml(
     return config
 
 
+def load_nhentai_cookies(inputs_dir: Optional[Path] = None) -> dict:
+
+    if inputs_dir is None:
+        application_folder_path = misc.get_application_folder_dir()
+        inputs_dir = Path(application_folder_path).absolute() / "inputs/"
+
+    json_filename = inputs_dir / "nhentai.net.har"
+    with open(json_filename) as f:
+        nhentai_net_jar = json.load(f)
+
+    if nhentai_net_jar["log"]["pages"][0]["title"] != "https://nhentai.net/":
+        raise Exception("Please export from 'https://nhentai.net'")
+
+    nhentai_headers = next(
+        entry["request"]["headers"]
+        for entry in nhentai_net_jar["log"]["entries"]
+        if entry["request"]["url"] == "https://nhentai.net/"
+    )
+
+    nhentai_Cookie = next(
+        item['value'] for item in nhentai_headers if item['name'] == 'Cookie'
+    )
+
+    return nhentai_Cookie
+
+
 def input_cookies() -> dict:
 
     cookies = input("Cookie: ")
