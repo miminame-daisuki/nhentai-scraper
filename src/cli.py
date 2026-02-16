@@ -6,15 +6,6 @@ def cli_parser():
     parser = argparse.ArgumentParser()
 
     parser.add_argument(
-        "--update-cookies",
-        action="store_true",
-        help=(
-            "Update headers and cookies used for "
-            "bypassing Cloudflare and Anubis protection."
-        ),
-    )
-
-    parser.add_argument(
         "--download_dir",
         type=str,
         help=(
