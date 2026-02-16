@@ -139,15 +139,15 @@ def load_nhentai_headers(inputs_dir: Optional[Path] = None) -> dict:
         application_folder_path = misc.get_application_folder_dir()
         inputs_dir = Path(application_folder_path).absolute() / "inputs/"
 
-    nhentai_headers = load_nhentai_cookies(inputs_dir=inputs_dir)
+    nhentai_cookies = load_nhentai_cookies(inputs_dir=inputs_dir)
 
     # search for 'Cookie'
-    nhentai_headers = next(
-        item['value'] for item in nhentai_headers if item['name'] == 'User-Agent'
+    User_Agent = next(
+        item['value'] for item in nhentai_cookies if item['name'] == 'User-Agent'
     )
 
     # parse headers
-    headers = {"User-Agent": nhentai_headers['value']}
+    headers = {"User-Agent": User_Agent}
 
     return headers
 
