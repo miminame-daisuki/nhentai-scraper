@@ -60,12 +60,12 @@ class Session(requests.Session):
         config = load_inputs.load_config_yaml()
 
         if cookie_dict is None:
-            cookie_dict = config["cookies"]
+            cookie_dict = load_inputs.load_nhentai_Cookie()
             cookiejar = requests.cookies.cookiejar_from_dict(cookie_dict)
             self.cookies = cookiejar
 
         if headers is None:
-            headers = config["headers"]
+            headers = load_inputs.load_nhentai_headers()
             if type(headers) is dict:
                 self.headers.update(headers)
 
@@ -105,11 +105,10 @@ def create_session(
 
     session = requests.Session()
 
-    config = load_inputs.load_config_yaml()
     if cookie_dict is None:
-        cookie_dict = config["cookies"]
+        cookie_dict = load_inputs.load_nhentai_Cookie()
     if headers_dict is None:
-        headers_dict = config["headers"]
+        headers_dict = load_inputs.load_nhentai_headers()
 
     cookiejar = requests.cookies.cookiejar_from_dict(cookie_dict)
     session.cookies = cookiejar

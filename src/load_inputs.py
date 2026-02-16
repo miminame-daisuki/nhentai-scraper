@@ -82,15 +82,6 @@ def load_config_yaml(
         config["downloads"]["set-thumbnail"] = True
     if config["downloads"]["set-tags"] is None:
         config["downloads"]["set-tags"] = True
-    if config["headers"]["User-Agent"] is None:
-        config["headers"] = load_nhentai_headers()
-    if not any([value for value in config["cookies"].values()]):
-        config["cookies"] = load_nhentai_Cookie()
-
-    if args is not None:
-        if args.update_cookies:
-            config["headers"] = load_nhentai_headers()
-            config["cookies"] = load_nhentai_Cookie()
 
     with open(config_filename, "w") as f:
         yaml.dump(config, f)
