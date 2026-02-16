@@ -15,9 +15,7 @@
 (with additional_tags = ['favorites', 'repeats'])?
 - 'EOFError' happening at the end of terminal output?
 - Add print result when # of downloaded galleries = # of repeats = # blacklists = 0
-- Don't add 'repeats' as an additional tag?
 - Make sure metadata.json exists when running Gallery.load_downloaded_metadata()
-- Add input for cookies and headers in nhentai_scraper.py
 - Add warning for empty download_list.txt
 - Add function to run indefinitely (with random sleep time in-between) (or just use cronjob?)
 - Add Docker container
