@@ -53,14 +53,14 @@ logger = logging.getLogger("__main__." + __name__)
 
 class Session(requests.Session):
     def __init__(
-        self, cookies: Optional[dict] = None, headers: Optional[dict] = None
+        self, cookie_dict: Optional[dict] = None, headers: Optional[dict] = None
     ):
 
         config = load_inputs.load_config_yaml()
 
-        if cookies is None:
-            cookies = config["cookies"]
-            cookiejar = requests.cookies.cookiejar_from_dict(cookies)
+        if cookie_dict is None:
+            cookie_dict = config["cookies"]
+            cookiejar = requests.cookies.cookiejar_from_dict(cookie_dict)
             self.cookies = cookiejar
 
         if headers is None:
@@ -99,22 +99,21 @@ class Session(requests.Session):
 
 
 def create_session(
-    cookies: Optional[dict] = None, headers: Optional[dict] = None
+    cookie_dict: Optional[dict] = None, headers_dict: Optional[dict] = None
 ) -> requests.sessions.Session:
 
     session = requests.Session()
 
     config = load_inputs.load_config_yaml()
+    if cookie_dict is None:
+        cookie_dict = config["cookies"]
+    if headers_dict is None:
+        headers_dict = config["headers"]
 
-    if cookies is None:
-        cookies = config["cookies"]
-        cookiejar = requests.cookies.cookiejar_from_dict(cookies)
-        session.cookies = cookiejar
-
-    if headers is None:
-        headers = config["headers"]
-        if type(headers) is dict:
-            session.headers.update(headers)
+    cookiejar = requests.cookies.cookiejar_from_dict(cookie_dict)
+    session.cookies = cookiejar
+    if type(headers_dict) is dict:
+        session.headers.update(headers_dict)
 
     return session
 

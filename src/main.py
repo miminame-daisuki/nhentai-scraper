@@ -33,7 +33,7 @@ def main():
     misc.print_start_message(download_dir)
 
     session = nhentai_scraper.create_session(
-        cookies=settings["cookies"], headers=settings["headers"]
+        cookie_dict=settings["cookies"], headers_dict=settings["headers"]
     )
 
     gallery_results = misc.create_gallery_results_dict(repeat_ids, blacklist)
