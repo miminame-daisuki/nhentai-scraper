@@ -95,12 +95,15 @@ def load_nhentai_cookies(inputs_dir: Optional[Path] = None) -> list[dict]:
         application_folder_path = misc.get_application_folder_dir()
         inputs_dir = Path(application_folder_path).absolute() / "inputs/"
 
-    json_filename = inputs_dir / "nhentai.net.har"
-    with open(json_filename) as f:
-        nhentai_net_jar = json.load(f)
+    har_filename = inputs_dir / "nhentai.net.har"
+    if har_filename.exists():
+        with open(har_filename) as f:
+            nhentai_net_jar = json.load(f)
+    else:
+        raise FileNotFoundError(f"`nhentai.net.har` not found in `{inputs_dir}`")
 
     if nhentai_net_jar["log"]["pages"][0]["title"] != "https://nhentai.net/":
-        raise Exception("Please export from 'https://nhentai.net'")
+        raise Exception("Please export `nhentai.net.jar` from 'https://nhentai.net'")
 
     # search for 'https://nhentai.net' headers
     nhentai_headers = next(
