@@ -8,12 +8,12 @@ Feel free to ask about any difficulties you are facing [here](issues)!
 
 ## Features
 
-- Downloads from [Favorites on nhentai][6] or a user-given list of gallery ids/searches/tags/artists/groups/parodies...
+- Downloads from [your favorites on nhentai.net][6] or a user-given list of gallery ids/searches/tags/artists/groups/parodies...
 - Galleries can be saved either as folders (directly viewed by Finder) or cbz archives (viewed on servers):
-  - By saving as folders,
-    - Thumbnail and tags are automatically set to folder for each gallery.
+  - By saving as folders:
+    - Thumbnail and tags are automatically set to the folder for each gallery.
     - Images are combined into a single PDF file for easier viewing.
-  - By saving as cbz archives,
+  - By saving as cbz archives:
     - Galleries may be viewed on servers such as [LANraragi][4] and [Kavita][5]
 - Prevents downloads from user-defined blacklists.
 - Skips over already-downloaded galleries.
@@ -74,15 +74,15 @@ Example using Safari:
     1. From the `Develop` menu, click on `Show Web Inspector`.
     (Follow [these steps][1] if you haven't enabled it.)
     1. Select the `Network` tab, and refresh the page.
-    1. Click on the `Export` option in the upper right hand corner, and save it inside the `inputs` folder where the program is located at.
+    1. Click on the `Export` option in the upper right hand corner, and save it inside the `inputs/` folder where the program is located at.
 
 1. Depending on your installation, execute the program either by:
     - Double clicking the `main` unix executable file.
     - Running `python main.py` (located in the `src/` folder) in your terminal.
 
     - (Do either of the following instead
-    - if you want the program to continue to run
-    - even when the computer is in sleep):
+    if you want the program to continue to run
+    even when the computer is in sleep):
         - Double click the `main_no_sleep.command` file.
         - Run `caffeinate python main.py` inside the `src/` folder.
 
