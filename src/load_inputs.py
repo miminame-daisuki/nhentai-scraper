@@ -15,19 +15,27 @@ def load_input_list(
 ) -> list[str]:
 
     application_folder_path = misc.get_application_folder_dir()
-    filename = Path(filename)
-    if not filename.is_absolute():
+    filename_path = Path(filename)
+    if not filename_path.is_absolute():
         inputs_folder_dir = os.path.abspath(
             f"{application_folder_path}/inputs/"
         )
-        filename = Path(f"{inputs_folder_dir}/{filename}")
-    else:
-        filename = Path(filename)
+        filename_path = Path(f"{inputs_folder_dir}/{filename}")
 
-    if not filename.exists():
-        raise Exception("'download_list.txt' doesn't exist in inputs/ folder!")
+    if not filename_path.exists():
+        print(f"`{str(filename_path)}` not found, creating new one...")
+        inputs = ''
+        if filename == 'download_list.txt':
+            inputs = input(f"Gallery id(s)/Tag(s) to download (separate by semi-column ';'):").replace(';', '\n')
+        elif filename == 'blacklist.txt':
+            inputs = input(f"Gallery id(s)/Tag(s) to NOT download (separate by semi-column ';'):").replace(';', '\n')
+        elif filename == 'repeats.txt':
+            inputs = ''
 
-    with open(filename) as f:
+        with open(filename_path, 'w') as f:
+            f.write(inputs)
+
+    with open(filename_path) as f:
         download_list = f.read().splitlines()
 
     download_list = [entry for entry in download_list if not entry == ""]
