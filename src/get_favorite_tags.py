@@ -35,9 +35,7 @@ def get_favorites_tags(
             gallery_id, session=session, download_dir=download_dir
         )
         tag_list = [
-            tag
-            for tag in gallery.metadata["tags"]
-            if (tag["type"] in type)
+            tag for tag in gallery.metadata["tags"] if (tag["type"] in type)
         ]
         download_list.extend(
             [f"{tag['type']}:{tag['name']}" for tag in tag_list]

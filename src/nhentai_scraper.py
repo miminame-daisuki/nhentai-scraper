@@ -54,7 +54,9 @@ logger = logging.getLogger("__main__." + __name__)
 
 class Session(requests.Session):
     def __init__(
-        self, cookie_dict: Optional[dict] = None, headers: Optional[dict] = None
+        self,
+        cookie_dict: Optional[dict] = None,
+        headers: Optional[dict] = None,
     ):
 
         config = load_inputs.load_config_yaml()
