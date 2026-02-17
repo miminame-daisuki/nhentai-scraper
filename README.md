@@ -24,7 +24,7 @@ Feel free to ask about any difficulties you are facing [here](issues)!
 
 ### Unix executable
 
-1. Download the unix executable from [Releases](https://github.com/miminame-daisuki/nhentai-scraper/releases).
+1. Download the `.tar.gz` archive from [Releases](https://github.com/miminame-daisuki/nhentai-scraper/releases).
 1. Extract the downloaded `.tar.gz` archive.
 
 ### Source code
@@ -37,7 +37,7 @@ Feel free to ask about any difficulties you are facing [here](issues)!
 
 ## Basic Usage
 
-1. Export your cookies and headers with your browser of choice for bypassing CloudFlareand Anubis.
+1. Export your cookies and headers for bypassing CloudFlare and Anubis in an `.har` file and save it to the `inputs/` folder.
 Example using Safari:
     1. Visit to [nhentai.net](https://nhentai.net).
     1. (Optional) Log in to your account
@@ -55,7 +55,9 @@ Example using Safari:
 
     - If you want the program to continue to run even when the computer is in sleep:
         - Double click the `main_no_sleep.command` file.
-        - Run `caffeinate python main.py` (located inside the `src/` folder) in your terminal.
+        - Run `caffeinate -is python main.py` (located inside the `src/` folder) in your terminal.
+
+1. For the first run, the program will print out the default settings. Enter 'n' if you want to change any of the settings. Otherwise, enter 'y'.
 
 1. The program will automatically create a `Downloaded/` folder
 for the downloaded galleries and begin download.
