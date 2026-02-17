@@ -8,14 +8,17 @@ Feel free to ask about any difficulties you are facing [here](issues)!
 
 ## Features
 
-- Automatically sets thumbnail and tags to folder for each gallery.
-- Combines downloaded images into a single PDF file.
-- Downloads from a user-given list of gallery ids or searches/tags/artists/groups/parodies...
-- Can also download from [Favorites on nhentai](https://nhentai.net/favorites/).
+- Downloads from [Favorites on nhentai][6] or a user-given list of gallery ids/searches/tags/artists/groups/parodies...
+- Galleries can be saved either as folders (directly viewed by Finder) or cbz archives (viewed on servers):
+  - By saving as folders,
+    - Thumbnail and tags are automatically set to folder for each gallery.
+    - Images are combined into a single PDF file for easier viewing.
+  - By saving as cbz archives,
+    - Galleries may be viewed on servers such as [LANraragi][4] and [Kavita][5]
 - Prevents downloads from user-defined blacklists.
-- Skips already-downloaded galleries.
-- Can also skip over galleries with the same title.
-- Supports running while computer is in sleep.
+- Skips over already-downloaded galleries.
+- Supports skipping over galleries with the same title.
+- Supports running while computer is in sleep with lid closed.
 
 ## Installation
 
@@ -66,17 +69,12 @@ Example `blacklist.txt`:
 Example using Safari:
     1. Visit to [nhentai.net](https://nhentai.net).
     1. (Optional) Log in to your account
-    (only necessary if you wish to download your favorites).
+    (only necessary if you wish to download your [favorites][6]).
     1. Clear the CloudFlare captcha.
     1. From the `Develop` menu, click on `Show Web Inspector`.
     (Follow [these steps][1] if you haven't enabled it.)
-    1. Select `nhentai.net` in the `Name` column.
-    It should be displaying almost nothing
-    (except for the `https://nhentai.net/` url in the `URL` line
-    under the `Summary` section).
-    1. Reload the page.
-    1. Repeat Step 3-iv. This time it should be displaying a lot more information.
-    1. Locate `Cookie` and `User-Agent` under the `Request` section.
+    1. Select the `Network` tab, and refresh the page.
+    1. Click on the `Export` option in the upper right hand corner, and save it inside the `inputs` folder where the program is located at.
 
 1. Depending on your installation, execute the program either by:
     - Double clicking the `main` unix executable file.
@@ -88,32 +86,10 @@ Example using Safari:
         - Double click the `main_no_sleep.command` file.
         - Run `caffeinate python main.py` inside the `src/` folder.
 
-1. Follow the instructions,
-and copy-paste your cookies & user agent from Step 3. when prompted.
-
 1. The program will automatically create a `Downloaded/` folder
 for the downloaded galleries and begin download.
 
-1. Confirm the download folder location
-when asked `Download to /your/download/folder/location?(y/n)`
-by either typing `y` or `n` then `Enter`.
-
-1. To end the program, simply press `Ctrl-c`.
-
-1. The next time you start the program, it will prompt the folloing questions:
-    1. `Download to /your/download/folder/location?(y/n)`:
-    Confirm download location by typing `y` or `n` then `Enter`.
-    1. `Update cookies?(y/n)`: Go to [nhentai][2]
-    and see if you need to update your cookies for bypassing CloudFlare.
-    1. `Skip downloaded galleries?(y/n)`: If `y`,
-    the program will skip over entries in the `download_list.txt`
-    if every gallery belonging to the entry is already downloaded.
-    1. `Skip to tag?(Press Enter for no skip)`:
-    If you wish to start downloading from where your last session ended,
-    enter the name of the last unfinished entry from your last session
-    (ex: if you stopped the program while it was downloading 'tag:aaa',
-    then type 'tag:aaa' then `Enter`).
-    The program should resume the download process.
+1. To terminate the program, simply press `Ctrl-c`.
 
 ## Usage with Servers
 
@@ -143,3 +119,5 @@ Ex: To search for `[artist] title`, simply type `title`.
 [2]: https://nhentai.net
 [3]: https://support.apple.com/en-us/102321
 [4]: https://github.com/Difegue/LANraragi
+[5]: https://github.com/Kareadita/Kavita
+[6]: https://nhentai.net/favorites/
