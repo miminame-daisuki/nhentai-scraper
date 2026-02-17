@@ -1,8 +1,8 @@
-# NHentai Scraper
+# nHentai Scraper
 
 English | [繁體中文](README_zh-TW.md)
 
-Scraper/Downloader for [nhentai](https://nhentai.net),
+Scraper/Downloader for [nHentai](https://nhentai.net),
 designed for ease of use on MacOS.\
 Feel free to ask about any difficulties you are facing [here](issues)!
 
@@ -14,7 +14,7 @@ Feel free to ask about any difficulties you are facing [here](issues)!
     - Thumbnail and tags are automatically set to the folder for each gallery.
     - Images are combined into a single PDF file for easier viewing.
   - By saving as cbz archives:
-    - Galleries may be viewed on servers such as [LANraragi][4] and [Kavita][5]
+    - Galleries may be viewed on servers such as [LANraragi][4] and [Kavita][5].
 - Prevents downloads from user-defined blacklists.
 - Skips over already-downloaded galleries.
 - Supports skipping over galleries with the same title.
@@ -37,40 +37,7 @@ Feel free to ask about any difficulties you are facing [here](issues)!
 
 ## Basic Usage
 
-1. (For people downloading from [Releases](releases))
-Create a folder with the name `inputs/`
-at the location of the `main` unix executable file.
-
-1. Create a file called `download_list.txt` inside the folder `inputs/`,
-and place the gallery id/tag name/artist name ... you wish to download in the file,
-separated by line breaks.\
-Example `download_list.txt`:
-
-    ```text
-    artist:
-    tag:
-    group:
-    search:
-    #114514
-    ```
-
-1. (Optional) Add `repeats` to `download_list.txt`
-if you wish to download repeated galleries
-(i.e. galleries with the same title as the already downloaded ones,
-but with different ids)
-
-1. (Optional) Create another file called `blacklist.txt`
-inside the `inputs/` folder,
-and place the list of tags you want to avoid downloading,
-separated by line breaks.\
-Example `blacklist.txt`:
-
-    ```text
-    tag:yaoi
-    tag:males only
-    ```
-
-1. Find your cookies and headers with your browser of choice for bypassing CloudFlare.
+1. Export your cookies and headers with your browser of choice for bypassing CloudFlareand Anubis.
 Example using Safari:
     1. Visit to [nhentai.net](https://nhentai.net).
     1. (Optional) Log in to your account
@@ -82,19 +49,28 @@ Example using Safari:
     1. Click on the `Export` option in the upper right hand corner, and save it inside the `inputs/` folder where the program is located at.
 
 1. Depending on your installation, execute the program either by:
-    - Double clicking the `main` unix executable file.
-    - Running `python main.py` (located in the `src/` folder) in your terminal.
+    - If you want the program to only run when your computer is awake:
+        - Double click the `main` file.
+        - Run `python main.py` (located in the `src/` folder) in your terminal.
 
-    - (Do either of the following instead
-    if you want the program to continue to run
-    even when the computer is in sleep):
+    - If you want the program to continue to run even when the computer is in sleep:
         - Double click the `main_no_sleep.command` file.
-        - Run `caffeinate python main.py` inside the `src/` folder.
+        - Run `caffeinate python main.py` (located inside the `src/` folder) in your terminal.
 
 1. The program will automatically create a `Downloaded/` folder
 for the downloaded galleries and begin download.
 
 1. To terminate the program, simply press `Ctrl-c`.
+
+## Example `download_list.txt` File
+
+    ```text
+    artist:<artist>
+    tag:<tag>
+    group:<group>
+    search:<search>
+    #114514
+    ```
 
 ## Usage with Servers
 
