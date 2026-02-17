@@ -822,6 +822,7 @@ class Gallery:
             "._Icon\r",
             "metadata.json",
             ".DS_Store",
+            "ComicInfo.xml",
             f"thumb.{self.thumb_extension}",
         ]
         self.image_filenames = [
