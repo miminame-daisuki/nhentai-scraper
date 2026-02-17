@@ -115,6 +115,21 @@ by either typing `y` or `n` then `Enter`.
     then type 'tag:aaa' then `Enter`).
     The program should resume the download process.
 
+## Usage with Servers
+
+### [LANraragi][4]
+
+1. Go to `Settings` then click `Tags and Thumbnails`
+1. Click `Generate Missing Thumbnails`
+1. After generating missing thumbnails, click `Return to Library`
+1. Go to `Batch Operations`
+1. Select `Use Plugin` for `Task` and `ComicInfo` for `Use plugin`
+1. Click `Check/Uncheck all` then `Start Task`
+(This took around 0.5 seconds per gallery on my machine, so you may need to wait a bit if you have a large library)
+1. (Optional)Repeat the previous two steps, but change the `Use plugin` option to:
+    - `Filename Parsing` if you want the filenames to only contain the title of the gallery
+    - `nHentai` if you want the filenames to completely follow the format on nHentai
+
 ## Some Tips when Using the Program
 
 - [Reindex spotlight][3] if it is not skipping a praticular tag,
@@ -127,3 +142,4 @@ Ex: To search for `[artist] title`, simply type `title`.
 [1]: https://developer.apple.com/documentation/safari-developer-tools/enabling-developer-features
 [2]: https://nhentai.net
 [3]: https://support.apple.com/en-us/102321
+[4]: https://github.com/Difegue/LANraragi
