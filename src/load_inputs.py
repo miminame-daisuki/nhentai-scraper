@@ -69,15 +69,18 @@ def create_config_yaml(inputs_path: Optional[Path] = None) -> None:
 def load_config_yaml(
     inputs_path: Optional[Path] = None,
     args: Optional[argparse.Namespace] = None,
-) -> dict:
+) -> tuple[dict, bool]:
 
     if inputs_path is None:
         application_folder_path = misc.get_application_folder_dir()
         inputs_path = Path(f"{application_folder_path}/inputs").absolute()
 
     config_filename = inputs_path / "config.yaml"
+    first_run = True
     if not config_filename.exists():
         create_config_yaml()
+    else:
+        first_run = False
     with open(config_filename, "r") as f:
         config = yaml.load(f, Loader=yaml.SafeLoader)
 
@@ -98,7 +101,7 @@ def load_config_yaml(
     with open(config_filename, "w") as f:
         yaml.dump(config, f)
 
-    return config
+    return config, first_run
 
 
 def load_nhentai_cookies(inputs_dir: Optional[Path] = None) -> list[dict]:
@@ -179,7 +182,7 @@ def generate_runtime_settings(inputs_path: Optional[Path] = None) -> dict:
 
     # load command line arguments and config.yaml
     args = cli.cli_parser()
-    config = load_config_yaml(inputs_path=inputs_path, args=args)
+    config, first_run = load_config_yaml(inputs_path=inputs_path, args=args)
 
     settings = copy.deepcopy(config)
 
@@ -200,19 +203,23 @@ def generate_runtime_settings(inputs_path: Optional[Path] = None) -> dict:
     settings["runtime"]["check-downloaded"] = args.check_downloaded
     settings["runtime"]["skip-to-tag"] = args.skip_to_tag
 
-    # confirm settings
-    if args.confirm_settings:
-        print("\u2500" * os.get_terminal_size().columns)
-        print("Runtime settings:")
-        print(json.dumps(settings, indent=4))
-        print("\u2500" * os.get_terminal_size().columns)
-        if input("Are these settings correct?(y/n)") != "y":
-            raise SystemExit(
-                "Please modify these settings in 'inputs/config.yaml'"
-                " or set the cli arguments."
-            )
+    if args.confirm_settings or first_run:
+        confirm_settings(settings)
 
     return settings
+
+
+def confirm_settings(settings) -> None:
+
+    print("\u2500" * os.get_terminal_size().columns)
+    print("Runtime settings:")
+    print(json.dumps(settings, indent=4))
+    print("\u2500" * os.get_terminal_size().columns)
+    if input("Are these settings correct?(y/n)") != "y":
+        raise SystemExit(
+            "Please modify these settings in 'inputs/config.yaml'"
+            " or set the cli arguments."
+        )
 
 
 if __name__ == "__main__":
