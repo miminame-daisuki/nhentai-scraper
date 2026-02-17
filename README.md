@@ -24,8 +24,8 @@ Feel free to ask about any difficulties you are facing [here](issues)!
 
 ### Unix executable
 
-1. Download the `.tar.gz` archive from [Releases](https://github.com/miminame-daisuki/nhentai-scraper/releases).
-1. Extract the downloaded `.tar.gz` archive.
+1. Download the `.tgz` archive from [Releases](https://github.com/miminame-daisuki/nhentai-scraper/releases).
+1. Extract the downloaded `.tgz` archive.
 
 ### Source code
 
