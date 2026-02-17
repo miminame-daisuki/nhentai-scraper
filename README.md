@@ -24,11 +24,16 @@ Feel free to ask about any difficulties you are facing [here](issues)!
 
 ### Unix executable
 
-- Download the unix executable from [Releases](https://github.com/miminame-daisuki/nhentai-scraper/releases).
+1. Download the unix executable from [Releases](https://github.com/miminame-daisuki/nhentai-scraper/releases).
+1. Extract the downloaded `.tar.gz` archive.
 
 ### Source code
 
-- Run `git clone https://github.com/miminame-daisuki/nhentai-scraper` in your terminal.
+1. Run `git clone https://github.com/miminame-daisuki/nhentai-scraper` in your terminal.
+1. Move into the program directory with `cd nhentai-scraper`.
+1. Create a virtual environment with `python -m venv venv`.
+1. Activate the virtual environment with `source venv/bin/activate`.
+1. Install dependencies with `pip install -r requirements.txt`.
 
 ## Basic Usage
 
