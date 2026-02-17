@@ -24,15 +24,19 @@ def load_input_list(
 
     if not filename_path.exists():
         print(f"`{str(filename_path)}` not found, creating new one...")
-        inputs = ''
-        if filename == 'download_list.txt':
-            inputs = input(f"Gallery id(s)/Tag(s) to download (separate by semi-column ';'):").replace(';', '\n')
-        elif filename == 'blacklist.txt':
-            inputs = input(f"Gallery id(s)/Tag(s) to NOT download (separate by semi-column ';'):").replace(';', '\n')
-        elif filename == 'repeats.txt':
-            inputs = ''
+        inputs = ""
+        if filename == "download_list.txt":
+            inputs = input(
+                f"Gallery id(s)/Tag(s) to download (separate by semi-column ';'):"
+            ).replace(";", "\n")
+        elif filename == "blacklist.txt":
+            inputs = input(
+                f"Gallery id(s)/Tag(s) to NOT download (separate by semi-column ';'):"
+            ).replace(";", "\n")
+        elif filename == "repeats.txt":
+            inputs = ""
 
-        with open(filename_path, 'w') as f:
+        with open(filename_path, "w") as f:
             f.write(inputs)
 
     with open(filename_path) as f:
@@ -114,7 +118,9 @@ def load_nhentai_cookies(inputs_dir: Optional[Path] = None) -> list[dict]:
         )
 
     if nhentai_net_jar["log"]["pages"][0]["title"] != "https://nhentai.net/":
-        raise Exception("Please export `nhentai.net.jar` from 'https://nhentai.net'")
+        raise Exception(
+            "Please export `nhentai.net.jar` from 'https://nhentai.net'"
+        )
 
     # search for 'https://nhentai.net' headers
     nhentai_headers = next(
@@ -136,12 +142,13 @@ def load_nhentai_Cookie(inputs_dir: Optional[Path] = None) -> dict:
 
     # search for 'Cookie'
     nhentai_Cookie = next(
-        item['value'] for item in nhentai_headers if item['name'] == 'Cookie'
+        item["value"] for item in nhentai_headers if item["name"] == "Cookie"
     )
 
     # parse cookies
     cookies = {
-        line.split("=")[0]: line.split("=")[1] for line in nhentai_Cookie.split("; ")
+        line.split("=")[0]: line.split("=")[1]
+        for line in nhentai_Cookie.split("; ")
     }
 
     return cookies
@@ -157,7 +164,9 @@ def load_nhentai_headers(inputs_dir: Optional[Path] = None) -> dict:
 
     # search for 'Cookie'
     User_Agent = next(
-        item['value'] for item in nhentai_cookies if item['name'] == 'User-Agent'
+        item["value"]
+        for item in nhentai_cookies
+        if item["name"] == "User-Agent"
     )
 
     # parse headers
@@ -193,10 +202,10 @@ def generate_runtime_settings(inputs_path: Optional[Path] = None) -> dict:
 
     # confirm settings
     if args.confirm_settings:
-        print('\u2500'*os.get_terminal_size().columns)
+        print("\u2500" * os.get_terminal_size().columns)
         print("Runtime settings:")
         print(json.dumps(settings, indent=4))
-        print('\u2500'*os.get_terminal_size().columns)
+        print("\u2500" * os.get_terminal_size().columns)
         if input("Are these settings correct?(y/n)") != "y":
             raise SystemExit(
                 "Please modify these settings in 'inputs/config.yaml'"
