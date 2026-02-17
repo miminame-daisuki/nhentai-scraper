@@ -66,13 +66,13 @@ for the downloaded galleries and begin download.
 
 ## Example `download_list.txt` File
 
-    ```text
-    artist:<artist>
-    tag:<tag>
-    group:<group>
-    search:<search>
-    #114514
-    ```
+```text
+artist:<artist>
+tag:<tag>
+group:<group>
+search:<search>
+#114514
+```
 
 ## Usage with Servers
 
