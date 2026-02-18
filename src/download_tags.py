@@ -267,18 +267,19 @@ def download_tag(
     # only keep not yet finished downloaded ids in id_list
     if not check_downloaded:
 
-        finished_cbz_ids = search_finished_cbz(download_dir=download_dir)
-        matched_galleries_id = search_finished_downloads(
-            tag, download_dir=download_dir
-        )
+        if filetype == 'cbz' and server == 'LANraragi':
+            finished_download_ids = search_finished_cbz(download_dir=download_dir)
+        elif filetype == 'folder':
+            finished_download_ids = search_finished_downloads(
+                tag, download_dir=download_dir
+            )
         blacklist = load_inputs.load_input_list("blacklist.txt")
         blacklist_ids = [id for id in blacklist if "#" in id]
 
         id_list_to_download = list(
             set(id_list)
-            - set(matched_galleries_id)
+            - set(finished_download_ids)
             - set(blacklist_ids)
-            - set(finished_cbz_ids)
         )
 
         # download repeats
