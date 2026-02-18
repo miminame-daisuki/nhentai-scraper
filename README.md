@@ -2,14 +2,16 @@
 
 English | [繁體中文](README_zh-TW.md)
 
-Scraper/Downloader for [nHentai](https://nhentai.net),
+Scraper/Downloader for [nHentai][2],
 designed for ease of use on MacOS.\
 Feel free to ask about any difficulties you are facing [here](issues)!
 
 ## Features
 
-- Downloads from [your favorites on nhentai.net][6] or a user-given list of gallery ids/searches/tags/artists/groups/parodies...
-- Galleries can be saved either as folders (directly viewed by Finder) or cbz archives (viewed on servers):
+- Downloads from [your favorites on nhentai.net][6]
+or a user-given list of gallery ids/searches/tags/artists/groups/parodies...
+- Galleries can be saved either as folders (directly viewed by Finder)
+or cbz archives (viewed on servers):
   - By saving as folders:
     - Thumbnail and tags are automatically set to the folder for each gallery.
     - Images are combined into a single PDF file for easier viewing.
@@ -24,7 +26,7 @@ Feel free to ask about any difficulties you are facing [here](issues)!
 
 ### Unix executable
 
-1. Download the `.tgz` archive from [Releases](https://github.com/miminame-daisuki/nhentai-scraper/releases).
+1. Download the `.tgz` archive from [Releases][7].
 1. Extract the downloaded `.tgz` archive.
 
 ### Source code
@@ -37,7 +39,10 @@ Feel free to ask about any difficulties you are facing [here](issues)!
 
 ## Basic Usage
 
-1. Export your cookies and headers for bypassing CloudFlare and Anubis in an `.har` file and save it to the `inputs/` folder.
+1. (For people downloading the unix executable from [Releases][7])
+Create a `inputs/` folder at the location of the `main` executable.
+1. Export your cookies and headers for bypassing CloudFlare and Anubis
+in an `.har` file and save it to the `inputs/` folder.
 Example using Safari:
     1. Visit to [nhentai.net](https://nhentai.net).
     1. (Optional) Log in to your account
@@ -46,7 +51,8 @@ Example using Safari:
     1. From the `Develop` menu, click on `Show Web Inspector`.
     (Follow [these steps][1] if you haven't enabled it.)
     1. Select the `Network` tab, and refresh the page.
-    1. Click on the `Export` option in the upper right hand corner, and save it inside the `inputs/` folder where the program is located at.
+    1. Click on the `Export` option in the upper right hand corner,
+    and save it inside the `inputs/` folder where the program is located at.
 
 1. Depending on your installation, execute the program either by:
     - If you want the program to only run when your computer is awake:
@@ -55,9 +61,11 @@ Example using Safari:
 
     - If you want the program to continue to run even when the computer is in sleep:
         - Double click the `main_no_sleep.command` file.
-        - Run `caffeinate -is python main.py` (located inside the `src/` folder) in your terminal.
+        - Run `caffeinate -is python main.py`
+        (located inside the `src/` folder) in your terminal.
 
-1. For the first run, the program will print out the default settings. Enter 'n' if you want to change any of the settings. Otherwise, enter 'y'.
+1. For the first run, the program will print out the default settings.
+Enter 'n' if you want to change any of the settings. Otherwise, enter 'y'.
 
 1. The program will automatically create a `Downloaded/` folder
 for the downloaded galleries and begin download.
@@ -84,9 +92,11 @@ search:<search>
 1. Go to `Batch Operations`
 1. Select `Use Plugin` for `Task` and `ComicInfo` for `Use plugin`
 1. Click `Check/Uncheck all` then `Start Task`
-(This took around 0.5 seconds per gallery on my machine, so you may need to wait a bit if you have a large library)
+(This took around 0.5 seconds per gallery on my machine,
+so you may need to wait a bit if you have a large library)
 1. (Optional)Repeat the previous two steps, but change the `Use plugin` option to:
-    - `Filename Parsing` if you want the filenames to only contain the title of the gallery
+    - `Filename Parsing` if you want the filenames
+    to only contain the title of the gallery
     - `nHentai` if you want the filenames to completely follow the format on nHentai
 
 ## Some Tips when Using the Program
@@ -97,6 +107,7 @@ even though all galleries from the tag have already been downloaded.
 - To search for downloaded galleries by title in Finder,
 don't include the parts in the paranthesis `[]`.
 Ex: To search for `[artist] title`, simply type `title`.
+- Restart Docker container if some of the archives are not showing in LANraragi
 
 [1]: https://developer.apple.com/documentation/safari-developer-tools/enabling-developer-features
 [2]: https://nhentai.net
@@ -104,3 +115,4 @@ Ex: To search for `[artist] title`, simply type `title`.
 [4]: https://github.com/Difegue/LANraragi
 [5]: https://github.com/Kareadita/Kavita
 [6]: https://nhentai.net/favorites/
+[7]: https://github.com/miminame-daisuki/nhentai-scraper/releases
