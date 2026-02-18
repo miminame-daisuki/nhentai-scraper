@@ -211,10 +211,10 @@ def generate_runtime_settings(inputs_path: Optional[Path] = None) -> dict:
 
 def confirm_settings(settings) -> None:
 
-    print("\u2500" * os.get_terminal_size().columns)
+    print("\u2500" * misc.get_separation_line_width())
     print("Runtime settings:")
     print(json.dumps(settings, indent=4))
-    print("\u2500" * os.get_terminal_size().columns)
+    print("\u2500" * misc.get_separation_line_width())
     if input("Are these settings correct?(y/n)") != "y":
         raise SystemExit(
             "Please modify these settings in 'inputs/config.yaml'"

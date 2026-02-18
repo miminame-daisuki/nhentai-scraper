@@ -34,9 +34,9 @@ def print_start_message(download_dir) -> None:
         f"Downloading to: {download_dir}\n"
     )
 
-    print('\u2500'*os.get_terminal_size().columns)
+    print('\u2500'*get_separation_line_width())
     print(message)
-    print('\u2500'*os.get_terminal_size().columns)
+    print('\u2500'*get_separation_line_width())
 
 
 def get_application_folder_dir() -> str:
@@ -94,3 +94,13 @@ def set_logging_config(
     )
     logging_config["handlers"]["file"]["filename"] = logging_filename
     logging.config.dictConfig(logging_config)
+
+
+def get_separation_line_width() -> int:
+
+    try:
+        width = os.get_terminal_size().columns
+    except OSError:
+        width = 80
+
+    return width

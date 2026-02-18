@@ -228,7 +228,7 @@ def write_final_results(gallery_results: dict):
             "written to 'failed_downloads.txt'\n\n"
             f"{bcolors.ENDC}"
         )
-        print('\u2500'*os.get_terminal_size().columns)
+        print('\u2500'*misc.get_separation_line_width())
         logger.info("\n\nFailed downloads written to failed_downloads.txt\n\n")
 
     else:
@@ -236,7 +236,7 @@ def write_final_results(gallery_results: dict):
             f"\n\nFinished all {len(gallery_results['finished'])} "
             "gallery downloads!!!\n\n"
         )
-        print('\u2500'*os.get_terminal_size().columns)
+        print('\u2500'*misc.get_separation_line_width())
         logger.info(f"\n{'-'*80}")
         logger.info("Finished all downloads")
 
@@ -247,7 +247,7 @@ def exit_gracefully(
 
     logger.info(f"\n{'-'*80}")
     logger.info("Program terminated with Ctrl-C")
-    print('\n' + '\u2500'*os.get_terminal_size().columns)
+    print('\n' + '\u2500'*misc.get_separation_line_width())
     print("\nProgram terminated with Ctrl-C.")
     write_final_results(gallery_results)
 
