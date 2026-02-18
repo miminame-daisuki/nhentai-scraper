@@ -99,8 +99,10 @@ def set_logging_config(
 def get_separation_line_width() -> int:
 
     try:
+        # for running in terminal
         width = os.get_terminal_size().columns
     except OSError:
+        # for running outside of a terminal (ex: cronjob)
         width = 80
 
     return width
