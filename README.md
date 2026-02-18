@@ -8,7 +8,7 @@ Feel free to ask about any difficulties you are facing [here](issues)!
 
 ## Features
 
-- Downloads from [your favorites on nhentai.net][6]
+- Downloads from your [favorites on nhentai.net][6]
 or a user-given list of gallery ids/searches/tags/artists/groups/parodies...
 - Galleries can be saved either as folders (directly viewed by Finder)
 or cbz archives (viewed on servers):
@@ -44,7 +44,7 @@ Create a `inputs/` folder at the location of the `main` executable.
 1. Export your cookies and headers for bypassing CloudFlare and Anubis
 in an `.har` file and save it to the `inputs/` folder.
 Example using Safari:
-    1. Visit to [nhentai.net](https://nhentai.net).
+    1. Open [nhentai.net](https://nhentai.net) in Safari.
     1. (Optional) Log in to your account
     (only necessary if you wish to download your [favorites][6]).
     1. Clear the CloudFlare captcha.
@@ -101,13 +101,13 @@ so you may need to wait a bit if you have a large library)
 
 ## Some Tips when Using the Program
 
-- [Reindex spotlight][3] if it is not skipping a praticular tag,
-even though all galleries from the tag have already been downloaded.
 - Use/Change VPN if constantly getting Error 403.
+Ex: To search for `[artist] title`, simply type `title`.
+- If some of the archives are not showing in LANraragi, restart the Docker container.
 - To search for downloaded galleries by title in Finder,
 don't include the parts in the paranthesis `[]`.
-Ex: To search for `[artist] title`, simply type `title`.
-- Restart Docker container if some of the archives are not showing in LANraragi
+- [Reindex spotlight][3] if it is not skipping a praticular tag,
+even though all galleries from the tag have already been downloaded.
 
 [1]: https://developer.apple.com/documentation/safari-developer-tools/enabling-developer-features
 [2]: https://nhentai.net
