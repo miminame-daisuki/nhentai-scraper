@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 def main():
 
     misc.set_logging_config()
-    logger.info(f"\n{'-'*os.get_terminal_size().columns}")
+    logger.info(f"\n{'-'*80}")
     logger.info("Program started")
 
     settings = load_inputs.generate_runtime_settings()
@@ -75,7 +75,7 @@ def main():
 
         # entry is a gallery id
         elif "#" in entry:
-            logger.info(f"\n{'-'*os.get_terminal_size().columns}")
+            logger.info(f"\n{'-'*80}")
 
             gallery = nhentai_scraper.Gallery(
                 entry,
@@ -92,7 +92,7 @@ def main():
             )
 
         else:
-            logger.info(f"\n{'-'*os.get_terminal_size().columns}")
+            logger.info(f"\n{'-'*80}")
             logger.error(f"{entry} is neither a tag nor a gallery id")
             print(f"{entry} is neither a tag nor a gallery id.")
 

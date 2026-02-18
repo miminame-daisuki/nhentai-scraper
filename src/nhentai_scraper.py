@@ -998,7 +998,7 @@ class Gallery:
 
 if __name__ == "__main__":
     misc.set_logging_config()
-    logger.info(f"\n{'-'*os.get_terminal_size().columns}")
+    logger.info(f"\n{'-'*80}")
     logger.info("Program started")
 
     settings = load_inputs.generate_runtime_settings()

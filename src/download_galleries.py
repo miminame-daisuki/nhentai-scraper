@@ -54,7 +54,7 @@ def download_id_list(
     )
     for count, gallery_id in progress_bar:
 
-        logger.info(f"\n{'-'*os.get_terminal_size().columns}")
+        logger.info(f"\n{'-'*80}")
         logger.info(
             (
                 f"Downloading number {count} "
@@ -89,7 +89,7 @@ def download_id_list(
             leave=False,
         )
         for count, gallery_id in progress_bar_retry:
-            logger.info(f"\n{'-'*os.get_terminal_size().columns}")
+            logger.info(f"\n{'-'*80}")
             logger.info(
                 (
                     f"Downloading number {count} "
@@ -237,7 +237,7 @@ def write_final_results(gallery_results: dict):
             "gallery downloads!!!\n\n"
         )
         print('\u2500'*os.get_terminal_size().columns)
-        logger.info(f"\n{'-'*os.get_terminal_size().columns}")
+        logger.info(f"\n{'-'*80}")
         logger.info("Finished all downloads")
 
 
@@ -245,7 +245,7 @@ def exit_gracefully(
     gallery_results: dict, signum: signal.Signals, frame
 ) -> None:
 
-    logger.info(f"\n{'-'*os.get_terminal_size().columns}")
+    logger.info(f"\n{'-'*80}")
     logger.info("Program terminated with Ctrl-C")
     print('\n' + '\u2500'*os.get_terminal_size().columns)
     print("\nProgram terminated with Ctrl-C.")

@@ -94,7 +94,7 @@ def search_tag(
     tag: str, session: requests.sessions.Session
 ) -> Optional[Union[list[str], str]]:
 
-    logger.info(f"\n{'-'*os.get_terminal_size().columns}")
+    logger.info(f"\n{'-'*80}")
     logger.info(f"Searching galleries from {tag}")
 
     id_list = []
