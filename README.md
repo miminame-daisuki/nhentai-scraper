@@ -72,6 +72,10 @@ for the downloaded galleries and begin download.
 
 1. To terminate the program, simply press `Ctrl-c`.
 
+## Advanced Usage
+
+- To run the program periodically, use [launchd][8].
+
 ## Example `download_list.txt` File
 
 ```text
@@ -116,3 +120,4 @@ even though all galleries from the tag have already been downloaded.
 [5]: https://github.com/Kareadita/Kavita
 [6]: https://nhentai.net/favorites/
 [7]: https://github.com/miminame-daisuki/nhentai-scraper/releases
+[8]: https://developer.apple.com/library/archive/documentation/MacOSX/Conceptual/BPSystemStartup/Chapters/ScheduledJobs.html#//apple_ref/doc/uid/10000172i-CH1-SW2
