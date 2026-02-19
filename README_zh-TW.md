@@ -3,9 +3,6 @@
 [English](README.md) | 繁體中文
 
 一個在MacOS上容易使用的[nHentai][1]爬蟲／下載器。
-啊啊啊我還沒把這部分翻譯成中文，
-如果有人急了.jpg的話可以在issues那邊留言，
-我盡快幫你～
 
 ## 懶人包（以下載[nHentai上的favorites][2]為例）
 
