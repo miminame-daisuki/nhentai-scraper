@@ -31,7 +31,7 @@ or cbz archives (viewed on servers):
 
 ### Source code
 
-1. Run `git clone https://github.com/miminame-daisuki/nhentai-scraper` in your terminal.
+1. Run `https://github.com/ecchi-na-no-wa-dame/nhentai-scraper.git` in your terminal.
 1. Move into the program directory with `cd nhentai-scraper`.
 1. Create a virtual environment with `python -m venv venv`.
 1. Activate the virtual environment with `source venv/bin/activate`.
