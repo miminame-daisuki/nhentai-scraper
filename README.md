@@ -1,14 +1,15 @@
-# nHentai Scraper
+# nHentai Scraper for MacOS
 
 English | [繁體中文](README_zh-TW.md)
 
-Scraper/Downloader for [nHentai][1],
+Scraper/Downloader for [nHentai][nHentai.net],
 designed for ease of use on MacOS.\
-Feel free to ask about any difficulties you are facing [here](issues)!
+Feel free to ask about any difficulties you are facing
+(or offer any suggestions) [here][issues]!
 
 ## Features
 
-- Downloads from your [favorites on nhentai.net][2]
+- Downloads from your [favorites on nhentai.net][favorites]
 or a user-given list of gallery ids/searches/tags/artists/groups/parodies...
 - Galleries can be saved either as folders (directly viewed by Finder)
 or cbz archives (viewed on servers):
@@ -16,7 +17,7 @@ or cbz archives (viewed on servers):
     - Thumbnail and tags are automatically set to the folder for each gallery.
     - Images are combined into a single PDF file for easier viewing.
   - By saving as cbz archives:
-    - Galleries may be viewed on servers such as [LANraragi][5] and [Kavita][6].
+    - Galleries may be viewed on servers such as [LANraragi][lanraragi] and [Kavita][kavita].
 - Prevents downloads from user-defined blacklists.
 - Skips over already-downloaded galleries.
 - Supports skipping over galleries with the same title.
@@ -26,7 +27,7 @@ or cbz archives (viewed on servers):
 
 ### Downloading the Unix executable
 
-1. Download the newest `.tgz` archive from [Releases][3].
+1. Download the newest `.tgz` archive from [Releases][releases].
 1. Extract the downloaded `.tgz` archive.
 
 ### Downloading the Source code
@@ -41,17 +42,17 @@ in your terminal.
 
 ## Basic Usage
 
-1. (For people downloading the unix executable from [Releases][3])
+1. (For people downloading the unix executable from [Releases][releases])
 Create a `inputs/` folder at the location of the `main` executable.
 1. Export your cookies and headers for bypassing CloudFlare and Anubis
 in an `.har` file and save it to the `inputs/` folder.
 Example using Safari:
     1. Open [nhentai.net](https://nhentai.net) in Safari.
     1. (Optional) Log in to your account
-    (only necessary if you wish to download your [favorites][2]).
+    (only necessary if you wish to download your [favorites][favorites]).
     1. Clear the CloudFlare captcha.
     1. From the `Develop` menu, click on `Show Web Inspector`.
-    (Follow [these steps][4] if you haven't enabled it.)
+    (Follow [these steps][Safari-Developer] if you haven't enabled it.)
     1. Select the `Network` tab, and refresh the page.
     1. Click on the `Export` option in the upper right hand corner,
     and save it inside the `inputs/` folder where the program is located at.
@@ -78,7 +79,7 @@ for the downloaded galleries and begin download.
 
 ### Updating the Unix executable
 
-1. Download the newest `.tgz` archive from [Releases][3].
+1. Download the newest `.tgz` archive from [Releases][releases].
 1. Extract the downloaded `.tgz` archive.
 1. Replace the `main` executable and the `_internal` folder with the new ones
 
@@ -105,7 +106,7 @@ search:<search>
 
 ## Usage with Servers
 
-### [LANraragi][5]
+### [LANraragi][lanraragi]
 
 1. Go to `Settings` then click `Tags and Thumbnails`
 1. Click `Generate Missing Thumbnails`
@@ -118,7 +119,8 @@ so you may need to wait a bit if you have a large library)
 1. (Optional)Repeat the previous two steps, but change the `Use plugin` option to:
     - `Filename Parsing` if you want the filenames
     to only contain the title of the gallery
-    - `nHentai` if you want the filenames to completely follow the format on nHentai
+    - `nHentai` if you want the filenames
+    to completely follow the format on [nHentai][nHentai.net]
 
 ## Some Tips when Using the Program
 
@@ -127,13 +129,14 @@ Ex: To search for `[artist] title`, simply type `title`.
 - If some of the archives are not showing in LANraragi, restart the Docker container.
 - To search for downloaded galleries by title in Finder,
 don't include the parts in the paranthesis `[]`.
-- [Reindex spotlight][7] if it is not skipping a praticular tag,
+- [Reindex spotlight][reindex-spotlight] if it is not skipping a praticular tag,
 even though all galleries from the tag have already been downloaded.
 
-[1]: https://nhentai.net
-[2]: https://nhentai.net/favorites/
-[3]: https://github.com/miminame-daisuki/nhentai-scraper/releases
-[4]: https://developer.apple.com/documentation/safari-developer-tools/enabling-developer-features
-[5]: https://github.com/Difegue/LANraragi
-[6]: https://github.com/Kareadita/Kavita
-[7]: https://support.apple.com/en-us/102321
+[nHentai.net]: https://nhentai.net
+[favorites]: https://nhentai.net/favorites/
+[issues]: https://github.com/ecchi-na-no-wa-dame/nhentai-scraper-MacOS/issues
+[releases]: https://github.com/ecchi-na-no-wa-dame/nhentai-scraper/releases
+[Safari-Developer]: https://developer.apple.com/documentation/safari-developer-tools/enabling-developer-features
+[lanraragi]: https://github.com/Difegue/LANraragi
+[kavita]: https://github.com/Kareadita/Kavita
+[reindex-spotlight]: https://support.apple.com/en-us/102321
