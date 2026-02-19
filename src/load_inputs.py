@@ -8,6 +8,7 @@ from typing import Union, Optional
 
 import cli
 import misc
+from print_colored_text import bcolors
 
 
 def load_input_list(
@@ -27,12 +28,14 @@ def load_input_list(
         inputs = ""
         if filename == "download_list.txt":
             inputs = input(
-                f"Gallery id(s)/Tag(s) to download (separate by semi-column ';'):"
-            ).replace(";", "\n")
+                "Gallery id(s)/Tag(s) to download "
+                "(separate by semi-column '; '):"
+            ).replace("; ", "\n")
         elif filename == "blacklist.txt":
             inputs = input(
-                f"Gallery id(s)/Tag(s) to NOT download (separate by semi-column ';'):"
-            ).replace(";", "\n")
+                "Gallery id(s)/Tag(s) to NOT download "
+                "(separate by semi-column '; ', press ENTER to download everything):"
+            ).replace("; ", "\n")
         elif filename == "repeats.txt":
             inputs = ""
 
@@ -57,10 +60,16 @@ def create_config_yaml(inputs_path: Optional[Path] = None) -> None:
         application_folder_path = misc.get_application_folder_dir()
         inputs_path = Path(f"{application_folder_path}/inputs").absolute()
 
-    # create config.yaml from config_template.yaml
-    config_template_filename = inputs_path / "config_template.yaml"
-    with open(config_template_filename, "r") as f:
-        config = yaml.load(f, Loader=yaml.SafeLoader)
+    # create config.yaml
+    config = {
+        'downloads': {
+            'download_dir': None,
+            'filetype': None,
+            'server': None,
+            'set-thumbnail': None,
+            'set-tags': None,
+        }
+    }
 
     with open(inputs_path / "config.yaml", "w") as f:
         yaml.dump(config, f)
@@ -74,6 +83,8 @@ def load_config_yaml(
     if inputs_path is None:
         application_folder_path = misc.get_application_folder_dir()
         inputs_path = Path(f"{application_folder_path}/inputs").absolute()
+        if not inputs_path.exists():
+            inputs_path.mkdir()
 
     config_filename = inputs_path / "config.yaml"
     first_run = True
@@ -111,14 +122,16 @@ def load_nhentai_cookies(inputs_dir: Optional[Path] = None) -> list[dict]:
         inputs_dir = Path(application_folder_path).absolute() / "inputs/"
 
     har_filename = inputs_dir / "nhentai.net.har"
-    if har_filename.exists():
+    while not har_filename.exists():
+        input(
+            f"{bcolors.WARNING}`nhentai.net.har` not found in `{inputs_dir}`.\n"
+            "Please press enter after downloading it "
+            f"by following the instructions in `README.md`.{bcolors.ENDC}"
+        )
+        print("\u2500" * misc.get_separation_line_width())
+    else:
         with open(har_filename) as f:
             nhentai_net_jar = json.load(f)
-    else:
-        raise FileNotFoundError(
-            f"`nhentai.net.har` not found in `{inputs_dir}`.\n"
-            "Please download it by following the instructions in `README.md`."
-        )
 
     if nhentai_net_jar["log"]["pages"][0]["title"] != "https://nhentai.net/":
         raise Exception(
