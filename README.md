@@ -24,14 +24,16 @@ or cbz archives (viewed on servers):
 
 ## Installation
 
-### Unix executable
+### Downloading the Unix executable
 
-1. Download the `.tgz` archive from [Releases][3].
+1. Download the newest `.tgz` archive from [Releases][3].
 1. Extract the downloaded `.tgz` archive.
 
-### Source code
+### Downloading the Source code
 
-1. Run `https://github.com/ecchi-na-no-wa-dame/nhentai-scraper.git` in your terminal.
+1. Clone the GitHub repository by running
+`git clone https://github.com/ecchi-na-no-wa-dame/nhentai-scraper.git`
+in your terminal.
 1. Move into the program directory with `cd nhentai-scraper`.
 1. Create a virtual environment with `python -m venv venv`.
 1. Activate the virtual environment with `source venv/bin/activate`.
@@ -72,9 +74,24 @@ for the downloaded galleries and begin download.
 
 1. To terminate the program, simply press `Ctrl-c`.
 
+## Updating
+
+### Updating the Unix executable
+
+1. Download the newest `.tgz` archive from [Releases][3].
+1. Extract the downloaded `.tgz` archive.
+1. Replace the `main` executable and the `_internal` folder with the new ones
+
+### Updating the Source code
+
+1. Move into the `nhentai-scraper` directory by `cd nhentai-scraper`.
+1. Pull the newest commits by running `git pull`.
+
 ## Advanced Usage
 
 - To run the program periodically, use cron or launchctl.
+  - For `cron`, give `Full Disk Access` to `/usr/sbin/cron`
+  in `System Preferences` (Or `System Settings` in newer MacOS versions).
 
 ## Example `download_list.txt` File
 
