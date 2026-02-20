@@ -68,6 +68,7 @@ for Safari.)
     - Enter `y` then press `Enter`,
     then enter the gallery ids/tags that you want to download,
     separated by '; '.
+    Press `Enter` after finishing.
     - Enter `n` then press `Enter`,
     then create a `download_list.txt` file in [this format](#example-inputs-file)
     and place it in the `inputs/`folder.
@@ -76,9 +77,10 @@ for Safari.)
     - Enter `y` then press `Enter`,
     then enter the gallery ids/tags that you **DO NOT** want to download,
     separated by '; '.
+    Press `Enter` after finishing.(If nothing, press `Enter` directly.)
     - Enter `n` then press `Enter`,
     then create a `blacklists.txt` file in [the same format](#example-inputs-file)
-    and place it in the `inputs/`folder.
+    and place it in the `inputs/`folder (A blank file is also acceptable).
     Go back to the Terminal app, press `Enter`.
 1. The program will automatically create a `Downloaded/` folder
 for the downloaded galleries and begin download.

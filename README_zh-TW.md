@@ -56,11 +56,11 @@ in your terminal.
 1. 匯出包含繞過Cloudflare和Anubis所需要之cookies和headers的`.har`檔後存在`inputs/`資料夾內。（Safari請參照[這些步驟](#繞過cloudflare和anubis保護)）
 1. 回到終端機，按`Enter`。
 1. 依照下方其中一種方法輸入想下載的本本／標籤：
-    - 輸入`y`並按下`Enter`後，輸入你想下載的本本id/標籤，用'; '來分隔
+    - 輸入`y`並按下`Enter`後，輸入你想下載的本本id/標籤，用'; '來分隔。輸入完成後按`Enter`。
     - 輸入`n`並按下`Enter`後，在`inputs/`資料夾裡依照[這個格式](#範例inputs檔)新增一個`download_list.txt`檔。回到終端機後按`Enter`。
 1. 依照下方其中一種方法輸入**不想**下載的本本／標籤：
-    - 輸入`y`並按下`Enter`後，輸入你**不想**下載的本本id/標籤，用'; '來分隔
-    - 輸入`n`並按下`Enter`後，在`inputs/`資料夾裡依照[相同格式](#範例inputs檔)新增一個`blacklists.txt`檔。回到終端機後按`Enter`。
+    - 輸入`y`並按下`Enter`後，輸入你**不想**下載的本本id/標籤，用'; '來分隔。輸入完成後按`Enter`。（沒有的話直接按`Enter`）
+    - 輸入`n`並按下`Enter`後，在`inputs/`資料夾裡依照[相同格式](#範例inputs檔)新增一個`blacklists.txt`檔（也可以完全空白）。回到終端機後按`Enter`。
 1. 程式會自動產生一個`Downloaded/`資料夾來存放下載後的本本並開始下載
 1. 要結束運行的話，按`Ctrl-c`
 
