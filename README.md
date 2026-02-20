@@ -7,7 +7,7 @@ designed for ease of use on macOS.\
 Feel free to ask about any difficulties you are facing
 or offer any suggestions [here][issues]!
 
-[Click here for TL;DR](#tl-dr).
+Click [here](#tldr) for TL;DR.
 
 ## Features
 
