@@ -125,7 +125,7 @@ def load_nhentai_cookies(inputs_dir: Optional[Path] = None) -> list[dict]:
     while not har_filename.exists():
         input(
             f"{bcolors.WARNING}`nhentai.net.har` not found in `{inputs_dir}`.\n"
-            "Please press enter after downloading it "
+            "Please press ENTER after downloading it "
             f"by following the instructions in `README.md`.{bcolors.ENDC}"
         )
         print("\u2500" * misc.get_separation_line_width())
