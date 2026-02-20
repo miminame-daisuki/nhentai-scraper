@@ -23,24 +23,28 @@ def load_input_list(
         )
         filename_path = Path(f"{inputs_folder_dir}/{filename}")
 
-    if not filename_path.exists():
-        print(f"`{str(filename_path)}` not found, creating new one...")
-        inputs = ""
-        if filename == "download_list.txt":
-            inputs = input(
-                "Gallery id(s)/Tag(s) to download "
-                "(separate by semi-column '; '):"
-            ).replace("; ", "\n")
-        elif filename == "blacklist.txt":
-            inputs = input(
-                "Gallery id(s)/Tag(s) to NOT download "
-                "(separate by semi-column '; ', press ENTER to download everything):"
-            ).replace("; ", "\n")
-        elif filename == "repeats.txt":
-            inputs = ""
+    while not filename_path.exists():
+        print("\u2500" * misc.get_separation_line_width())
 
-        with open(filename_path, "w") as f:
-            f.write(inputs)
+        if filename_path.name == "repeats.txt":
+            create_inputs_txt(filename_path)
+            print(
+                f"{bcolors.WARNING}'{str(filename_path)}' not found, "
+                f"automatically created new one.{bcolors.ENDC}"
+            )
+            break
+
+        auto_create_input_txt = input(
+            f"{bcolors.WARNING}`{str(filename_path)}` not found, "
+            f"automatically create new one?(y/n){bcolors.ENDC}"
+        )
+        if auto_create_input_txt == 'y':
+            create_inputs_txt(filename_path)
+        else:
+            input(
+                f"Press ENTER after placing {filename_path.name} "
+                f"in {filename_path.parent}."
+            )
 
     with open(filename_path) as f:
         download_list = f.read().splitlines()
@@ -52,6 +56,32 @@ def load_input_list(
         download_list = download_list[skip_to_index:]
 
     return download_list
+
+
+def create_inputs_txt(filename_path: Path) -> None:
+
+    if filename_path.name == "download_list.txt":
+        inputs = input(
+            "Gallery id(s)/Tag(s) to download "
+            "(separate by semi-column '; '):"
+        ).replace("; ", "\n")
+    elif filename_path.name == "blacklist.txt":
+        inputs = input(
+            "Gallery id(s)/Tag(s) to NOT download "
+            "(separate by semi-column '; ', "
+            "press ENTER to download everything):"
+        ).replace("; ", "\n")
+    elif filename_path.name == "repeats.txt":
+        inputs = ""
+    else:
+        raise ValueError(
+            f"{filename_path.name} only accepts 'download_list.txt', "
+            "'blacklist.txt' and 'repeats.txt.'"
+        )
+
+    with open(filename_path, "w") as f:
+        f.write(inputs)
+
 
 
 def create_config_yaml(inputs_path: Optional[Path] = None) -> None:
@@ -124,14 +154,15 @@ def load_nhentai_cookies(inputs_dir: Optional[Path] = None) -> list[dict]:
     har_filename = inputs_dir / "nhentai.net.har"
     while not har_filename.exists():
         input(
-            f"{bcolors.WARNING}`nhentai.net.har` not found in `{inputs_dir}`.\n"
+            f"{bcolors.WARNING}'nhentai.net.har' not found in '{inputs_dir}'.\n"
             "Please press ENTER after downloading it "
-            f"by following the instructions in `README.md`.{bcolors.ENDC}"
+            "by following the instructions in the "
+            "'Bypassing NHentai CloudFlare and Anubis Protections' section"
+            f"in 'README.md'.{bcolors.ENDC}"
         )
-        print("\u2500" * misc.get_separation_line_width())
-    else:
-        with open(har_filename) as f:
-            nhentai_net_jar = json.load(f)
+
+    with open(har_filename) as f:
+        nhentai_net_jar = json.load(f)
 
     if nhentai_net_jar["log"]["pages"][0]["title"] != "https://nhentai.net/":
         raise Exception(
@@ -233,6 +264,7 @@ def confirm_settings(settings) -> None:
             "Please modify these settings in 'inputs/config.yaml'"
             " or set the cli arguments."
         )
+    print("\u2500" * misc.get_separation_line_width())
 
 
 if __name__ == "__main__":
