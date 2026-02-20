@@ -24,6 +24,9 @@ def main():
     check_downloaded = settings["runtime"]["check-downloaded"]
     skip_to_tag = settings["runtime"]["skip-to-tag"]
 
+    cookie_dict=load_inputs.load_nhentai_Cookie()
+    headers_dict=load_inputs.load_nhentai_headers()
+
     download_list = load_inputs.load_input_list(
         "download_list.txt", skip_to_tag=skip_to_tag
     )
@@ -33,8 +36,8 @@ def main():
     misc.print_start_message(download_dir)
 
     session = nhentai_scraper.create_session(
-        cookie_dict=load_inputs.load_nhentai_Cookie(),
-        headers_dict=load_inputs.load_nhentai_headers(),
+        cookie_dict=cookie_dict,
+        headers_dict=headers_dict,
     )
 
     gallery_results = misc.create_gallery_results_dict(repeat_ids, blacklist)
