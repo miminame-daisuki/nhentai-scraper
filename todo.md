@@ -1,6 +1,5 @@
 # To-do
 
-- Dynamically create ComicInfo.xml and config.yaml instead of loading from templates
 - Update README
 - Output and print initial_fails when initial_try = False?
 - How to download repeats for favorites

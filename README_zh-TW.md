@@ -2,13 +2,13 @@
 
 [English](README.md) | 繁體中文
 
-一個專為在MacOS上容易使用而設計的[nHentai][nHentai.net]爬蟲／下載器。
+一個專為在MacOS上容易使用而設計的[nHentai][nHentai.net]爬蟲／下載器。\
 有任何問題或建議歡迎在[這裡][issues]提出～
 
 ## 懶人包（以下載[nHentai上自己的favorites][favorites]為例）
 
 1. 從[Releases][releases]下載最新的`.tgz`檔後解壓縮
-1. 點兩下`main`執行檔（`終端機`會開啟一個新視窗）
+1. 點兩下`main`執行檔（會開啟MacOS的終端機）
 1. 畫面會顯示預設設定，輸入`y`後按`Enter`
 1. 輸入`favorites`後按`Enter`
 1. 再按一次`Enter`
