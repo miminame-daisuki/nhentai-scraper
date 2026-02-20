@@ -56,17 +56,17 @@ in your terminal.
 
 1. 第一次執行時會顯示預設設定。如果要改任何設定的話輸入'n'，反之輸入'y'。
 1. 匯出包含繞過CloudFlare和Anubis所需要之cookies和headers的`.har`檔後
-存在`inputs/`資料夾內。（Safari請參照[這些步驟](#export-har)）
+存在`inputs/`資料夾內。（Safari請參照[這些步驟](#繞過cloudflare和anubis保護)）
 1. 依照下方其中一種方法輸入想下載的本本／標籤：
-    - 在`inputs/`資料夾裡依照[這個格式](#inputs_format)新增一個`download_list.txt`檔
+    - 在`inputs/`資料夾裡依照[這個格式](#範例inputs檔)新增一個`download_list.txt`檔
     - 輸入你想下載的本本id/標籤，用'; '來分隔
 1. 依照下方其中一種方法輸入**不想**下載的本本／標籤：
-    - 在`inputs/`資料夾裡依照[相同格式](#inputs_format)新增一個`blacklists.txt`檔
+    - 在`inputs/`資料夾裡依照[相同格式](#範例inputs檔)新增一個`blacklists.txt`檔
     - 輸入你**不想**下載的本本id/標籤，用'; '來分隔
 1. 程式會自動產生一個`Downloaded/`資料夾來存放下載後的本本並開始下載
 1. 要結束運行的話，按`Ctrl-c`
 
-## 繞過CloudFlare和Anubis保護 {#export-har}
+## 繞過CloudFlare和Anubis保護
 
 1. 使用Safari打開[nHentai][nHentai.net]
 1. 需要時通過CloudFlare CAPTCHA
@@ -77,7 +77,9 @@ in your terminal.
 1. 點選右上角的「匯出」後儲存到與`nhentai-scraper`執行檔同位置下的`inputs/`資料夾內
 （檔名維持預設之`nhentai.net.har`）
 
-## 範例`inputs/download_list.txt`檔 {#inputs_format}
+## 範例Inputs檔
+
+`inputs/download_list.txt`和`inputs/blacklist.txt`都是按照相同格式。
 
 ```text
 artist:<artist>
@@ -138,17 +140,18 @@ so you may need to wait a bit if you have a large library)
 
 ## 懶人包
 
-以下載[nHentai上自己的favorites][favorites]為例：
+下載[nHentai上自己的favorites][favorites]：
 
 1. 從[Releases][releases]下載最新的`.tgz`檔後解壓縮
 1. 點兩下`nhentai-scraper`執行檔（會開啟macOS的終端機）
 1. 畫面會顯示預設設定，輸入`y`後按`Enter`
-1. 輸出繞過CloudFlare和Anubis所需要之headers和cookies到`.har`檔中，
-並存到`inputs/`資料夾內（Safari請參照[這些步驟](#export-har)）
-1. 輸入`favorites`後按`Enter`
-1. 再按一次`Enter`
+1. 請參照[這些步驟](#繞過cloudflare和anubis保護)來繞過nHentai的CloudFlare和Anubis保護
 1. 回到終端機後按`Enter`
-1. 如果看到出現'Searching galleries from favorites: '以及後面之進度條就ok了！
+1. 輸入`y`後按`Enter`
+1. 輸入`favorites`後按`Enter`
+1. 輸入`y`後按`Enter`
+1. 再按一次`Enter`
+1. 如果看到出現'Searching galleries from favorites: '以及後面的進度條就ok了！
 1. 下載的本本會存在`Downloaded/`資料夾裡
 1. 想停止下載的話按`Ctrl-c`, 之後要繼續下載時再點兩次`nhentai-scraper`執行檔
 

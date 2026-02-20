@@ -28,12 +28,12 @@ or cbz archives (viewed on servers):
 
 ## Installation
 
-### Downloading the Unix executable
+### Downloading the Unix Executable File
 
 1. Download the newest `.tgz` archive from [Releases][releases].
 1. Extract the downloaded `.tgz` archive.
 
-### Downloading the Source code
+### Downloading the Source Code
 
 1. Clone the GitHub repository by running
 `git clone https://github.com/ecchi-na-no-wa-dame/nhentai-scraper.git`
@@ -56,14 +56,15 @@ in your terminal.
 Enter 'n' if you want to change any of the settings. Otherwise, enter 'y'.
 1. Export your cookies and headers for bypassing CloudFlare and Anubis
 in an `.har` file and save it to the `inputs/` folder.
-(Follow [these steps](#export-har) for Safari.)
+(Follow [these steps](#bypassing-cloudflare-and-anubis-protections)
+for Safari.)
 1. Specify the galleries you wish to download either by:
-    - Creating a `download_list.txt` file in [this format](#inputs_format)
+    - Creating a `download_list.txt` file in [this format](#example-inputs-file)
     and place it in the `inputs/`folder.
     - Enter the gallery ids/tags that you want to download,
     separated by '; '.
 1. Specify the galleries/tags you wish to **NOT** download either by:
-    - Creating a `blacklists.txt` file in [the same format](#inputs_format)
+    - Creating a `blacklists.txt` file in [the same format](#example-inputs-file)
     and place it in the `inputs/`folder.
     - Enter the gallery ids/tags that you **DO NOT** want to download,
     separated by '; '.
@@ -71,7 +72,7 @@ in an `.har` file and save it to the `inputs/` folder.
 for the downloaded galleries and begin download.
 1. To terminate the program, simply press `Ctrl-c`.
 
-## Bypassing nHentai CloudFlare and Anubis Protections {#export-har}
+## Bypassing CloudFlare and Anubis Protections
 
 1. Open [nHentai][nhentai.net] in Safari.
 1. Clear the CloudFlare CAPTCHA if necessary.
@@ -83,7 +84,9 @@ for the downloaded galleries and begin download.
 located in the same directory as the `nhentai-scraper` executable.
 (Keep the filename as its default value `nhentai.net.har`.)
 
-## Example `inputs/download_list.txt` File {#inputs_format}
+## Example Inputs File
+
+Same format applies to both `inputs/download_list.txt` and `inputs/blacklist.txt`.
 
 ```text
 artist:<artist>
@@ -148,16 +151,18 @@ even though all galleries from the tag have already been downloaded.
 
 ## TL;DR
 
-Downloading [your favorites on nHentai][favorites] as an example:
+To download [your favorites on nHentai][favorites]:
 
 1. Download the newest `.tgz` file from [Releases][releases] and extract it
 1. Double click on the `nhentai-scraper` executable (macOS's Terminal will open)
-1. A window will popup showing the default settings, press `y` then `Enter`
-1. Enter `favorites` then press `Enter`
-1. Press `Enter` again
-1. Follow [these steps](#export-har) to bypass CloudFlare
-and Anubis protections on nHentai
+1. The default settings will be printed on screen, press `y` then `Enter`
+1. Follow [these steps](#bypassing-cloudflare-and-anubis-protections)
+to bypass CloudFlare and Anubis protections on nHentai
 1. Go back to the Terminal application, then press `Enter`
+1. Press `y` then `Enter`
+1. Enter `favorites` then press `Enter`
+1. Press `y` then `Enter`
+1. Press `Enter` again
 1. If you see the words 'Searching galleries from favorites: '
 and the progress bar behind it, then everything should be working as intended!
 1. The downloaded galleries will be placed inside the `Downloaded` folder
