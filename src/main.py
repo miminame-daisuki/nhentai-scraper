@@ -31,7 +31,7 @@ def main():
         "download_list.txt", skip_to_tag=skip_to_tag
     )
     blacklist = load_inputs.load_input_list("blacklist.txt")
-    repeat_ids = load_inputs.load_input_list("repeated_galleries.txt")
+    repeat_ids = load_inputs.load_input_list("repeats.txt")
 
     misc.print_start_message(download_dir)
 
@@ -101,7 +101,7 @@ def main():
 
         if gallery_results["repeats"]:
             download_galleries.write_gallery_results(
-                gallery_results["repeats"], "repeated_galleries.txt"
+                gallery_results["repeats"], "repeats.txt"
             )
         if gallery_results["blacklists"]:
             download_galleries.write_gallery_results(

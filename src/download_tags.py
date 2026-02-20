@@ -121,7 +121,7 @@ def search_tag(
             url = FAVORITES_URL
             page_count = search_url(url, session)[1]
         elif tag == "repeats":
-            id_list = load_inputs.load_input_list("repeated_galleries.txt")
+            id_list = load_inputs.load_input_list("repeats.txt")
 
             return id_list
 
@@ -288,7 +288,7 @@ def download_tag(
         else:
             download_repeats = False
 
-            repeat_ids = load_inputs.load_input_list("repeated_galleries.txt")
+            repeat_ids = load_inputs.load_input_list("repeats.txt")
             id_list_to_download = list(
                 set(id_list_to_download) - set(repeat_ids)
             )
