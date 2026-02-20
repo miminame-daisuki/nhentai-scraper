@@ -52,7 +52,7 @@ in your terminal.
         even when the lid of your macbook is closed,
         run `caffeinate -is python src/main.py` in your terminal.
 
-1. 第一次執行時會顯示預設設定。如果要改任何設定的話輸入'n'，反之輸入'y'。
+1. 第一次執行時會顯示預設設定。如果要[更改任何設定](#設定參數)的話輸入'n'，反之輸入'y'。
 1. 匯出包含繞過Cloudflare和Anubis所需要之cookies和headers的`.har`檔後存在`inputs/`資料夾內。（Safari請參照[這些步驟](#繞過cloudflare和anubis保護)）
 1. 回到終端機，按`Enter`。
 1. 依照下方其中一種方法輸入想下載的本本／標籤：
@@ -89,6 +89,26 @@ favorites
 
 （':'後面不用加空格）
 
+## 設定參數
+
+這些設定都儲存在`inputs/config.yaml`檔裡面。
+格式如下：
+
+```yaml
+downloads:
+  download_dir: <download_dir>
+  filetype: <filetype>
+  server: <server>
+  set-tags: <set-tags>
+  set-thumbnail: <set-thumbnail>
+```
+
+- download_dir: 儲存所有下載的本本的資料夾位置。（絕對位置跟相對位置都可接受）
+- filetype: 本本下載後的檔案類型。目前支持`folder`和`cbz`。
+- Server: （自架）伺服器的名字。目前支持[`LANrargi`][lanraragi]和[`Kavita`][kavita]。只在`filetype`設為`cbz`時有效。
+- set-tags: 是否要在下載的本本資料夾上設定標籤。可以是`true`或是`false`。只在`filetype`設為`folder`時有效。
+- set-thumbnail: 是否要在下載的本本資料夾上設定縮圖。可以是`true`或是`false`。只在`filetype`設為`folder`時有效。
+
 ## 更新
 
 ### 更新Unix執行檔
@@ -97,7 +117,7 @@ favorites
 1. 解壓縮
 1. 把`nhentai-scraper` 執行檔跟`_internal` 資料夾用新的取代
 
-### Updating the Source code
+### Updating the Source Code
 
 1. Move into the `nhentai-scraper` directory by `cd nhentai-scraper`.
 1. Pull the newest commits by running `git pull`.

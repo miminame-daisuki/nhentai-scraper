@@ -59,7 +59,8 @@ in your terminal.
         even when the lid of your macbook is closed,
         run `caffeinate -is python src/main.py` in your terminal.
 1. For the first run, the program will print out the default settings.
-Enter 'n' if you want to change any of the settings. Otherwise, enter 'y'.
+Enter 'n' if you want to [change any of the settings](#configure-parameters).
+Otherwise, enter 'y'.
 1. Export your cookies and headers for bypassing Cloudflare and Anubis
 in an `.har` file and save it to the `inputs/` folder.
 (Follow [these steps](#bypassing-cloudflare-and-anubis-protections)
@@ -113,6 +114,36 @@ favorites
 
 (No empty space after ':'.)
 
+## Configure Parameters
+
+The settings are stored in the `inputs/config.yaml` file.
+Its structure is as follows:
+
+```yaml
+downloads:
+  download_dir: <download_dir>
+  filetype: <filetype>
+  server: <server>
+  set-tags: <set-tags>
+  set-thumbnail: <set-thumbnail>
+```
+
+- download_dir: Directory where all the downloaded galleries are stored
+(both absolute and relative paths are acceptable)
+- filetype: The filetype of the downloaded galleries.
+Currently supports `folder` and `cbz`.
+- Server: The (self-hosted) server for viewing the downloaded galleries.
+Currently supports [`LANrargi`][lanraragi] and [`Kavita`][kavita].
+Only affective when `filetype` is set to `cbz`.
+- set-tags: Whether to set the gallery tags
+to the folder for the downloaded galleries.
+Can be `true` or `false`.
+Only affective when `filetype` is set to `folder`.
+- set-thumbnail: Whether to set the thumbnail
+to the folder for the downloaded galleries.
+Can be `true` or `false`.
+Only affective when `filetype` is set to `folder`.
+
 ## Updating
 
 ### Updating the Unix executable
@@ -122,7 +153,7 @@ favorites
 1. Replace the `nhentai-scraper` executable
 and the `_internal` folder with the new ones
 
-### Updating the Source code
+### Updating the Source Code
 
 1. Move into the `nhentai-scraper` directory by `cd nhentai-scraper`.
 1. Pull the newest commits by running `git pull`.
