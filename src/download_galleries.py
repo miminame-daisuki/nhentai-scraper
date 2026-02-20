@@ -233,8 +233,8 @@ def write_final_results(gallery_results: dict):
 
     else:
         print(
-            f"\n\nFinished all {len(gallery_results['finished'])} "
-            "gallery downloads!!!\n\n"
+            f"{bcolors.OKGREEN}\n\nFinished all {len(gallery_results['finished'])} "
+            f"gallery downloads!!!\n\n{bcolors.ENDC}"
         )
         print('\u2500'*misc.get_separation_line_width())
         logger.info(f"\n{'-'*80}")
