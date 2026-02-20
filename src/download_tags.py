@@ -195,22 +195,22 @@ def search_finished_downloads(
         download_dir = str(misc.set_download_dir(download_dir))
 
     find_tag_command = [
-        "tag",
-        "--find",
-        tag.replace("-", " "),
+        "mdfind",
+        f"_kMDItemUserTags == \"{tag}\"",
+        "-onlyin",
+        download_dir,
     ]
     result = run(find_tag_command, capture_output=True, check=True)
-
     matched_galleries = result.stdout.decode("utf-8")
 
     if not matched_galleries:
         find_tag_command = [
-            "tag",
-            "--find",
-            tag,
+            "mdfind",
+            f"_kMDItemUserTags == \"{tag.replace('-', ' ')}\""
+            "-onlyin",
+            download_dir,
         ]
         result = run(find_tag_command, capture_output=True, check=True)
-
         matched_galleries = result.stdout.decode("utf-8")
 
     # remove last one (blank stirng)
