@@ -5,14 +5,14 @@
 一個專為在macOS上容易使用而設計的[nHentai][nHentai.net]爬蟲／下載器。\
 有任何問題或建議歡迎在[這裡][issues]提出～
 
-[懶人包請按我](#tl-dr)
+[懶人包請按我](#懶人包)
 
 ## 功能
 
 - 下載[nHentai上自己的favorites][favorites]或是使用者給定之本本id/tag/搜尋列表...
 - 下載的本本可以儲存成資料夾（直接在macOS的Finder裡看）或是cbz壓縮檔（在伺服器上看）：
   - 以資料夾儲存後：
-    - 縮圖和標籤會自動被設定在包含每本本本的資料夾上
+    - 縮圖和標籤會自動被設定在每本本本的資料夾上
     - 圖片會另存成一個PDF檔以方便閱讀
   - 以cbz壓縮檔儲存後：
     - 可以在[LANraragi][lanraragi]或是[Kavita][kavita]等自架伺服器上閱讀
@@ -28,7 +28,7 @@
 1. 從[Releases][releases]下載最新的`.tgz`壓縮檔
 1. 解壓縮
 
-### 下載原始碼（會想這麼做的應該也看得懂英文，所以就不翻了（其實只是我懶））
+### 下載原始碼（會想這麼做的應該也看得懂英文，所以就不翻了（~~其實只是我懶~~））
 
 1. Clone the GitHub repository by running
 `git clone https://github.com/ecchi-na-no-wa-dame/nhentai-scraper.git`
@@ -136,7 +136,9 @@ so you may need to wait a bit if you have a large library)
 - 如果下載時即便某標籤內所有本本都有下載了卻仍然沒有跳過下載的話，
 試著[重建Spotlight索引][reindex-spotlight]
 
-## 懶人包（以下載[nHentai上自己的favorites][favorites]為例）{#tl-dr}
+## 懶人包
+
+以下載[nHentai上自己的favorites][favorites]為例：
 
 1. 從[Releases][releases]下載最新的`.tgz`檔後解壓縮
 1. 點兩下`nhentai-scraper`執行檔（會開啟macOS的終端機）

@@ -146,7 +146,9 @@ Ex: To search for '[artist] title', simply type 'title'.
 the download for a praticular tag,
 even though all galleries from the tag have already been downloaded.
 
-## TL;DR (Downloading [your favorites on nHentai][favorites] as an example){#tl-dr}
+## TL;DR
+
+Downloading [your favorites on nHentai][favorites] as an example:
 
 1. Download the newest `.tgz` file from [Releases][releases] and extract it
 1. Double click on the `nhentai-scraper` executable (macOS's Terminal will open)
