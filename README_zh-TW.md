@@ -41,38 +41,35 @@ in your terminal.
 ## 基本用法
 
 1. 依據你的安裝方法，執行程式的步驟為：
-    - 從[Releases][releases]下載`.tgz`壓縮檔的人：
-        - 如果你希望只在筆電螢幕掀開時執行，
-        請點兩下`nhentai-scraper`執行檔。
-        - 如果你希望在macbook闔上螢幕後繼續執行，
-        請點兩下`nhentai-scraper_no_sleep.command`執行檔。
+    - 下載Unix執行檔的人：
+        - 如果你希望只在電腦醒著時執行，請點兩下`nhentai-scraper`執行檔。
+        - 如果你希望在筆電闔上螢幕後繼續執行，請點兩下`nhentai-scraper_no_sleep.command`執行檔。
 
-    - For people downloading cloning the repository:
-        - If you want the program to run only when your computer is not sleeping,
-        run `caffeinate -is python src/main.py` in your terminal.
+    - For people cloning the repository:
+        - If you want the program to only run when your computer is awake,
+        run `python src/main.py`  in your terminal.
         - If you want the program to continue to run
         even when the lid of your macbook is closed,
-        run `python src/main.py`  in your terminal.
+        run `caffeinate -is python src/main.py` in your terminal.
 
 1. 第一次執行時會顯示預設設定。如果要改任何設定的話輸入'n'，反之輸入'y'。
-1. 匯出包含繞過CloudFlare和Anubis所需要之cookies和headers的`.har`檔後
-存在`inputs/`資料夾內。（Safari請參照[這些步驟](#繞過cloudflare和anubis保護)）
+1. 匯出包含繞過Cloudflare和Anubis所需要之cookies和headers的`.har`檔後存在`inputs/`資料夾內。（Safari請參照[這些步驟](#繞過cloudflare和anubis保護)）
+1. 回到終端機，按`Enter`。
 1. 依照下方其中一種方法輸入想下載的本本／標籤：
-    - 在`inputs/`資料夾裡依照[這個格式](#範例inputs檔)新增一個`download_list.txt`檔
-    - 輸入你想下載的本本id/標籤，用'; '來分隔
+    - 輸入`y`並按下`Enter`後，輸入你想下載的本本id/標籤，用'; '來分隔
+    - 輸入`n`並按下`Enter`後，在`inputs/`資料夾裡依照[這個格式](#範例inputs檔)新增一個`download_list.txt`檔。回到終端機後按`Enter`。
 1. 依照下方其中一種方法輸入**不想**下載的本本／標籤：
-    - 在`inputs/`資料夾裡依照[相同格式](#範例inputs檔)新增一個`blacklists.txt`檔
-    - 輸入你**不想**下載的本本id/標籤，用'; '來分隔
+    - 輸入`y`並按下`Enter`後，輸入你**不想**下載的本本id/標籤，用'; '來分隔
+    - 輸入`n`並按下`Enter`後，在`inputs/`資料夾裡依照[相同格式](#範例inputs檔)新增一個`blacklists.txt`檔。回到終端機後按`Enter`。
 1. 程式會自動產生一個`Downloaded/`資料夾來存放下載後的本本並開始下載
 1. 要結束運行的話，按`Ctrl-c`
 
-## 繞過CloudFlare和Anubis保護
+## 繞過Cloudflare和Anubis保護
 
 1. 使用Safari打開[nHentai][nHentai.net]
-1. 需要時通過CloudFlare CAPTCHA
+1. 需要時通過Cloudflare CAPTCHA
 1. 登入你的帳號
-1. 從Safari選單列中的「開發」選單點選「顯示網頁原始碼」
-（如果沒有看到「開發」選單的話請參照[這些步驟][Safari-Developer]）
+1. 從Safari選單列中的「開發」選單點選「顯示網頁原始碼」（如果沒有看到「開發」選單的話請參照[這些步驟][Safari-Developer]）
 1. 點選「網路」分頁後重新整理網頁
 1. 點選右上角的「匯出」後儲存到與`nhentai-scraper`執行檔同位置下的`inputs/`資料夾內
 （檔名維持預設之`nhentai.net.har`）
@@ -133,10 +130,8 @@ so you may need to wait a bit if you have a large library)
 
 - 如果一直出現'Error 403'的話，試著啟用／更改VPN
 - 如果有些本本一直沒在LANraragi裡出現的話，試著重啟Docker container
-- 如果要在Finder裡用標題搜尋下載後的本本的話，去掉括弧'[]'裡的部分
-例：要搜尋'[artist]title'的話，直接打'title'
-- 如果下載時即便某標籤內所有本本都有下載了卻仍然沒有跳過下載的話，
-試著[重建Spotlight索引][reindex-spotlight]
+- 如果要在Finder裡用標題搜尋下載後的本本的話，去掉括弧'[]'裡的部分（例：要搜尋'[artist]title'的話，直接打'title'）
+- 如果下載時即便某標籤內所有本本都有下載了卻仍然沒有跳過下載的話，試著[重建Spotlight索引][reindex-spotlight]
 
 ## 懶人包
 
@@ -145,7 +140,7 @@ so you may need to wait a bit if you have a large library)
 1. 從[Releases][releases]下載最新的`.tgz`檔後解壓縮
 1. 點兩下`nhentai-scraper`執行檔（會開啟macOS的終端機）
 1. 畫面會顯示預設設定，輸入`y`後按`Enter`
-1. 請參照[這些步驟](#繞過cloudflare和anubis保護)來繞過nHentai的CloudFlare和Anubis保護
+1. 請參照[這些步驟](#繞過cloudflare和anubis保護)來繞過nHentai的Cloudflare和Anubis保護
 1. 回到終端機後按`Enter`
 1. 輸入`y`後按`Enter`
 1. 輸入`favorites`後按`Enter`
@@ -162,8 +157,7 @@ so you may need to wait a bit if you have a large library)
 這其實有幾個原因（這些只是我個人粗淺的認知，如有錯誤歡迎指正）：
 
 - 有些本本在熊貓被版權砲後還有機會在n站找到
-- 對於iOS使用者來說，在不使用Sideloading或越獄等手段的前提下，
-n站的存取方便性和UI設計遠優於熊貓
+- 對於iOS使用者來說，在不使用Sideloading或越獄等手段的前提下，n站的存取方便性和UI設計遠優於熊貓
 - 對n站用的很久且累積了不少favorites的人來說，要遷移到熊貓可能不太容易
 
 [nHentai.net]: https://nhentai.net

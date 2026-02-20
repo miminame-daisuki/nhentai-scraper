@@ -46,36 +46,48 @@ in your terminal.
 ## Basic Usage
 
 1. Depending on your installation, execute the program either by:
-    - If you want the program to only run when your computer is awake:
-        - Double click the `nhentai-scraper` executable.
-        - Run `python src/main.py`  in your terminal.
-    - If you want the program to continue to run even with the lid closed:
-        - Double click the `nhentai-scraper.command` file.
-        - Run `caffeinate -is python src/main.py` in your terminal.
+    - For people downloading the Unix executable file:
+        - If you want the program to only run when your computer is awake,
+        double click the `nhentai-scraper` executable.
+        - If you want the program to continue to run
+        even when the lid of your macbook is closed,
+        double click the `nhentai-scraper.command` file.
+    - For people cloning the repository:
+        - If you want the program to only run when your computer is awake,
+        run `python src/main.py`  in your terminal.
+        - If you want the program to continue to run
+        even when the lid of your macbook is closed,
+        run `caffeinate -is python src/main.py` in your terminal.
 1. For the first run, the program will print out the default settings.
 Enter 'n' if you want to change any of the settings. Otherwise, enter 'y'.
-1. Export your cookies and headers for bypassing CloudFlare and Anubis
+1. Export your cookies and headers for bypassing Cloudflare and Anubis
 in an `.har` file and save it to the `inputs/` folder.
 (Follow [these steps](#bypassing-cloudflare-and-anubis-protections)
 for Safari.)
 1. Specify the galleries you wish to download either by:
-    - Creating a `download_list.txt` file in [this format](#example-inputs-file)
-    and place it in the `inputs/`folder.
-    - Enter the gallery ids/tags that you want to download,
+    - Enter `y` then press `Enter`,
+    then enter the gallery ids/tags that you want to download,
     separated by '; '.
+    - Enter `n` then press `Enter`,
+    then create a `download_list.txt` file in [this format](#example-inputs-file)
+    and place it in the `inputs/`folder.
+    Go back to the Terminal app, press `Enter`.
 1. Specify the galleries/tags you wish to **NOT** download either by:
-    - Creating a `blacklists.txt` file in [the same format](#example-inputs-file)
-    and place it in the `inputs/`folder.
-    - Enter the gallery ids/tags that you **DO NOT** want to download,
+    - Enter `y` then press `Enter`,
+    then enter the gallery ids/tags that you **DO NOT** want to download,
     separated by '; '.
+    - Enter `n` then press `Enter`,
+    then create a `blacklists.txt` file in [the same format](#example-inputs-file)
+    and place it in the `inputs/`folder.
+    Go back to the Terminal app, press `Enter`.
 1. The program will automatically create a `Downloaded/` folder
 for the downloaded galleries and begin download.
 1. To terminate the program, simply press `Ctrl-c`.
 
-## Bypassing CloudFlare and Anubis Protections
+## Bypassing Cloudflare and Anubis Protections
 
 1. Open [nHentai][nhentai.net] in Safari.
-1. Clear the CloudFlare CAPTCHA if necessary.
+1. Clear the Cloudflare CAPTCHA if necessary.
 1. Login to your account.
 1. Select "Show Page Source" from the "Develop" menu in Safari's menu bar.
 (Follow [these steps][Safari-Developer] if you don't see the "Develop" menu.)
@@ -145,7 +157,7 @@ try restarting the Docker container.
 - To search for downloaded galleries by title in Finder,
 don't include the parts in the paranthesis '[]'.
 Ex: To search for '[artist] title', simply type 'title'.
-- Try [reindex spotlight][reindex-spotlight] if it is not skipping
+- Try to [reindex spotlight][reindex-spotlight] if it is not skipping
 the download for a praticular tag,
 even though all galleries from the tag have already been downloaded.
 
@@ -157,7 +169,7 @@ To download [your favorites on nHentai][favorites]:
 1. Double click on the `nhentai-scraper` executable (macOS's Terminal will open)
 1. The default settings will be printed on screen, press `y` then `Enter`
 1. Follow [these steps](#bypassing-cloudflare-and-anubis-protections)
-to bypass CloudFlare and Anubis protections on nHentai
+to bypass Cloudflare and Anubis protections on nHentai
 1. Go back to the Terminal application, then press `Enter`
 1. Press `y` then `Enter`
 1. Enter `favorites` then press `Enter`
