@@ -1,3 +1,4 @@
+import multiprocessing
 import os
 import logging
 import signal
@@ -14,6 +15,11 @@ logger = logging.getLogger(__name__)
 
 
 def main():
+
+    # Divert the program flow in worker sub-process as soon as possible,
+    # before importing heavy-weight modules.
+    # https://pyinstaller.org/en/v6.6.0/common-issues-and-pitfalls.html
+    multiprocessing.freeze_support()
 
     misc.set_logging_config()
     logger.info(f"\n{'-'*80}")
